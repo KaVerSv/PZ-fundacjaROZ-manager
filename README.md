@@ -1,2 +1,0 @@
-# PZ-fundacjaROZ-manager
- 
