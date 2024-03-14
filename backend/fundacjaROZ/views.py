@@ -1,6 +1,9 @@
 # django-react-docker/backend/backend/views.py
+import json
+from django.http import JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from django.views.decorators.csrf import csrf_exempt
 from .models import Children
 
 @api_view(['GET'])
