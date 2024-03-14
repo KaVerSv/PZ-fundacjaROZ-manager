@@ -5,7 +5,7 @@ services:
   db:
     image: postgres:14-alpine
     ports:
-      - '5432:5432'
+      - '5431:5432'
 
     environment:
       - POSTGRES_PASSWORD=postgres
@@ -16,9 +16,7 @@ services:
       - ./data/db:/var/lib/postgresql/data/
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: zakharsytoi/roz_frontend:latest
 
     ports:
       - '8080:8080'
