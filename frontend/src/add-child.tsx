@@ -38,28 +38,31 @@ const AddChildForm: React.FC = () => {
     }));
   };
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Tutaj możesz wykonać żądanie HTTP do serwera Django, aby dodać dane
-    console.log('Form submitted:', formData);
-  };
+    try {
+        const response = await fetch('http://localhost:8000/fundacjaROZ/add-child/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+        });
+
+        if (response.ok) {
+            const responseData = await response.json();
+            console.log('Dane wysłane:', responseData);
+            console.log('Sukces');
+        } else {
+            throw new Error('Błąd podczas wysyłania danych');
+        }
+    } catch (error) {
+        console.error('Błąd podczas wysyłania danych:', error);
+        console.log('Coś sie zjebało')
+    }
+};
 
   return (
-    <body>
-        <header>
-            <div id="head">
-                <div id="logo">
-                    <img src="../public/logo.png" alt="Logo should be here" />
-                </div>
-                <div id="noti">
-                    <span id="logged_user">Jadwiga Paździerz</span>
-                    <img src="..//public/noti.png" alt="Ikona powiadomień" />
-                </div>
-            </div>
-            <div id="stripe">
-              a
-            </div>
-        </header>
         <main>
             <form onSubmit={handleSubmit}>
                 <div id="left">
@@ -85,7 +88,7 @@ const AddChildForm: React.FC = () => {
   
                   <div className="form-row">
                     <label htmlFor="birthDate">Data urodzenia</label>
-                    <input type="text" name="birthDate" value={formData.birthDate} onChange={handleChange} />
+                    <input type="date" name="birthDate" value={formData.birthDate} onChange={handleChange} />
                   </div>
   
                   <div className="form-row">
@@ -110,7 +113,7 @@ const AddChildForm: React.FC = () => {
   
                   <div className="form-row">
                     <label htmlFor="admissionDate">Data przyjęcia</label>
-                    <input type="text" name="admissionDate" value={formData.admissionDate} onChange={handleChange} />
+                    <input type="date" name="admissionDate" value={formData.admissionDate} onChange={handleChange} />
                   </div>
 
                   <div className="form-row">
@@ -120,11 +123,9 @@ const AddChildForm: React.FC = () => {
                   <div className="form-row">
                     <button type="submit">Zapisz zmiany</button>
                   </div>
-
                 </div>
             </form>
         </main>
-    </body>
   );
 };
 
