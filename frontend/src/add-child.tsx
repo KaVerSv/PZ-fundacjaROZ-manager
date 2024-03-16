@@ -23,7 +23,7 @@ const AddChildForm: React.FC = () => {
     surname: '',
     birthDate: '',
     birthplace: '',
-    residentialAddress: 'aaaaaaa',
+    residentialAddress: 'aaaa',
     registeredAddress: 'sss',
     admissionDate: '',
     leavingDate: '',
