@@ -1,15 +1,16 @@
-import React from 'react';
-import Wrapper from "../components/Wrapper.tsx";
+
 import Header from "../components/Header/Header.tsx";
+import Top from "../components/Header/Top.tsx";
+import HeightWrapper from "../components/wrappers/HeightWrapper.tsx";
 
 const Home = () => {
     return (
-        <Wrapper>
-            <Header></Header>
-            <div className=''>
-                Home Page
-            </div>
-        </Wrapper>
+        <HeightWrapper>
+            <Top>
+                <Header/>
+            </Top>
+        </HeightWrapper>
+
 
     );
 };

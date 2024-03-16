@@ -1,9 +1,9 @@
-import React from 'react';
+
 
 function NavItem() {
     return (
         <div>
-            NavItem
+            <span className='text-main_white font-roboto text-sm lg:text-lg'>NavItem</span>
         </div>
     );
 }

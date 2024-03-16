@@ -1,18 +1,23 @@
-import React from 'react';
 import Logo from "./Logo.tsx";
 import ProfileBlock from "./ProfileBlock.tsx";
 import NavBar from "./NavBar/NavBar.tsx";
+import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 
 
-function Header () {
-    return (
-        <header>
-            <div className='flex justify-between'>
-                <Logo />
-                <ProfileBlock />
-            </div>
-            <NavBar />
-        </header>
+function Header() {
+    return (<>
+            <header className='bg-main_white bg-opacity-80'>
+                <WidthWrapper>
+                    <div className='flex justify-between'>
+                        <Logo/>
+                        <ProfileBlock/>
+                    </div>
+
+                </WidthWrapper>
+            </header>
+            <NavBar/>
+        </>
+
     );
 };
 

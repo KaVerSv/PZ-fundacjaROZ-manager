@@ -8,12 +8,13 @@ module.exports = {
         colors: {
             'main_red': '#77142B',
             'main_grey': '#666666',
-            'bg_white': '#FFFFFF',
+            'main_white': '#FFFFFF',
             'main_black': '#000000'
         },
         extend: {
             fontFamily: {
                 oswald: ['Oswald', 'sans-serif'],
+                roboto: ['Roboto Condensed', 'sans-serif']
             },
         },
     },
