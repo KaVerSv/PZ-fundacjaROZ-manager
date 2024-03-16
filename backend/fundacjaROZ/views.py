@@ -43,6 +43,7 @@ def children(request):
 
 class AddChildAPIView(APIView):
     def post(self, request):
+        print(request.data)
         serializer = ChildrenSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()

@@ -7,7 +7,7 @@ import './add-child.css'
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    {/* <AddChildForm/> */}
-    <ChildrenComponent/>
+    <AddChildForm/>
+    {/* <ChildrenComponent/> */}
   </React.StrictMode>,
 )
