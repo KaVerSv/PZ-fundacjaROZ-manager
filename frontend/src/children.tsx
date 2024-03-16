@@ -29,8 +29,8 @@ const ChildrenComponent: React.FC = () => {
             <div className="children-container"> {/* Dodaj klasę "children-container" */}
                 {children.map((child: any) => (
                     <div className="child">
-                       
-                        <p>{child.pesel}{child.second_name} {child.surname}</p>
+                        <img src={`../public/${child.photo_path}`} alt='profilowe'/>
+                        <span>{child.first_name} {child.second_name} {child.surname}</span>
                     </div>
                 ))}
             </div>

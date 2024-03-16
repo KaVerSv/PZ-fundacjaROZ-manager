@@ -54,8 +54,15 @@ header > div > #noti > span {
     font-weight: 400;
 }
 
-main {
+.stripe-1{
+    background-color: #77142B;
+    color: white;
+    font-size: 16px;
+    padding: 10px 0;
+    font-weight: 400;
+}
 
+main {
     background-color: #77142B;
     display: flex;
     justify-content: space-between;
@@ -148,12 +155,28 @@ button{
     background-color: green;
 }
 .children-container {
+    margin: 30px 100px 10px 100px;
     display: flex;
     overflow-x: auto;
 }
 
 .child {
-    max-width: 25%;
+    width: 25%;
+    margin: 0 20px 0px 20px;
+    padding: 10px;
     background-color: #77142B;
     margin-right: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.child > img{
+    width: 60px;
+    border-radius: 30px;
+    margin-right: 20px;
+}
+
+.child > span{
+    color: white;
 }
