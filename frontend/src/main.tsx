@@ -1,12 +1,13 @@
 import React from 'react'
 import ReactDOM from 'react-dom/client'
-import App from './App.tsx'
 import AddChildForm from './add-child.tsx'
-//import './index.css'
+import ChildrenComponent from './children.tsx'
 import './add-child.css'
+
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <AddChildForm/>
+    {/* <AddChildForm/> */}
+    <ChildrenComponent/>
   </React.StrictMode>,
 )

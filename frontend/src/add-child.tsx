@@ -23,8 +23,8 @@ const AddChildForm: React.FC = () => {
     surname: '',
     birthDate: '',
     birthplace: '',
-    residentialAddress: '',
-    registeredAddress: '',
+    residentialAddress: 'aaaaaaa',
+    registeredAddress: 'sss',
     admissionDate: '',
     leavingDate: '',
     photoPath: ''
@@ -41,7 +41,7 @@ const AddChildForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-        const response = await fetch('http://localhost:8000/fundacjaROZ/add-child/', {
+        const response = await fetch('http://localhost:8000/api/children/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'

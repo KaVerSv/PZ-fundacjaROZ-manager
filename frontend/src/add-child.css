@@ -147,3 +147,13 @@ button{
 #right > .form-row:nth-child(11) > button {
     background-color: green;
 }
+.children-container {
+    display: flex;
+    overflow-x: auto;
+}
+
+.child {
+    max-width: 25%;
+    background-color: #77142B;
+    margin-right: 10px;
+}
