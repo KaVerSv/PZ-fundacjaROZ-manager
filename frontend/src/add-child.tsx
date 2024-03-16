@@ -14,19 +14,7 @@ interface FormData {
   leaving_date: string;
   photo_path: string;
 }
-const sampleData = {
-  "pesel": "00311502873",
-  "first_name": "k",
-  "second_name": "k",
-  "surname": "k",
-  "birth_date": "2000-11-15",
-  "birthplace": "k",
-  "residential_address": "k",
-  "registered_address": "k",
-  "admission_date": "2024-03-16",
-  "leaving_date": "2024-03-28",
-  "photo_path": "k"
-};
+
 
 const AddChildForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
