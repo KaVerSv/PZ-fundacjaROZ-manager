@@ -19,7 +19,6 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
     path('children/', views.children),
     path('add-child/', views.add_child),
     path('edit-child/', views.edit_child),

@@ -1,0 +1,149 @@
+::-webkit-scrollbar{
+    display: none;
+}
+
+body{
+    margin: 0;
+}
+
+header{
+    height: 400px;
+    background-image: url('./header.jpg');
+    background-size: cover;
+    background-position-y: 25%;
+    background-repeat: no-repeat;
+}
+
+header > div{
+    background:  rgba(255,255,255,0.8);
+    text-align: center;
+    padding: 0;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center;
+}
+
+header > div > #logo > img {
+    margin: 5px 0px 5px 80px;
+    width: 100%; 
+    max-width: 370px; 
+}
+
+header > div > #noti > img {
+    width: 60px; 
+    margin-right: 12px; 
+}
+
+header > div > div {
+    display: flex;
+    align-items: center; 
+}
+
+header > div > #noti > span {
+    color: black;
+    font-weight: bold;
+    font-size: 26px; 
+    padding: 0 40px;
+}
+
+#stripe{
+    background-color: #77142B;
+    color: #77142B;
+    font-size: 16px;
+    padding: 10px 0;
+    font-weight: 400;
+}
+
+main {
+
+    background-color: #77142B;
+    display: flex;
+    justify-content: space-between;
+    margin: 30px 100px 10px 100px;
+    padding: 40px 0;
+}
+
+form {
+    display: flex;
+    width: 100%;
+}
+
+#left {
+    width: 30%;
+    text-align: center;
+    float: left; 
+}
+
+img {
+    width: 80%;
+    margin-bottom: 15px;
+}
+
+input[type="file"]::-webkit-file-upload-button{
+    width: calc(80% - 12px);
+    padding: 10px;
+    margin-bottom: 15px;
+    background-color: blue;
+    color: white;
+    box-sizing: border-box;
+    border: none;
+    cursor: pointer;
+    font-weight: bold;
+}
+
+#right {
+    width: 70%;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    float: left;
+  }
+  
+.form-row {
+    width: 25%;
+    padding: 0 20px;
+    margin: 0 30px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    box-sizing: border-box;
+}
+
+#right > .form-row:nth-child(7) {
+    width: 100%;
+}
+
+#right > .form-row:nth-child(8) {
+    width: 100%;
+}
+
+.form-row input{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+  
+.form-row label {
+    font-size: 16px;
+    color: white;
+    margin-bottom: 5px;
+}
+
+.form-row button{
+    width: 100%;
+    margin-top: 24px;
+    padding: 10px;
+    margin-bottom: 10px;
+}
+
+button{
+    color: white;
+}
+
+#right > .form-row:nth-child(10) > button {
+    background-color: red;
+}
+
+#right > .form-row:nth-child(11) > button {
+    background-color: green;
+}
