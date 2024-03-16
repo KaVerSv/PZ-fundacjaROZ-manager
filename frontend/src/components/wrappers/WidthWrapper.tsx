@@ -5,7 +5,7 @@ type props = {
 }
 const WidthWrapper = ({children} : props) => {
     return (
-        <div className='container mx-auto p-2'>
+        <div className='container mx-auto ps-2'>
             {children}
         </div>
     );

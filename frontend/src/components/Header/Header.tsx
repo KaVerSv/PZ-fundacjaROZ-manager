@@ -6,7 +6,7 @@ import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 
 function Header() {
     return (<>
-            <header className='bg-main_white bg-opacity-80'>
+            <header className='bg-main_white bg-opacity-80 py-2'>
                 <WidthWrapper>
                     <div className='flex justify-between'>
                         <Logo/>
@@ -19,6 +19,6 @@ function Header() {
         </>
 
     );
-};
+}
 
 export default Header;
