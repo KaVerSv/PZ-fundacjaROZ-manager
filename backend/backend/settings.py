@@ -31,7 +31,7 @@ ALLOWED_HOSTS = []
 # Application definition
 
 INSTALLED_APPS = [
-    'fundacjaROZ.apps.FundacjarozConfig',
+    # 'fundacjaROZ.apps.FundacjarozConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,7 +40,11 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'fundacjaROZ',
 ]
+
+CORS_ALLOWED_ORIGINS=['http://localhost:8080']
+
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
@@ -53,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-CORS_ALLOW_ALL_ORIGINS=True
+# ['http://localhost:8080']
 
 ROOT_URLCONF = 'backend.urls'
 

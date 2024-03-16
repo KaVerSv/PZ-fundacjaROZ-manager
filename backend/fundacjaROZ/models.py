@@ -37,7 +37,7 @@ def validate_admission_date(admission_date):
         raise ValidationError("Wrong admission date!!!")
     
 class Children(models.Model):
-    pesel = models.CharField(primary_key=True, unique=True, max_length=11, validators=[validate_pesel])
+    pesel = models.CharField(primary_key=True, unique=True, max_length=11)#, validators=[validate_pesel]
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50)
     surname = models.CharField(max_length=100)
@@ -46,7 +46,7 @@ class Children(models.Model):
     residential_address = models.CharField(max_length=200)
     registered_address = models.CharField(max_length=200)
     admission_date = models.DateField(validators=[validate_admission_date])
-    leaving_date = models.DateField(blank=True, null=True, validators=[validate_leaving_date])
+    leaving_date = models.DateField(blank=True, null=True)#, validators=[validate_leaving_date]
     photo_path = models.CharField(max_length = 100)
     #regon_of_the_institution = models.CharField(max_length = 14)
 
