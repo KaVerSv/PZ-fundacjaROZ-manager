@@ -8,7 +8,7 @@ import ArchiveBlockHeader from "../components/ChildrenBlock/childBlockHeaders/Ar
 const Home = () => {
     return (
         <HeightWrapper>
-            <Top>
+            <Top headerHeight={500}>
                 <Header/>
             </Top>
             <ChildrenBlock header={<CurrentBlockHeader/>}/>
