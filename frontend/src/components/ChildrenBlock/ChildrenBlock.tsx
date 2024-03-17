@@ -1,7 +1,7 @@
 import ChildCardMinimized from "./ChildCardMinimized.tsx";
-import WidthWrapper from "../../wrappers/WidthWrapper.tsx";
+import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import React from "react";
-import CurrentBlockHeader from "../CurrentChildren/CurrentBlockHeader.tsx";
+import CurrentBlockHeader from "./childBlockHeaders/CurrentBlockHeader.tsx";
 
 interface ChildBlockProps {
     header: React.ReactNode
