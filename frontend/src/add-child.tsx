@@ -19,16 +19,16 @@ interface FormData {
 const AddChildForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     pesel: '',
-    first_name: 'aaa',
-    second_name: 'aaa',
-    surname: 'aaa',
-    birth_date: '2024-03-06',
+    first_name: '',
+    second_name: '',
+    surname: '',
+    birth_date: '',
     birthplace: '',
-    residential_address: 'aaaa',
-    registered_address: 'sss',
-    admission_date: '2024-03-06',
-    leaving_date: '2024-03-06',
-    photo_path: 'nie_puste'
+    residential_address: '',
+    registered_address: '',
+    admission_date: '',
+    leaving_date: '',
+    photo_path: ''
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {

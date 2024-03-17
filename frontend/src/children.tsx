@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
 
 const ChildrenComponent: React.FC = () => {
-    const [children, setChildren] = useState([]);
+    const [currentChildren, setCurrentChildren] = useState([]);
+    const [archivalChildren, setArchivalChildren] = useState([]);
 
     useEffect(() => {
         const fetchData = async () => {
@@ -9,7 +10,8 @@ const ChildrenComponent: React.FC = () => {
                 const response = await fetch('http://localhost:8000/fundacjaROZ/children/');
                 if (response.ok) {
                     const data = await response.json();
-                    setChildren(data);
+                    setCurrentChildren(data.current_children);
+                    setArchivalChildren(data.archival_children);
                 } else {
                     throw new Error('Błąd podczas pobierania danych');
                 }
@@ -26,11 +28,24 @@ const ChildrenComponent: React.FC = () => {
             <div className="stripe-1">
                 Obecni wychowankowie
             </div>
-            <div className="children-container"> {/* Dodaj klasę "children-container" */}
-                {children.map((child: any) => (
-                    <div className="child">
-                       
-                        <p>{child.pesel}{child.second_name} {child.surname}</p>
+            <div className="children-container">
+                {currentChildren.map((child: any) => (
+                    <a href={`./child.tsx?pesel=${child.pesel}`}>
+                        <div className="child-1">
+                            <img src={'./public/profilowe.png'}/>
+                            <p>{child.first_name} {child.second_name} {child.surname}</p>
+                        </div>
+                    </a>
+                ))}
+            </div>
+            <div className="stripe-2">
+                Archiwalni wychowankowie
+            </div>
+            <div className="children-container">
+                {archivalChildren.map((child: any) => (
+                    <div className="child-2">
+                       <img src={'./public/profilowe.png'}/>
+                        <p>{child.first_name} {child.second_name} {child.surname}</p>
                     </div>
                 ))}
             </div>

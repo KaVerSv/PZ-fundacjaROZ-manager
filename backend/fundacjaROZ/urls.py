@@ -20,9 +20,7 @@ from . import views
 
 urlpatterns = [
     path('children/', views.children),
-    # path('add-child-form/', views.add_child_form),
-    path('add-child/', views.add_child),
     path('edit-child/', views.edit_child),
     path('child/', views.child),
-    path('api/add_child/', views.AddChildAPIView.as_view(), name='add_child_api'),
+    path('api/add_child/', views.AddChildAPIView.as_view()),
 ]

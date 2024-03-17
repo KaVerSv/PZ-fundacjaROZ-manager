@@ -11,22 +11,16 @@ from .api.serializers import ChildrenSerializer
 
 @api_view(['GET'])
 def child(request):
-    return Response({
-        "data": "Child"
-    })
-    # wyślij dane z from .models import Children, Notes, Relatives, Documents do reacta
-
-@api_view(['GET'])
-def children(request):
-    return Response({
-        "data": "Children list from fundaction"
-    })
-
-@api_view(['GET'])
-def add_child(request):
-    return Response({
-        "data": "Child add"
-    })
+    pesel = request.GET.get('pesel')
+    if pesel:
+        try:
+            child = Children.objects.get(pesel=pesel)
+            serializer = ChildrenSerializer(child)
+            return Response(serializer.data)
+        except Children.DoesNotExist:
+            return Response({'error': 'Dziecko o podanym peselu nie zostało znalezione'}, status=404)
+    else:
+        return Response({'error': 'Brak parametru pesel'}, status=400)
 
 @api_view(['GET'])
 def edit_child(request):
@@ -36,9 +30,16 @@ def edit_child(request):
 
 @api_view(['GET'])
 def children(request):
-    children = Children.objects.all()
-    data = list(children.values())
-    return Response(data)
+    archival_children = Children.objects.exclude(leaving_date__isnull=True)
+    current_children = Children.objects.filter(leaving_date__isnull=True)
+    
+    current_children = list(current_children.values())
+    archival_children = list(archival_children.values())
+    
+    return Response({
+        'current_children': current_children,
+        'archival_children': archival_children
+    })
 
 
 class AddChildAPIView(APIView):

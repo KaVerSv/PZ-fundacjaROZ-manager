@@ -122,6 +122,13 @@ input[type="file"]::-webkit-file-upload-button{
     padding: 10px;
     margin-bottom: 10px;
 }
+
+.form-row span{
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 10px;
+    background-color: white;
+}
   
 .form-row label {
     font-size: 16px;
@@ -152,8 +159,50 @@ button{
     overflow-x: auto;
 }
 
-.child {
-    max-width: 25%;
+.child-1 {
+    width: 25%;
     background-color: #77142B;
     margin-right: 10px;
+    padding: 20px;
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.child-2 {
+    width: 25%;
+    background-color: #4a4a4a;
+    margin-right: 10px;
+    padding: 20px;
+    margin: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+
+.child-1 > img,.child-2 > img{
+    width: 60px;
+    border-radius: 30px;
+    margin: 10px;
+}
+
+.child-1 > p, .child-2 > p{
+    text-align: center;
+}
+
+.stripe-1{
+    background-color: #77142B;
+    color: white;
+    font-size: 16px;
+    padding: 10px 0;
+    font-weight: 400;
+}
+
+.stripe-2{
+    background-color: rgb(79, 79, 79);
+    color: white;
+    font-size: 16px;
+    padding: 10px 0;
+    font-weight: 400;
 }
