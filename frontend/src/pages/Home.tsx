@@ -1,7 +1,9 @@
 import Header from "../components/Header/Header.tsx";
 import Top from "../components/Header/Top.tsx";
 import HeightWrapper from "../components/wrappers/HeightWrapper.tsx";
-import CurrentChildrenBlock from "../components/ChildrenBlock/CurrentChildren/CurrentChildrenBlock.tsx";
+import ChildrenBlock from "../components/ChildrenBlock/Common/ChildrenBlock.tsx";
+import CurrentBlockHeader from "../components/ChildrenBlock/CurrentChildren/CurrentBlockHeader.tsx";
+import ArchiveBlockHeader from "../components/ChildrenBlock/ArchiveChildren/ArchiveBlockHeader.tsx";
 
 const Home = () => {
     return (
@@ -9,7 +11,8 @@ const Home = () => {
             <Top>
                 <Header/>
             </Top>
-            <CurrentChildrenBlock/>
+            <ChildrenBlock header={<CurrentBlockHeader/>}/>
+            <ChildrenBlock header={<ArchiveBlockHeader/>}/>
         </HeightWrapper>
 
 
