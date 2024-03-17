@@ -1,8 +1,8 @@
 import WidthWrapper from "../../wrappers/WidthWrapper.tsx";
 
-function BlockHeader() {
+function CurrentBlockHeader() {
     return (
-        <div className='flex bg-main_red'>
+        <div className='flex bg-main_red mt-2'>
             <WidthWrapper>
                 <div className='flex items-center justify-between'>
                     <span className='text-main_white'>Obecni wychowankowie</span>
@@ -16,4 +16,4 @@ function BlockHeader() {
     );
 }
 
-export default BlockHeader;
+export default CurrentBlockHeader;
