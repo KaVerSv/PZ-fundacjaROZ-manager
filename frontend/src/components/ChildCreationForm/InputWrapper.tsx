@@ -1,5 +1,6 @@
-import React, {FormEventHandler, useState} from 'react';
+import React, {useState} from 'react';
 import LabelForInput from "./LabelForInput.tsx";
+import {FieldError} from "react-hook-form";
 
 type props = {
     children: React.ReactNode;
@@ -7,10 +8,12 @@ type props = {
     labelNote: string;
     shift?: number[];
     alwaysShowLabel?: boolean;
+    error?: FieldError;
 }
-const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel}: props) => {
+const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel, error}: props) => {
     const [inputValue, setInputValue] = useState('');
 
+    // @ts-ignore
     const handleChange = (event) => {
         setInputValue(event.target.value.trim()); // Update input value state
     };
@@ -18,6 +21,10 @@ const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel}: p
         <div className={`flex flex-col mx-5 my-3 relative mb-3 mt-6`} onChange={handleChange}>
             <LabelForInput labelFor={labelFor} labelNote={labelNote} isDirty={alwaysShowLabel || !!inputValue} shift={!!shift? shift : [0,0]}/>
             {children}
+            {error && <div
+                className={`text-red-600 absolute bottom-11 self-end`}>
+                <span>{error.message}</span>
+            </div>}
         </div>
     );
 };
