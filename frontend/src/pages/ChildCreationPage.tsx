@@ -11,6 +11,7 @@ function ChildCreationPage() {
                 <Header/>
             </Top>
             <ChildCreationForm/>
+            <div className='mt-96'></div>
         </HeightWrapper>
     );
 }
