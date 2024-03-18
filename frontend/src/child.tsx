@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 
 const ChildComponent: React.FC = () => {
     const [childData, setChildData] = useState<any>({});
+    const [relativesData, setRelativesData] = useState<any[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
 
     useEffect(() => {
@@ -13,7 +14,8 @@ const ChildComponent: React.FC = () => {
                 const response = await fetch(`http://localhost:8000/fundacjaROZ/child/?pesel=${pesel}`);
                 if (response.ok) {
                     const data = await response.json();
-                    setChildData(data);
+                    setChildData(data.child);
+                    setRelativesData(data.child_relatives);
                     setLoading(false);
                 } else {
                     throw new Error('Błąd podczas pobierania danych');
@@ -34,6 +36,7 @@ const ChildComponent: React.FC = () => {
     }
 
     return (
+      <div>
         <main>
             <div id="left">
                 <img src="../public/profilowe.png" alt="profilowe"/>
@@ -86,6 +89,52 @@ const ChildComponent: React.FC = () => {
                   </div>
             </div>
         </main>
+        <div className="stripe-1">
+                Osoby powiązane
+          </div>
+        <div>
+        <div className="relatives">
+            {relativesData.map((relative: any) => (
+                <div className="relative">
+                    <div className="form-row">
+                    <label>Imię</label>
+                    <span>{relative.first_name} </span>
+                  </div>
+  
+                  <div className="form-row">
+                    <label>Drugie imię</label>
+                    <span>{relative.second_name} </span>
+                  </div>
+  
+                  <div className="form-row">
+                    <label>Nazwisko</label>
+                    <span>{relative.surname} </span>
+                  </div>
+
+                  <div className="form-row">
+                    <label>Rodzaj powiązania</label>
+                    <span>{relative.association_type} </span>
+                  </div>
+  
+                  <div className="form-row">
+                    <label>Adres zamieszkania</label>
+                    <span>{relative.residential_address} </span>
+                  </div>
+  
+                  <div className="form-row">
+                    <label>Numer telefonu</label>
+                    <span>{relative.phone_number} </span>
+                  </div>
+  
+                  <div className="form-row">
+                    <label>E-mail</label>
+                    <span>{relative.e_mail} </span>
+                  </div>
+                </div>
+            ))}
+        </div>
+      </div>
+    </div>
     );
 };
 

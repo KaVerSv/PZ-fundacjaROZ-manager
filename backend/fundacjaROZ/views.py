@@ -1,13 +1,13 @@
 # django-react-docker/backend/backend/views.py
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Children
+from .models import Children, Relatives
 
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from .api.serializers import ChildrenSerializer
+from .api.serializers import ChildrenSerializer, RelativesSerializer
 
 @api_view(['GET'])
 def child(request):
@@ -16,7 +16,12 @@ def child(request):
         try:
             child = Children.objects.get(pesel=pesel)
             serializer = ChildrenSerializer(child)
-            return Response(serializer.data)
+            child_relatives = Relatives.objects.filter(child_pesel=pesel)
+            relatives_data = list(child_relatives.values())
+            return Response({
+                'child': serializer.data,
+                'child_relatives': relatives_data
+            })
         except Children.DoesNotExist:
             return Response({'error': 'Dziecko o podanym peselu nie zostało znalezione'}, status=404)
     else:
@@ -46,6 +51,15 @@ class AddChildAPIView(APIView):
     def post(self, request):
         print(request.data)
         serializer = ChildrenSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class AddRelativeAPIView(APIView):
+    def post(self, request):
+        print(request.data)
+        serializer = RelativesSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
