@@ -41,16 +41,18 @@ function ChildCreationForm() {
             <WidthWrapper>
                 <form className='flex flex-col items-center border-main_red border-4 p-2 rounded-2xl'
                       onSubmit={handleSubmit(onSubmit)}>
-                    <div className='flex flex-col lg:flex-row'>
-                        <div className='flex items-center'>
+                    <div className='flex flex-col lg:flex-row items-center'>
+                        <div className='flex flex-col px-2 items-center'>
+                            <div>
+                                <img className='px-1  max-w-56 sm:max-w-72' src='src/components/ChildCreationForm/profilowe.png' alt='profileImg'/>
+                            </div>
                             <input
-                                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-
+                                className="appearance-none block w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 type="file"
                                 accept="image/*" // Allow only image files
                             />
                         </div>
-                        <div className='flex flex-col'>
+                        <div className='flex flex-col sm:w-[90%] md:w-auto'>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
                                 <FormInput name={'firstName'} type={'text'} label={'Imie'} register={register}
                                            rules={{required: 'Pole Obowiązkowe'}} error={errors.firstName}/>
