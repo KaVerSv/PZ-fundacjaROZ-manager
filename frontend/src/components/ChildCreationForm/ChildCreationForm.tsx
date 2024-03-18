@@ -2,6 +2,7 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import InputWrapper from "./InputWrapper.tsx";
 import FormInput from "./FormInput.tsx";
+import {useState} from "react";
 
 interface FormData {
     pesel: string;
@@ -15,6 +16,7 @@ interface FormData {
     admissionDate: string;
     leavingDate: string;
     photoPath: string;
+    image: File
     gender: GenderEnum;
 }
 
@@ -30,12 +32,24 @@ function ChildCreationForm() {
         mode: 'onChange'
 
     })
+    const [preview, setPreview] = useState();
     const onSubmit: SubmitHandler<FormData> = (data) => {
         console.log(data)
     };
     const validateGender = (value: GenderEnum) => {
         return value === GenderEnum.notDefined ? 'Pole Obowiązkowe' : true;
     };
+
+    const handleUploadedFile = (event) => {
+        const file = event.target.files[0];
+
+
+        const urlImage = URL.createObjectURL(file);
+
+
+        setPreview(urlImage);
+    };
+
     return (
         <div className='mt-3'>
             <WidthWrapper>
@@ -43,13 +57,18 @@ function ChildCreationForm() {
                       onSubmit={handleSubmit(onSubmit)}>
                     <div className='flex flex-col lg:flex-row items-center'>
                         <div className='flex flex-col px-2 items-center'>
+
                             <div>
-                                <img className='px-1  max-w-56 sm:max-w-72' src='src/components/ChildCreationForm/profilowe.png' alt='profileImg'/>
+                                {!preview && <img className='px-1  pb-2 w-56 sm:w-72'
+                                     src='src/components/ChildCreationForm/profilowe.png' alt='profileImg'/>}
+                                {preview && <img className='px-1 pb-2 w-56 sm:w-72' src={preview} alt='profileImg'/>}
                             </div>
                             <input
-                                className="appearance-none block w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                className="appearance-none block w-64 sm:w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 type="file"
+                                {...register('image', {required:true})}
                                 accept="image/*" // Allow only image files
+                                onChange={handleUploadedFile}
                             />
                         </div>
                         <div className='flex flex-col sm:w-[90%] md:w-auto'>
