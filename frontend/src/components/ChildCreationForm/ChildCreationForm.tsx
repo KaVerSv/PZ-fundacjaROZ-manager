@@ -60,7 +60,7 @@ function ChildCreationForm() {
                                            rules={{required: 'Pole Obowiązkowe'}} error={errors.surname}/>
                                 <InputWrapper labelFor="gender" labelNote="Płeć" error={errors.gender}>
                                     <select
-                                        className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                                        className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                         id="gender" {...register('gender', {required: true, validate: validateGender})}
                                         defaultValue={GenderEnum.notDefined}>
                                         <option disabled hidden value={GenderEnum.notDefined}>Płeć</option>
