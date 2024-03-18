@@ -206,3 +206,18 @@ button{
     padding: 10px 0;
     font-weight: 400;
 }
+
+.relatives{
+    width: 80%;
+    padding: 20px;
+}
+
+.relative{
+    margin: 20px;
+    width: 70%;
+    background-color: #77142B;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+}
+

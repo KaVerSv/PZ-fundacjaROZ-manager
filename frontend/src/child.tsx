@@ -87,12 +87,15 @@ const ChildComponent: React.FC = () => {
                     <label>Data przyjęcia</label>
                     <span>{childData.admission_date} </span>
                   </div>
+
+                  <div className="form-row">
+                    <button type="button">Edytuj</button>
+                  </div>
             </div>
         </main>
         <div className="stripe-1">
-                Osoby powiązane
+                Osoby powiązane <a href="">+dodaj osobe</a>
           </div>
-        <div>
         <div className="relatives">
             {relativesData.map((relative: any) => (
                 <div className="relative">
@@ -130,11 +133,14 @@ const ChildComponent: React.FC = () => {
                     <label>E-mail</label>
                     <span>{relative.e_mail} </span>
                   </div>
+
+                  <div className="form-row">
+                    <button type="button">Usuń powiązanie</button>
+                  </div>
                 </div>
             ))}
         </div>
       </div>
-    </div>
     );
 };
 

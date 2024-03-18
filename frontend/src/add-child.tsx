@@ -116,10 +116,6 @@ const AddChildForm: React.FC = () => {
                     <label htmlFor="admissionDate">Data przyjęcia</label>
                     <input type="date" name="admissionDate" value={formData.admission_date} onChange={handleChange} />
                   </div>
-
-                  <div className="form-row">
-                    <button type="submit">Odrzuć zmiany</button>
-                  </div>
                 
                   <div className="form-row">
                     <button type="submit">Zapisz zmiany</button>
