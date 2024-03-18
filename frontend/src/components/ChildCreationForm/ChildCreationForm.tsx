@@ -36,18 +36,18 @@ function ChildCreationForm() {
                     <div className='flex flex-col lg:flex-row'>
                         <div className='flex flex-col'>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
-                                <InputWrapper labelFor="firstName" labelNote="First Name">
+                                <InputWrapper labelFor="firstName" labelNote="Imie">
                                     <input type="text" id="firstName"
-                                           placeholder="First Name" {...register('firstName')} />
+                                           placeholder="Imie" {...register('firstName')} />
                                 </InputWrapper>
-                                <InputWrapper labelFor="lastName" labelNote="Last Name">
+                                <InputWrapper labelFor="lastName" labelNote="Drugie Imie">
                                     <input type="text" id="lastName"
-                                           placeholder="Last Name" {...register('secondName')} />
+                                           placeholder="Drugie Imie" {...register('secondName')} />
                                 </InputWrapper>
-                                <InputWrapper labelFor="surname" labelNote="Surname">
-                                    <input type="text" id="surname" placeholder="Surname" {...register('surname')} />
+                                <InputWrapper labelFor="surname" labelNote="Nazwisko">
+                                    <input type="text" id="surname" placeholder="Nazwisko" {...register('surname')} />
                                 </InputWrapper>
-                                <InputWrapper labelFor="gender" labelNote="Gender">
+                                <InputWrapper labelFor="gender" labelNote="Płeć">
                                     <select id="gender" {...register('gender')}>
                                         <option value={GenderEnum.male}>Male</option>
                                         <option value={GenderEnum.female}>Female</option>
@@ -55,34 +55,34 @@ function ChildCreationForm() {
                                 </InputWrapper>
                             </div>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
-                                <InputWrapper labelFor="birthDate" labelNote="Birth Date">
+                                <InputWrapper labelFor="birthDate" labelNote="Data urodzenia">
                                     <input type="date" id="birthDate"
-                                           placeholder="Birth Date" {...register('birthDate')} />
+                                           placeholder="Data urodzenia" {...register('birthDate')} />
                                 </InputWrapper>
-                                <InputWrapper labelFor="birthplace" labelNote="Birthplace">
+                                <InputWrapper labelFor="birthplace" labelNote="Miejsce urodzenia">
                                     <input type="text" id="birthplace"
-                                           placeholder="Birthplace" {...register('birthplace')} />
+                                           placeholder="Miejsce urodzenia" {...register('birthplace')} />
                                 </InputWrapper>
                                 <InputWrapper labelFor="pesel" labelNote="PESEL">
                                     <input type="text" id="pesel" placeholder="PESEL" {...register('pesel')} />
                                 </InputWrapper>
                             </div>
                             <div className='flex flex-col'>
-                                <InputWrapper labelFor="residentialAddress" labelNote="Residential Address">
+                                <InputWrapper labelFor="Adres zamieszkania" labelNote="Residential Address">
                                     <input type="text" id="residentialAddress"
                                            placeholder="Residential Address" {...register('residentialAddress')} />
                                 </InputWrapper>
-                                <InputWrapper labelFor="registeredAddress" labelNote="Registered Address">
+                                <InputWrapper labelFor="registeredAddress" labelNote="Adres zameldowania">
                                     <input type="text" id="registeredAddress"
-                                           placeholder="Registered Address" {...register('registeredAddress')} />
+                                           placeholder="Adres zameldowania" {...register('registeredAddress')} />
                                 </InputWrapper>
                             </div>
                             <div className='flex flex-col sm:flex-row'>
-                                <InputWrapper labelFor="admissionDate" labelNote="Admission Date">
+                                <InputWrapper labelFor="admissionDate" labelNote="Data przyjęcia">
                                     <input type="date" id="admissionDate"
                                            placeholder="Admission Date" {...register('admissionDate')} />
                                 </InputWrapper>
-                                <InputWrapper labelFor="leavingDate" labelNote="Leaving Date">
+                                <InputWrapper labelFor="leavingDate" labelNote="Data opuszczenia">
                                     <input type="date" id="leavingDate"
                                            placeholder="Leaving Date" {...register('leavingDate')} />
                                 </InputWrapper>
