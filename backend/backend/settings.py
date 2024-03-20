@@ -41,7 +41,13 @@ INSTALLED_APPS = [
     'corsheaders',
     'rest_framework',
     'fundacjaROZ',
+    'drf_spectacular',
 ]
+
+REST_FRAMEWORK = {
+    # other DRF settings here
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+}
 
 CORS_ALLOWED_ORIGINS=['http://localhost:8080']
 

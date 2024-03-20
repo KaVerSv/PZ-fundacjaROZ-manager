@@ -1,0 +1,531 @@
+openapi: 3.0.3
+info:
+  title: ''
+  version: 0.0.0
+paths:
+  /api/children/:
+    get:
+      operationId: api_children_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Children'
+          description: ''
+    post:
+      operationId: api_children_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Children'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Children'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Children'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Children'
+          description: ''
+  /api/children/{pesel}/:
+    get:
+      operationId: api_children_retrieve
+      parameters:
+      - in: path
+        name: pesel
+        schema:
+          type: string
+        description: A unique value identifying this children.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Children'
+          description: ''
+    put:
+      operationId: api_children_update
+      parameters:
+      - in: path
+        name: pesel
+        schema:
+          type: string
+        description: A unique value identifying this children.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Children'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Children'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Children'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Children'
+          description: ''
+    patch:
+      operationId: api_children_partial_update
+      parameters:
+      - in: path
+        name: pesel
+        schema:
+          type: string
+        description: A unique value identifying this children.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedChildren'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedChildren'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedChildren'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Children'
+          description: ''
+    delete:
+      operationId: api_children_destroy
+      parameters:
+      - in: path
+        name: pesel
+        schema:
+          type: string
+        description: A unique value identifying this children.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /api/relatives/:
+    get:
+      operationId: api_relatives_list
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Relatives'
+          description: ''
+    post:
+      operationId: api_relatives_create
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relatives'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Relatives'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Relatives'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '201':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relatives'
+          description: ''
+  /api/relatives/{id}/:
+    get:
+      operationId: api_relatives_retrieve
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this relatives.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relatives'
+          description: ''
+    put:
+      operationId: api_relatives_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this relatives.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Relatives'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/Relatives'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/Relatives'
+        required: true
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relatives'
+          description: ''
+    patch:
+      operationId: api_relatives_partial_update
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this relatives.
+        required: true
+      tags:
+      - api
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PatchedRelatives'
+          application/x-www-form-urlencoded:
+            schema:
+              $ref: '#/components/schemas/PatchedRelatives'
+          multipart/form-data:
+            schema:
+              $ref: '#/components/schemas/PatchedRelatives'
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Relatives'
+          description: ''
+    delete:
+      operationId: api_relatives_destroy
+      parameters:
+      - in: path
+        name: id
+        schema:
+          type: integer
+        description: A unique integer value identifying this relatives.
+        required: true
+      tags:
+      - api
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '204':
+          description: No response body
+  /fundacjaROZ/api/add_child/:
+    post:
+      operationId: fundacjaROZ_api_add_child_create
+      tags:
+      - fundacjaROZ
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /fundacjaROZ/api/add_relative/:
+    post:
+      operationId: fundacjaROZ_api_add_relative_create
+      tags:
+      - fundacjaROZ
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /fundacjaROZ/child/:
+    get:
+      operationId: fundacjaROZ_child_retrieve
+      tags:
+      - fundacjaROZ
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /fundacjaROZ/children/:
+    get:
+      operationId: fundacjaROZ_children_retrieve
+      tags:
+      - fundacjaROZ
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+  /fundacjaROZ/edit-child/:
+    get:
+      operationId: fundacjaROZ_edit_child_retrieve
+      tags:
+      - fundacjaROZ
+      security:
+      - cookieAuth: []
+      - basicAuth: []
+      - {}
+      responses:
+        '200':
+          description: No response body
+components:
+  schemas:
+    Children:
+      type: object
+      properties:
+        pesel:
+          type: string
+          maxLength: 11
+        first_name:
+          type: string
+          maxLength: 50
+        second_name:
+          type: string
+          maxLength: 50
+        surname:
+          type: string
+          maxLength: 100
+        birth_date:
+          type: string
+          format: date
+        birthplace:
+          type: string
+          maxLength: 100
+        residential_address:
+          type: string
+          maxLength: 200
+        registered_address:
+          type: string
+          maxLength: 200
+        admission_date:
+          type: string
+          format: date
+        leaving_date:
+          type: string
+          format: date
+          nullable: true
+        photo_path:
+          type: string
+          maxLength: 100
+      required:
+      - admission_date
+      - birth_date
+      - birthplace
+      - first_name
+      - pesel
+      - photo_path
+      - registered_address
+      - residential_address
+      - second_name
+      - surname
+    PatchedChildren:
+      type: object
+      properties:
+        pesel:
+          type: string
+          maxLength: 11
+        first_name:
+          type: string
+          maxLength: 50
+        second_name:
+          type: string
+          maxLength: 50
+        surname:
+          type: string
+          maxLength: 100
+        birth_date:
+          type: string
+          format: date
+        birthplace:
+          type: string
+          maxLength: 100
+        residential_address:
+          type: string
+          maxLength: 200
+        registered_address:
+          type: string
+          maxLength: 200
+        admission_date:
+          type: string
+          format: date
+        leaving_date:
+          type: string
+          format: date
+          nullable: true
+        photo_path:
+          type: string
+          maxLength: 100
+    PatchedRelatives:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 50
+        second_name:
+          type: string
+          maxLength: 50
+        surname:
+          type: string
+          maxLength: 100
+        phone_number:
+          type: string
+          maxLength: 15
+        residential_address:
+          type: string
+          maxLength: 200
+        e_mail:
+          type: string
+          maxLength: 100
+        association_type:
+          type: string
+          maxLength: 20
+        child_pesel:
+          type: array
+          items:
+            type: string
+    Relatives:
+      type: object
+      properties:
+        first_name:
+          type: string
+          maxLength: 50
+        second_name:
+          type: string
+          maxLength: 50
+        surname:
+          type: string
+          maxLength: 100
+        phone_number:
+          type: string
+          maxLength: 15
+        residential_address:
+          type: string
+          maxLength: 200
+        e_mail:
+          type: string
+          maxLength: 100
+        association_type:
+          type: string
+          maxLength: 20
+        child_pesel:
+          type: array
+          items:
+            type: string
+      required:
+      - association_type
+      - child_pesel
+      - e_mail
+      - first_name
+      - phone_number
+      - residential_address
+      - second_name
+      - surname
+  securitySchemes:
+    basicAuth:
+      type: http
+      scheme: basic
+    cookieAuth:
+      type: apiKey
+      in: cookie
+      name: sessionid

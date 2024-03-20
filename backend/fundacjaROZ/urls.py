@@ -22,6 +22,6 @@ urlpatterns = [
     path('children/', views.children),
     path('edit-child/', views.edit_child),
     path('child/', views.child),
-    path('api/add_child/', views.AddChildAPIView.as_view()),
-    path('api/add_relative/', views.AddRelativeAPIView.as_view()),
+    path('add_child/', views.AddChildAPIView.as_view()),
+    path('add_relative/', views.AddRelativeAPIView.as_view()),
 ]
