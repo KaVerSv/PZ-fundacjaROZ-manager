@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from ..models import Children, Relatives
+from .models import Children, Relatives
 
 class ChildrenSerializer(ModelSerializer):
     class Meta:

@@ -18,16 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
-
-#from . import views
+from fundacjaROZ.routers import router
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('fundacjaROZ/', include('fundacjaROZ.urls')),
-    path('api/', include('backend.api.urls')),
+      path('api/', include('backend.api.urls')),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
-    # Swagger UI:
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
-    # Redoc UI:
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
+    path('', include(router.urls)),
 ]
