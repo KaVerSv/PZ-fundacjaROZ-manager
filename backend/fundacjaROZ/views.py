@@ -4,10 +4,11 @@ from rest_framework.response import Response
 from .models import Children, Relatives
 
 from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
-from .api.serializers import ChildrenSerializer, RelativesSerializer
+from .serializers import ChildrenSerializer, RelativesSerializer
 
 @api_view(['GET'])
 def child(request):
@@ -46,20 +47,38 @@ def children(request):
         'archival_children': archival_children
     })
 
+class DispayChildren(APIView):
+    def get(self, request):
+        archival_children = Children.objects.exclude(leaving_date__isnull=True)
+        current_children = Children.objects.filter(leaving_date__isnull=True)
+        
+        current_children = list(current_children.values())
+        archival_children = list(archival_children.values())
+        
+        return Response({
+            'current_children': current_children,
+            'archival_children': archival_children
+        })
+    
 
-class AddChildAPIView(APIView):
-    def post(self, request):
-        print(request.data)
-        serializer = ChildrenSerializer(data=request.data)
+class AddChildAPIView(ModelViewSet):
+    queryset = Children.objects.all()
+    serializer_class = ChildrenSerializer
+
+    def create(self, request, *args, **kwargs):
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-class AddRelativeAPIView(APIView):
-    def post(self, request):
+class AddRelativeAPIView(ModelViewSet):
+    queryset = Relatives.objects.all()
+    serializer_class = RelativesSerializer
+    
+    def create(self, request,*args, **kwargs):
         print(request.data)
-        serializer = RelativesSerializer(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)

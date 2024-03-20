@@ -19,16 +19,16 @@ interface FormData {
 const AddChildForm: React.FC = () => {
   const [formData, setFormData] = useState<FormData>({
     pesel: '',
-    first_name: '',
-    second_name: '',
-    surname: '',
-    birth_date: '',
-    birthplace: '',
-    residential_address: '',
-    registered_address: '',
-    admission_date: '',
-    leaving_date: '',
-    photo_path: ''
+    first_name: 'q',
+    second_name: 'q',
+    surname: 'q',
+    birth_date: '2000-11-15',
+    birthplace: 'a',
+    residential_address: 'a',
+    registered_address: 'a',
+    admission_date: '2000-11-15',
+    leaving_date: '2024-11-15',
+    photo_path: 'q'
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -42,7 +42,7 @@ const AddChildForm: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     try {
-        const response = await fetch('http://localhost:8000/fundacjaROZ/api/add_child/', {
+        const response = await fetch('http://localhost:8000/add_children/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
