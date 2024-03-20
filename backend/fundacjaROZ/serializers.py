@@ -16,3 +16,8 @@ class RelativesSerializer(ModelSerializer):
                   'phone_number', 'residential_address','e_mail',
                   'association_type', 'child_pesel'
                   )
+
+class ChildrenSerializer2(ModelSerializer):
+    class Meta:
+        model = Children
+        fields = ('pesel','first_name','surname','photo_path')
