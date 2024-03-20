@@ -2,11 +2,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Children, Relatives
-
-from rest_framework.views import APIView
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
+
+from rest_framework.decorators import action
 
 from .serializers import ChildrenSerializer, RelativesSerializer,ChildrenSerializer2
 
@@ -86,6 +86,7 @@ class AddChildAPIView(ModelViewSet):
     queryset = Children.objects.all()
     serializer_class = ChildrenSerializer
 
+ 
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
@@ -96,6 +97,31 @@ class AddChildAPIView(ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+
+
+    @action(methods=['get'], detail=False,url_path='current', url_name='current')
+    def current(self, request, *args, **kwargs):
+        
+        children = Children.objects.filter(leaving_date__isnull=True)
+        serializer = ChildrenSerializer2(children, many=True)
+        return Response(serializer.data)
+    
+    @action(methods=['get'], detail=False,url_path='archival', url_name='archival')
+    def archival(self, request, *args, **kwargs):
+       
+        children = Children.objects.exclude(leaving_date__isnull=True)
+        serializer = ChildrenSerializer2(children, many=True)
+        return Response(serializer.data)
+    
+    @action(methods=['get'], detail=True,url_path='photo', url_name='photo')
+    def get_photo(self, request, *args, **kwargs):
+        child = self.get_object()
+        photo_path = child.photo_path
+        return Response({'photo_path': photo_path})
+        
+
+    
     
 class AddRelativeAPIView(ModelViewSet):
     queryset = Relatives.objects.all()
