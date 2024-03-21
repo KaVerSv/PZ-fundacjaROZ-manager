@@ -114,8 +114,9 @@ class AddChildAPIView(ModelViewSet):
         serializer = ChildrenSerializer2(children, many=True)
         return Response(serializer.data)
     
-    @action(methods=['get'], detail=True,url_path='photo', url_name='photo')
-    def get_photo(self, request, *args, **kwargs):
+    @action(methods=['get','post'], detail=True,url_path='photo', url_name='photo')
+    def photo(self, request, *args, **kwargs):
+
         child = self.get_object()
         photo_path = child.photo_path
         return Response({'photo_path': photo_path})

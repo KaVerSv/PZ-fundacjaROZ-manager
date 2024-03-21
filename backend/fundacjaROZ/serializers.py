@@ -12,7 +12,7 @@ class ChildrenSerializer(ModelSerializer):
 class RelativesSerializer(ModelSerializer):
     class Meta:
         model = Relatives
-        fields = ('first_name','second_name','surname',
+        fields = ('id','first_name','second_name','surname',
                   'phone_number', 'residential_address','e_mail',
                   'association_type', 'child_pesel'
                   )
