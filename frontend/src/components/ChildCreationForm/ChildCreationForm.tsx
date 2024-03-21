@@ -3,6 +3,7 @@ import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import InputWrapper from "./InputWrapper.tsx";
 import FormInput from "./FormInput.tsx";
 import {useState} from "react";
+import {GenderEnum} from "../../models/GenderEnum.tsx";
 
 interface FormData {
     pesel: string;
@@ -19,14 +20,6 @@ interface FormData {
     image: File
     gender: GenderEnum;
 }
-
-enum GenderEnum {
-    notDefined = "not",
-    female = "female",
-    male = "male"
-}
-
-
 function ChildCreationForm() {
     const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
         mode: 'onChange'
