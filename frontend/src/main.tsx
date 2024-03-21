@@ -4,6 +4,7 @@ import './index.css'
 import {createBrowserRouter, RouterProvider} from "react-router-dom";
 import Home from "./pages/Home.tsx";
 import ChildCreationPage from "./pages/ChildCreationPage.tsx";
+import ChildPage from "./pages/ChildPage.tsx";
 
 const router = createBrowserRouter([
     {
@@ -13,6 +14,10 @@ const router = createBrowserRouter([
     {
         path: "/addchild",
         element: <ChildCreationPage/>,
+    },
+    {
+        path: "/children/:id",
+        element: <ChildPage/>
     }
 ]);
 
