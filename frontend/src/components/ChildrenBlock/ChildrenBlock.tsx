@@ -14,42 +14,42 @@ export const currentChildren: ChildModelMinimized[] = [
         childName: "Alice",
         childLastName: "Smith",
         childSurname: "Johnson",
-        childPhotoLink: 'src/components/ChildrenBlock/2.jpg'
+        childPhotoLink: 'src/assets/2.jpg'
     },
     {
         id: "2",
         childName: "Bob",
         childLastName: "Brown",
         childSurname: "Miller",
-        childPhotoLink: 'src/components/ChildrenBlock/2.jpg'
+        childPhotoLink: 'src/assets/2.jpg'
     },
     {
         id: "3",
         childName: "Charlie",
         childLastName: "Jones",
         childSurname: "Williams",
-        childPhotoLink: 'src/components/ChildrenBlock/2.jpg'
+        childPhotoLink: 'src/assets/2.jpg'
     },
     {
         id: "4",
         childName: "Emma",
         childLastName: "Davis",
         childSurname: "Anderson",
-        childPhotoLink: 'src/components/ChildrenBlock/2.jpg'
+        childPhotoLink: 'src/assets/2.jpg'
     },
     {
         id: "5",
         childName: "Finn",
         childLastName: "Wilson",
         childSurname: "Thompson",
-        childPhotoLink: 'src/components/ChildrenBlock/2.jpg'
+        childPhotoLink: 'src/assets/2.jpg'
     },
     {
         id: "6",
         childName: "Grace",
         childLastName: "Taylor",
         childSurname: "Harris",
-        childPhotoLink: 'src/components/ChildrenBlock/2.jpg'
+        childPhotoLink: 'src/assets/2.jpg'
     },
 ];
 
