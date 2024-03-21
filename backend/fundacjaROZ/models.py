@@ -28,8 +28,6 @@ def validate_pesel(pesel, birth_date):
     if pesel_birth_date != birth_date:
         raise ValidationError("PESEL doesn't match to birth date")
     
-    
-    
 def validate_leaving_date(admission_date, leaving_date):
     if admission_date > leaving_date or leaving_date > datetime.date.today():
         raise ValidationError("Wrong leaving date!!!")
@@ -39,7 +37,7 @@ def validate_admission_date(admission_date):
         raise ValidationError("Wrong admission date!!!")
     
 class Children(models.Model):
-    pesel = models.CharField(primary_key=True, unique=True, max_length=11)#, validators=[validate_pesel]
+    pesel = models.CharField(unique=True, max_length=11)#, validators=[validate_pesel]
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50)
     surname = models.CharField(max_length=100)
@@ -75,9 +73,16 @@ class Association(models.Model):
     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     association_type = models.CharField(max_length=20)
 
+class Users(models.Model):
+    first_name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=100)
+    e_mail = models.CharField(max_length=100, validators=[validate_email])
+    password = models.CharField()
+
 # class Documents(models.Model):
 #     name = models.CharField(max_length = 50)
 #     doc_type = models.CharField(max_length = 20)
 #     date = models.DateField()
 #     path = models.CharField(max_length=100)
 #     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
+    

@@ -1,14 +1,14 @@
 # django-react-docker/backend/backend/views.py
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from .models import Children, Relatives
+from .models import Children, Relatives#, Association
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
 
 from rest_framework.decorators import action
 
-from .serializers import ChildrenSerializer, RelativesSerializer,ChildrenSerializer2
+from .serializers import ChildrenSerializer, RelativesSerializer,ChildrenSerializer2#, RelativesSerializer2
 
 # @api_view(['GET'])
 # def child(request):
@@ -28,39 +28,39 @@ from .serializers import ChildrenSerializer, RelativesSerializer,ChildrenSeriali
 #     else:
 #         return Response({'error': 'Brak parametru pesel'}, status=400)
 
-class ChildrenCurrent(ModelViewSet):
-    serializer_class = ChildrenSerializer2
+# class ChildrenCurrent(ModelViewSet):
+#     serializer_class = ChildrenSerializer2
 
-    def get_queryset(self):
-        return Children.objects.filter(leaving_date__isnull=True)
+#     def get_queryset(self):
+#         return Children.objects.filter(leaving_date__isnull=True)
 
-    def create(self, request, *args, **kwargs):
-        leaving_date = request.data.get('leaving_date')
-        if leaving_date:
-            return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
+#     def create(self, request, *args, **kwargs):
+#         leaving_date = request.data.get('leaving_date')
+#         if leaving_date:
+#             return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         serializer = self.get_serializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ChildrenArchival(ModelViewSet):
-    serializer_class = ChildrenSerializer2
+# class ChildrenArchival(ModelViewSet):
+#     serializer_class = ChildrenSerializer2
 
-    def get_queryset(self):
-        return Children.objects.exclude(leaving_date__isnull=True)
+#     def get_queryset(self):
+#         return Children.objects.exclude(leaving_date__isnull=True)
 
-    def create(self, request, *args, **kwargs):
-        leaving_date = request.data.get('leaving_date')
-        if leaving_date:
-            return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
+#     def create(self, request, *args, **kwargs):
+#         leaving_date = request.data.get('leaving_date')
+#         if leaving_date:
+#             return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         serializer = self.get_serializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class ChildrenAPIView(ModelViewSet):
@@ -78,8 +78,6 @@ class ChildrenAPIView(ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
 
     @action(methods=['get'], detail=False, url_path='current', url_name='current')
     def current(self, request, *args, **kwargs):
@@ -101,11 +99,39 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
         photo_path = child.photo_path
         return Response({'photo_path': photo_path})
-        
 
+    # @action(methods=['get'], detail=True,url_path='associations', url_name='associations')
+    # def associations(self, request, *args, **kwargs):
+    #     child = self.get_object()
+    #     associations = Association.objects.filter(child.id)
     
+    #     # Pobierz identyfikatory krewnych z powiązań
+    #     relatives_ids = associations.values_list('relative_id', flat=True)
     
-class AddRelativeAPIView(ModelViewSet):
+    #     # Pobierz wszystkie informacje o krewnych na podstawie identyfikatorów
+    #     relatives = Relatives.objects.filter(id__in=relatives_ids)
+    
+    #     # Serializuj dane krewnych i zwróć odpowiedź
+    #     serializer = RelativesSerializer2(relatives, many=True)
+    #     return Response(serializer.data)
+    
+    # @action(methods=['post'], detail=True,url_path='association', url_name='association')
+    # def association(self, request, *args, **kwargs):
+    #     child_id = kwargs.get('child_id')
+    #     associations = Association.objects.filter(child_id=child_id)
+    
+    #     # Pobierz identyfikatory krewnych z powiązań
+    #     relatives_ids = associations.values_list('relative_id', flat=True)
+    
+    #     # Pobierz wszystkie informacje o krewnych na podstawie identyfikatorów
+    #     relatives = Relatives.objects.filter(id__in=relatives_ids)
+    
+    #     # Serializuj dane krewnych i zwróć odpowiedź
+    #     serializer = RelativesSerializer2(relatives, many=True)
+    #     return Response(serializer.data)
+        
+    
+class RelativeAPIView(ModelViewSet):
     queryset = Relatives.objects.all()
     serializer_class = RelativesSerializer
     
