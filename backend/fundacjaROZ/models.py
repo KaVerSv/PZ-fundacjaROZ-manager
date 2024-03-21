@@ -37,7 +37,7 @@ def validate_admission_date(admission_date):
         raise ValidationError("Wrong admission date!!!")
     
 class Children(models.Model):
-    pesel = models.CharField(primary_key=True, unique=True, max_length=11)#, validators=[validate_pesel]
+    pesel = models.CharField(unique=True, max_length=11)#, validators=[validate_pesel]
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50)
     surname = models.CharField(max_length=100)
@@ -53,7 +53,8 @@ class Children(models.Model):
     def clean(self):
         super().clean()
         validate_pesel(self.pesel, self.birth_date)
-        validate_leaving_date(self.admission_date, self.leaving_date)
+        if self.leaving_date:
+            validate_leaving_date(self.admission_date, self.leaving_date)
 
 class Notes(models.Model):
     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
@@ -67,8 +68,11 @@ class Relatives(models.Model):
     phone_number = models.CharField(max_length=15)
     residential_address = models.CharField(max_length=200)
     e_mail = models.CharField(max_length=100, validators=[validate_email])
+
+class Association(models.Model):
+    relative_id = models.ForeignKey(Relatives, on_delete=models.CASCADE)
+    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     association_type = models.CharField(max_length=20)
-    child_pesel = models.ManyToManyField(Children)
 
 # class Institutions(models.Model):
 #     regon = models.CharField(primary_key = True, unique=True, max_length = 14)
@@ -77,9 +81,9 @@ class Relatives(models.Model):
 #     e_mail = models.CharField(max_length=100, validators=[validate_email])
 #     phone_number = models.CharField(max_length=15)
 
-class Documents(models.Model):
-    name = models.CharField(max_length = 50)
-    doc_type = models.CharField(max_length = 20)
-    date = models.DateField()
-    path = models.CharField(max_length=100)
-    child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
+# class Documents(models.Model):
+#     name = models.CharField(max_length = 50)
+#     doc_type = models.CharField(max_length = 20)
+#     date = models.DateField()
+#     path = models.CharField(max_length=100)
+#     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
