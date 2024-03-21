@@ -10,42 +10,23 @@ from rest_framework.decorators import action
 
 from .serializers import ChildrenSerializer, RelativesSerializer,ChildrenSerializer2
 
-@api_view(['GET'])
-def child(request):
-    pesel = request.GET.get('pesel')
-    if pesel:
-        try:
-            child = Children.objects.get(pesel=pesel)
-            serializer = ChildrenSerializer(child)
-            child_relatives = Relatives.objects.filter(child_pesel=pesel)
-            relatives_data = list(child_relatives.values())
-            return Response({
-                'child': serializer.data,
-                'child_relatives': relatives_data
-            })
-        except Children.DoesNotExist:
-            return Response({'error': 'Dziecko o podanym peselu nie zostało znalezione'}, status=404)
-    else:
-        return Response({'error': 'Brak parametru pesel'}, status=400)
-
-@api_view(['GET'])
-def edit_child(request):
-    return Response({
-        "data": "Child edit"
-    })
-
-@api_view(['GET'])
-def children(request):
-    archival_children = Children.objects.exclude(leaving_date__isnull=True)
-    current_children = Children.objects.filter(leaving_date__isnull=True)
-    
-    current_children = list(current_children.values())
-    archival_children = list(archival_children.values())
-    
-    return Response({
-        'current_children': current_children,
-        'archival_children': archival_children
-    })
+# @api_view(['GET'])
+# def child(request):
+#     pesel = request.GET.get('pesel')
+#     if pesel:
+#         try:
+#             child = Children.objects.get(pesel=pesel)
+#             serializer = ChildrenSerializer(child)
+#             child_relatives = Relatives.objects.filter(child_pesel=pesel)
+#             relatives_data = list(child_relatives.values())
+#             return Response({
+#                 'child': serializer.data,
+#                 'child_relatives': relatives_data
+#             })
+#         except Children.DoesNotExist:
+#             return Response({'error': 'Dziecko o podanym peselu nie zostało znalezione'}, status=404)
+#     else:
+#         return Response({'error': 'Brak parametru pesel'}, status=400)
 
 class ChildrenCurrent(ModelViewSet):
     serializer_class = ChildrenSerializer2
@@ -100,7 +81,7 @@ class ChildrenAPIView(ModelViewSet):
     
 
 
-    @action(methods=['get'], detail=False,url_path='current', url_name='current')
+    @action(methods=['get'], detail=False, url_path='current', url_name='current')
     def current(self, request, *args, **kwargs):
         
         children = Children.objects.filter(leaving_date__isnull=True)
