@@ -63,6 +63,7 @@ function ChildrenBlock(props: ChildBlockProps) {
                         currentChildren.map(
                             child =>
                                 <ChildCardMinimized
+                                    key = {child.id}
                                     isArchived={React.isValidElement(props.header) && props.header.type === CurrentBlockHeader}
                                     child={{
                                         childName: child.childName,
