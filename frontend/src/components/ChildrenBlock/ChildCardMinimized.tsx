@@ -6,7 +6,7 @@ interface ChildProps {
     child: ChildModelMinimized
 }
 
-// 'src/components/ChildrenBlock/2.jpg'
+// 'src/assets/2.jpg'
 function ChildCardMinimized(props: ChildProps) {
     let optionalStyles = props.isArchived ?
         `bg-main_red hover:bg-red_selected` :
