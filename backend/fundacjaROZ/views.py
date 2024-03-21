@@ -28,39 +28,39 @@ from .serializers import ChildrenSerializer, RelativesSerializer,ChildrenSeriali
 #     else:
 #         return Response({'error': 'Brak parametru pesel'}, status=400)
 
-class ChildrenCurrent(ModelViewSet):
-    serializer_class = ChildrenSerializer2
+# class ChildrenCurrent(ModelViewSet):
+#     serializer_class = ChildrenSerializer2
 
-    def get_queryset(self):
-        return Children.objects.filter(leaving_date__isnull=True)
+#     def get_queryset(self):
+#         return Children.objects.filter(leaving_date__isnull=True)
 
-    def create(self, request, *args, **kwargs):
-        leaving_date = request.data.get('leaving_date')
-        if leaving_date:
-            return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
+#     def create(self, request, *args, **kwargs):
+#         leaving_date = request.data.get('leaving_date')
+#         if leaving_date:
+#             return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         serializer = self.get_serializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ChildrenArchival(ModelViewSet):
-    serializer_class = ChildrenSerializer2
+# class ChildrenArchival(ModelViewSet):
+#     serializer_class = ChildrenSerializer2
 
-    def get_queryset(self):
-        return Children.objects.exclude(leaving_date__isnull=True)
+#     def get_queryset(self):
+#         return Children.objects.exclude(leaving_date__isnull=True)
 
-    def create(self, request, *args, **kwargs):
-        leaving_date = request.data.get('leaving_date')
-        if leaving_date:
-            return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
+#     def create(self, request, *args, **kwargs):
+#         leaving_date = request.data.get('leaving_date')
+#         if leaving_date:
+#             return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+#         serializer = self.get_serializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
 class ChildrenAPIView(ModelViewSet):

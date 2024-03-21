@@ -39,7 +39,7 @@ def validate_admission_date(admission_date):
         raise ValidationError("Wrong admission date!!!")
     
 class Children(models.Model):
-    pesel = models.CharField(primary_key=True, unique=True, max_length=11)#, validators=[validate_pesel]
+    pesel = models.CharField( unique=True, max_length=11)#, validators=[validate_pesel]
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50)
     surname = models.CharField(max_length=100)
@@ -70,10 +70,10 @@ class Relatives(models.Model):
     residential_address = models.CharField(max_length=200)
     e_mail = models.CharField(max_length=100, validators=[validate_email])
 
-class Association(models.Model):
-    relative_id = models.ForeignKey(Relatives, on_delete=models.CASCADE)
-    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
-    association_type = models.CharField(max_length=20)
+# class Association(models.Model):
+#     relative_id = models.ForeignKey(Relatives, on_delete=models.CASCADE)
+#     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
+#     association_type = models.CharField(max_length=20)
 
 # class Documents(models.Model):
 #     name = models.CharField(max_length = 50)

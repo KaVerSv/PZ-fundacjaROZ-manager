@@ -7,6 +7,6 @@ router = DefaultRouter()
 router.register(r'relatives', AddRelativeAPIView)
 
 router.register(r'children', ChildrenAPIView)
-router.register(r'current', ChildrenCurrent, basename='child-current')
-router.register(r'archival', ChildrenArchival, basename='child-archival')
+# router.register(r'current', ChildrenCurrent, basename='child-current')
+# router.register(r'archival', ChildrenArchival, basename='child-archival')
 
