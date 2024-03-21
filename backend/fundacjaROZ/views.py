@@ -47,7 +47,7 @@ def children(request):
         'archival_children': archival_children
     })
 
-class DispayChildrenCurrent(ModelViewSet):
+class ChildrenCurrent(ModelViewSet):
     serializer_class = ChildrenSerializer2
 
     def get_queryset(self):
@@ -64,7 +64,7 @@ class DispayChildrenCurrent(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class DispayChildrenArchival(ModelViewSet):
+class ChildrenArchival(ModelViewSet):
     serializer_class = ChildrenSerializer2
 
     def get_queryset(self):
@@ -82,7 +82,7 @@ class DispayChildrenArchival(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 
-class AddChildAPIView(ModelViewSet):
+class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
     serializer_class = ChildrenSerializer
 

@@ -4,7 +4,7 @@ from .models import Children, Relatives
 class ChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('pesel','first_name','second_name','surname',
+        fields = ('id','pesel','first_name','second_name','surname',
                   'birth_date','birthplace','residential_address','registered_address',
                   'admission_date','leaving_date','photo_path'
                   )
@@ -20,4 +20,4 @@ class RelativesSerializer(ModelSerializer):
 class ChildrenSerializer2(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('pesel','first_name','surname','photo_path')
+        fields = ('id','pesel','first_name','surname','photo_path')
