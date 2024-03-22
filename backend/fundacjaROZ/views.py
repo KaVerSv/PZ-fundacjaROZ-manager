@@ -71,6 +71,7 @@ class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
     serializer_class = ChildrenSerializer
 
+    http_method_names = ['get', 'post', 'put', 'delete','path']
  
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -182,7 +183,7 @@ class ChildrenAPIView(ModelViewSet):
         # Zwróć dane powiązań z krewnymi
         return Response(associations_data)
     
-    @action(methods=['get'], detail=True, url_path='notes', url_name='notes')
+    @action(methods=['get', 'post'], detail=True, url_path='notes', url_name='notes')
     def notes(self, request, pk=None):
         child = self.get_object()
 
@@ -194,26 +195,46 @@ class ChildrenAPIView(ModelViewSet):
         elif request.method == 'POST':
             # Utwórz nową notatkę dla danego dziecka
             serializer = NotesSerializer(data=request.data)
+            serializer.initial_data['child_id'] = child.id
+            
             if serializer.is_valid():
-                serializer.save(child_id=child)
+                serializer.save()
                 return Response(serializer.data, status=201)
             return Response(serializer.errors, status=400)
         
-    @action(methods=['delete'], detail=True, url_path='notes/(?P<note_id>[^/.]+)', url_name='delete_note')
-    def delete_note(self, request, pk=None, note_id=None):
-        child = self.get_object()
+    # @action(methods=['delete'], detail=True, url_path='notes/(?P<note_id>\d+)', url_name='delete_note')
+    # def delete_note(self, request, pk=None, note_id=None):
+    #     child = self.get_object()
 
-        try:
-            # Spróbuj odnaleźć notatkę o podanym ID należącą do danego dziecka
-            note = Notes.objects.get(id=note_id, child_id=child)
-        except Notes.DoesNotExist:
-            return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+    #     if request.method == 'DELETE':
+    #         try:
+    #             # Spróbuj odnaleźć notatkę o podanym ID należącą do danego dziecka
+    #             note = Notes.objects.get(id=note_id, child_id=child)
+    #         except Notes.DoesNotExist:
+    #             return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
-        # Usuń notatkę
-        note.delete()
+    #         # Usuń notatkę
+    #         note.delete()
     
-        return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
+    #         return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
         
+    @action(methods=['put'], detail=True, url_path='notes/(?P<note_id>\d+)', url_name='update')
+    def update_note(self, request, pk=None, note_id=None):
+        self.serializer_class=NotesSerializer
+        
+        try:
+            note = Notes.objects.get(id=note_id)
+        except (Notes.DoesNotExist):
+            return Response({'error': 'Nie znaleziono notatki'}, status=status.HTTP_404_NOT_FOUND)
+
+        serializer = NotesSerializer(note, data=request.data, partial=True)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
     # @action(methods=['post'], detail=True,url_path='association', url_name='association')
     # def association(self, request, *args, **kwargs):
     #     child_id = kwargs.get('child_id')
@@ -265,3 +286,36 @@ class NotesAPIView(ModelViewSet):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+# from rest_framework.views import APIView
+
+# class NotesDetailView(APIView):
+    
+#     def delete(self, request, pk=None, note_id=None):
+#         child = self.get_object()
+
+#         try:
+#             note = child.notes.get(id=note_id)
+#         except Notes.DoesNotExist:
+#             return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+
+#         note.delete()
+
+#         return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
+
+#     def put(self, request, pk=None, note_id=None):
+        
+#         try:
+#             note = Notes.objects.get(id=note_id)
+#         except (Notes.DoesNotExist):
+#             return Response({'error': 'Nie znaleziono notatki'}, status=status.HTTP_404_NOT_FOUND)
+
+#         serializer = NotesSerializer(note, data=request.data, partial=True)
+
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_200_OK)
+
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

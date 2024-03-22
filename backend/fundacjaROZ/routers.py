@@ -9,3 +9,6 @@ router.register(r'children', ChildrenAPIView)
 router.register(r'association', AssociationAPIView)
 router.register(r'notes', NotesAPIView)
 
+
+
+# router.register(r'children/(?P<pk>[^/.]+)/notes', NotesDetailView, basename='notes-detail')

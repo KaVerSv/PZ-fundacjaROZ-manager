@@ -19,7 +19,7 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
 from fundacjaROZ.routers import router
-
+# from fundacjaROZ.views import NotesDetailView
 urlpatterns = [
     path('admin/', admin.site.urls),
     # path('fundacjaROZ/', include('fundacjaROZ.urls')),
@@ -27,6 +27,8 @@ urlpatterns = [
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
     path('', include(router.urls)),
+    # path('children/<int:pk>/notes/<int:note_id>/', NotesDetailView.as_view(), name='notes-detail'),
+
 
     
 ]

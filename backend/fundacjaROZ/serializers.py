@@ -37,3 +37,6 @@ class NotesSerializer(ModelSerializer):
     class Meta:
         model = Notes
         fields = ('id','child_id', 'title', 'contents')
+
+
+
