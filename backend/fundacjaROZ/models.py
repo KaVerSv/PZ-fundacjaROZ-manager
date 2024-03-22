@@ -47,7 +47,7 @@ class Children(models.Model):
     registered_address = models.CharField(max_length=200)
     admission_date = models.DateField(validators=[validate_admission_date])
     leaving_date = models.DateField(blank=True, null=True, validators=[validate_leaving_date])
-    photo_path = models.CharField(max_length = 100)
+    photo_path = models.CharField(null=True, max_length = 100)
 
     def clean(self):
         super().clean()
