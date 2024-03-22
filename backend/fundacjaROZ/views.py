@@ -1,10 +1,14 @@
 # django-react-docker/backend/backend/views.py
+import base64
+import os
+from django.http import FileResponse
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Children, Relatives, Association, Notes
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.response import Response
 from rest_framework import status
+from django.conf import settings
 
 from rest_framework.decorators import action
 
@@ -79,22 +83,21 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    @action(methods=['get','post'], detail=False, url_path='current', url_name='current')
+    @action(methods=['get'], detail=False, url_path='current', url_name='current')
     def current(self, request, *args, **kwargs):
-        if request.method == 'GET':
-            children = Children.objects.exclude(leaving_date__isnull=True)
-            serializer = ChildrenSerializer2(children, many=True)
-            return Response(serializer.data)
+        children = Children.objects.exclude(leaving_date__isnull=True)
+        serializer = ChildrenSerializer2(children, many=True)
+        return Response(serializer.data)
 
-        leaving_date = request.data.get('leaving_date')
-        if leaving_date:
-            return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
+        # leaving_date = request.data.get('leaving_date')
+        # if leaving_date:
+        #     return Response({'error': 'Nie można dodać dziecka z datą opuszczenia.'}, status=status.HTTP_400_BAD_REQUEST)
 
-        serializer = ChildrenSerializer2(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        # serializer = ChildrenSerializer2(data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data, status=status.HTTP_201_CREATED)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(methods=['get'], detail=False,url_path='archival', url_name='archival')
     def archival(self, request, *args, **kwargs):
@@ -109,6 +112,51 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
         photo_path = child.photo_path
         return Response({'photo_path': photo_path})
+    
+    # @action(methods=['get', 'put'], detail=True, url_path='photo', url_name='photo')
+    # def photo(self, request, *args, **kwargs):
+    #     child = self.get_object()
+
+    #     if request.method == 'GET':
+    #     # Pobierz ścieżkę do zdjęcia z bazy danych
+    #         photo_path = child.photo_path
+
+    #     # Sprawdź, czy zdjęcie istnieje
+    #         if not photo_path:
+    #             return Response({'error': 'Zdjęcie nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+
+    #         try:
+    #         # Otwórz plik zdjęcia
+    #             photo_path = os.path.join(settings.MEDIA_ROOT, 'photos', photo_path)
+    #             with open(photo_path, 'rb') as photo_file:
+    #             # Zwróć zdjęcie jako blob
+    #                 return FileResponse(photo_file, content_type='image/jpeg')
+    #         except FileNotFoundError:
+    #             return Response({'error': 'Nie można odnaleźć pliku zdjęcia'}, status=status.HTTP_404_NOT_FOUND)
+
+    #     elif request.method == 'POST':
+    #     # Odczytaj i zapisz zdjęcie z żądania POST
+    #         encoded_image = request.data.get('photo_blob')
+    #         if encoded_image:
+    #             try:
+    #             # Dekoduj obraz
+    #                 decoded_image = base64.b64decode(encoded_image)
+                
+    #             # Zapisz zdjęcie na serwerze
+    #                 photo_name = f"{child.id}_photo.jpg"
+    #                 photo_path = os.path.join('./media/', photo_name)
+    #                 with open(photo_path, 'wb') as photo_file:
+    #                     photo_file.write(decoded_image)
+
+    #             # Zapisz ścieżkę do zdjęcia w bazie danych
+    #                 child.photo_path = photo_path
+    #                 child.save()
+
+    #                 return Response({'success': 'Zdjęcie zostało pomyślnie zapisane'}, status=status.HTTP_201_CREATED)
+    #             except Exception as e:
+    #                 return Response({'error': f'Błąd podczas zapisywania zdjęcia: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
+    #         else:
+    #             return Response({'error': 'Nieprawidłowe dane zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
 
     @action(methods=['get'], detail=True, url_path='associations', url_name='associations')
     def associations(self, request, *args, **kwargs):
@@ -150,6 +198,21 @@ class ChildrenAPIView(ModelViewSet):
                 serializer.save(child_id=child)
                 return Response(serializer.data, status=201)
             return Response(serializer.errors, status=400)
+        
+    @action(methods=['delete'], detail=True, url_path='notes/(?P<note_id>[^/.]+)', url_name='delete_note')
+    def delete_note(self, request, pk=None, note_id=None):
+        child = self.get_object()
+
+        try:
+            # Spróbuj odnaleźć notatkę o podanym ID należącą do danego dziecka
+            note = Notes.objects.get(id=note_id, child_id=child)
+        except Notes.DoesNotExist:
+            return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+
+        # Usuń notatkę
+        note.delete()
+    
+        return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
         
     # @action(methods=['post'], detail=True,url_path='association', url_name='association')
     # def association(self, request, *args, **kwargs):
