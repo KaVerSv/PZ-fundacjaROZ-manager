@@ -60,15 +60,15 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                     <div className='flex flex-col lg:flex-row items-center'>
                         <div className='flex flex-col px-2 items-center'>
                             <div>
-                                {!preview && <img className='px-1  pb-2 w-56 sm:w-72'
+                                {!preview && <img className='px-1 rounded-2xl pb-2 w-56 sm:w-72'
                                                   src={currentChild ? currentChild!.photoPath : 'src/components/ChildCreationForm/profilowe.png'}
                                                   alt='profileImg'/>}
-                                {preview && <img className='px-1 pb-2 w-56 sm:w-72' src={preview} alt='profileImg'/>}
+                                {preview && <img className='px-1 rounded-2xl pb-2 w-56 sm:w-72' src={preview} alt='profileImg'/>}
                             </div>
                             <input
                                 className="appearance-none block w-64 sm:w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 type="file"
-                                {...register('image', {required: true})}
+                                {...register('image', {})}
                                 accept="image/*" // Allow only image files
                                 onChange={handleUploadedFile}
                             />
