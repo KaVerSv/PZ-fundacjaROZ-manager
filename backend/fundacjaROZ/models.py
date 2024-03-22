@@ -56,7 +56,7 @@ class Children(models.Model):
             validate_leaving_date(self.admission_date, self.leaving_date)
 
 class Notes(models.Model):
-    child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
+    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     contents = models.TextField()
 
