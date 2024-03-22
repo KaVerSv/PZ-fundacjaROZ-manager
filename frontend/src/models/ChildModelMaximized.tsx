@@ -5,7 +5,7 @@ export interface ChildModelMaximized {
     id: string
     pesel: string;
     firstName: string;
-    secondName: string;
+    secondName?: string;
     surname: string;
     birthDate: string;
     birthPlace: string;
@@ -17,7 +17,7 @@ export interface ChildModelMaximized {
     gender: GenderEnum;
 }
 
-export const currentChildrenFull: ChildModelMaximized[] = [
+export var currentChildrenFull: ChildModelMaximized[] = [
     {
         id: "1",
         pesel: "12345678901",
