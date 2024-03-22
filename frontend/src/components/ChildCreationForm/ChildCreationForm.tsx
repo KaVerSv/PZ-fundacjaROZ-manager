@@ -4,8 +4,9 @@ import InputWrapper from "./InputWrapper.tsx";
 import FormInput from "./FormInput.tsx";
 import {useState} from "react";
 import {GenderEnum} from "../../models/GenderEnum.tsx";
+import {ChildModelMaximized, currentChildrenFull} from "../../models/ChildModelMaximized.tsx";
 
-interface FormData {
+interface FormData extends ChildModelMaximized {
     pesel: string;
     firstName: string;
     secondName: string;
@@ -20,10 +21,17 @@ interface FormData {
     image: File
     gender: GenderEnum;
 }
-function ChildCreationForm() {
-    const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
-        mode: 'onChange'
 
+interface ChildCreationFormProps {
+    editMode?: boolean;
+    childId?: string;
+}
+
+function ChildCreationForm(props: ChildCreationFormProps) {
+    const currentChild: ChildModelMaximized | null = props.editMode && props.childId ? currentChildrenFull[parseInt(props.childId) -1] : null;
+    const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
+        mode: 'onChange',
+        defaultValues: currentChild
     })
     const [preview, setPreview] = useState();
     const onSubmit: SubmitHandler<FormData> = (data) => {
@@ -32,6 +40,7 @@ function ChildCreationForm() {
     const validateGender = (value: GenderEnum) => {
         return value === GenderEnum.notDefined ? 'Pole Obowiązkowe' : true;
     };
+
 
     const handleUploadedFile = (event) => {
         const file = event.target.files[0];
@@ -50,16 +59,16 @@ function ChildCreationForm() {
                       onSubmit={handleSubmit(onSubmit)}>
                     <div className='flex flex-col lg:flex-row items-center'>
                         <div className='flex flex-col px-2 items-center'>
-
                             <div>
                                 {!preview && <img className='px-1  pb-2 w-56 sm:w-72'
-                                     src='src/components/ChildCreationForm/profilowe.png' alt='profileImg'/>}
+                                                  src={currentChild ? currentChild!.photoPath : 'src/components/ChildCreationForm/profilowe.png'}
+                                                  alt='profileImg'/>}
                                 {preview && <img className='px-1 pb-2 w-56 sm:w-72' src={preview} alt='profileImg'/>}
                             </div>
                             <input
                                 className="appearance-none block w-64 sm:w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 type="file"
-                                {...register('image', {required:true})}
+                                {...register('image', {required: true})}
                                 accept="image/*" // Allow only image files
                                 onChange={handleUploadedFile}
                             />
@@ -69,7 +78,7 @@ function ChildCreationForm() {
                                 <FormInput name={'firstName'} type={'text'} label={'Imie'} register={register}
                                            rules={{required: 'Pole Obowiązkowe'}} error={errors.firstName}/>
                                 <FormInput name={"secondName"} type={"text"} label={"Drugie Imie"} register={register}
-                                           rules={{required: 'Pole Obowiązkowe'}} error={errors.secondName}/>
+                                           rules={{}} error={errors.secondName}/>
                                 <FormInput name={"surname"} type={"text"} label={"Nazwisko"} register={register}
                                            rules={{required: 'Pole Obowiązkowe'}} error={errors.surname}/>
                                 <InputWrapper labelFor="gender" labelNote="Płeć" error={errors.gender}>
@@ -121,7 +130,8 @@ function ChildCreationForm() {
                     <div>
                         <button
                             className='mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded'
-                            type="submit">Dodaj dziecko
+                            type="submit">
+                            {currentChild? 'Zapisz zmiany' : 'Dodaj dziecko'}
                         </button>
                     </div>
                 </form>
