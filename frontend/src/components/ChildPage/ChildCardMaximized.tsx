@@ -1,6 +1,7 @@
 import {ChildModelMaximized, currentChildrenFull} from "../../models/ChildModelMaximized.tsx";
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import ChildInfoContainer from "./ChildInfoContainer.tsx";
+import {Link} from "react-router-dom";
 
 interface ChildCardProps {
     childId: string;
@@ -26,7 +27,7 @@ function ChildCardMaximized(props: ChildCardProps) {
                             <ChildInfoContainer note='' text={child.surname}/>
                         </div>
                         <div>
-                            <ChildInfoContainer note='Płeć' text={child.gender === "male"? 'Mężczyzna' : 'Kobieta'}/>
+                            <ChildInfoContainer note='Płeć' text={child.gender === "male" ? 'Mężczyzna' : 'Kobieta'}/>
                         </div>
                         <div className='md:flex md:flex-row gap-4'>
                             <ChildInfoContainer note='Data urodzenia' text={child.birthDate}/>
@@ -41,6 +42,16 @@ function ChildCardMaximized(props: ChildCardProps) {
                             <ChildInfoContainer note='Data opuszczenia' text={child.leavingDate}/>
                         </div>
                     </div>
+                </div>
+                <div className='flex justify-center'>
+                    <Link to={`/children-edit/${child.id}`}>
+                        <button
+                            className='mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded'
+                            type="submit">
+                            Edutuj
+                        </button>
+                    </Link>
+
                 </div>
             </WidthWrapper>
         </div>
