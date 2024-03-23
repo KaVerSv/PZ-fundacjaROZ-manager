@@ -6,6 +6,8 @@ import Home from "./pages/Home.tsx";
 import ChildCreationPage from "./pages/ChildCreationPage.tsx";
 import ChildPage from "./pages/ChildPage.tsx";
 import ChildEditPage from "./pages/ChildEditPage.tsx";
+import Login from "./pages/Login.tsx";
+import Registration from "./pages/Registration.tsx";
 
 const router = createBrowserRouter([
     {
@@ -23,6 +25,14 @@ const router = createBrowserRouter([
     {
         path: "/children-edit/:id",
         element: <ChildEditPage/>
+    },
+    {
+        path: "registration",
+        element: <Registration/>
+    },
+    {
+        path: "/login",
+        element: <Login/>
     }
 ]);
 
