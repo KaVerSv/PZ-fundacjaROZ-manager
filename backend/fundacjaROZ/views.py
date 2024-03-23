@@ -1,7 +1,8 @@
 # django-react-docker/backend/backend/views.py
 from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
+from rest_framework import generics
 from rest_framework.views import APIView
 import os
 from django.http import FileResponse
@@ -17,21 +18,10 @@ from rest_framework.decorators import action
 
 from .serializers import *
 
-# class AuthenticationView(ModelViewSet):
-#     authentication_classes = [SessionAuthentication, BasicAuthentication]
-#     permission_classes = [IsAuthenticated]
-
-#     def post(self, request, format=None):
-#         # Wyloguj użytkownika
-#         request.user.auth_token.delete()
-#         return Response(status=status.HTTP_200_OK)
-
-#     def get(self, request, format=None):
-#         content = {
-#             'user': str(request.user),  # `django.contrib.auth.User` instance.
-#             'auth': str(request.auth),  # None
-#         }
-#         return Response(content)
+class UserCreate(generics.CreateAPIView):
+    queryset = Users.objects.all()
+    serializer_class = UserSerializer
+    permission_classes = (AllowAny, )
 
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
@@ -220,9 +210,27 @@ class ChildrenAPIView(ModelViewSet):
         elif request.method == 'POST':
             # Utwórz nową notatkę dla danego dziecka
             serializer = RelativesSerializer(data=request.data)
+            
             if serializer.is_valid():
-                relative = serializer.save()
+                relative_data = serializer.validated_data  # Pobierz dane zdeserializowane
+
+                # Sprawdź, czy obiekt Relatives już istnieje w bazie danych
+                try:
+                    relative = Relatives.objects.get(
+                    first_name=relative_data['first_name'],
+                    second_name=relative_data['second_name'],
+                    surname=relative_data['surname'],
+                    phone_number=relative_data['phone_number'],
+                    residential_address=relative_data['residential_address'],
+                    e_mail=relative_data['e_mail']
+                )
+                except Relatives.DoesNotExist:
+                    # Jeśli obiekt Relatives nie istnieje, utwórz nowy
+                    relative = serializer.save()
+
+                # Dodaj powiązanie do dzieci
                 child.relatives.add(relative)
+
                 return Response(serializer.data, status=201)
             return Response(serializer.errors, status=400)
         

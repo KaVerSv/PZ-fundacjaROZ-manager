@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Children, Relatives, Notes
+from .models import *
 
 class ChildrenSerializer(ModelSerializer):
     class Meta:
@@ -25,6 +25,27 @@ class NotesSerializer(ModelSerializer):
     class Meta:
         model = Notes
         fields = ('id','child_id', 'title', 'contents')
+
+
+class UserSerializer(ModelSerializer):
+    class Meta:
+        model = Users
+        fields = ('id', 'first_name', 'surname', 'e_mail', 'password')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
