@@ -1,5 +1,8 @@
 # django-react-docker/backend/backend/views.py
-import base64
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
 import os
 from django.http import FileResponse
 from rest_framework.decorators import api_view
@@ -13,6 +16,17 @@ from django.conf import settings
 from rest_framework.decorators import action
 
 from .serializers import *
+
+# class AuthenticationView(APIView):
+#     authentication_classes = [SessionAuthentication, BasicAuthentication]
+#     permission_classes = [IsAuthenticated]
+
+#     def get(self, request, format=None):
+#         content = {
+#             'user': str(request.user),  # `django.contrib.auth.User` instance.
+#             'auth': str(request.auth),  # None
+#         }
+#         return Response(content)
 
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
@@ -189,7 +203,7 @@ class ChildrenAPIView(ModelViewSet):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    @action(methods=['get', 'delete'], detail=True, url_path='associations', url_name='associations')
+    @action(methods=['get'], detail=True, url_path='associations', url_name='associations')
     def associations(self, request, *args, **kwargs):
         if request.method == 'GET':
             child = self.get_object()
@@ -216,7 +230,18 @@ class ChildrenAPIView(ModelViewSet):
         
             # Zwróć dane powiązań z krewnymi
             return Response(associations_data)
-        # if request.method == 'DELETE':
+        
+    @action(methods=['delete'], detail=True, url_path='associations/(?P<id>[^/.]+)', url_name='associations')
+    def associations1(self, request, pk=None, id=None):
+        if request.method == 'DELETE':
+            try:
+                # Spróbuj znaleźć i usunąć obiekt Association
+                association = Association.objects.get(id=id)
+                association.delete()
+                return Response(status=status.HTTP_204_NO_CONTENT)
+            except Association.DoesNotExist:
+                # Jeśli obiekt nie istnieje, zwróć odpowiedni komunikat
+                return Response({"detail": "Association not found."}, status=status.HTTP_404_NOT_FOUND)
 
 
 
