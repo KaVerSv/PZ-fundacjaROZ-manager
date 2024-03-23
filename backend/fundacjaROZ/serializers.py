@@ -15,12 +15,19 @@ class RelativesSerializer(ModelSerializer):
         fields = ('id','first_name','second_name','surname',
                   'phone_number', 'residential_address','e_mail'
                   )
+        
+class RelativesSerializer1(ModelSerializer):
+    class Meta:
+        model = Relatives
+        fields = ('first_name','second_name','surname',
+                  'phone_number', 'residential_address','e_mail'
+                  )
 
-class RelativesSerializer2(ModelSerializer):
+class AssociationSerializer1(ModelSerializer):
     class Meta:
         model = Relatives, Association
-        fields = ('association_type', 'relative_id','id','first_name','second_name','surname',
-                  'phone_number', 'residential_address','e_mail', 'associations'
+        fields = ('id', 'relative_id', 'child_id', 'association_type', 'first_name','second_name','surname',
+                  'phone_number', 'residential_address','e_mail'
                   )
 
 class ChildrenSerializer2(ModelSerializer):

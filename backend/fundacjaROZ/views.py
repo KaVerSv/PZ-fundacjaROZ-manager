@@ -19,6 +19,49 @@ class ChildrenAPIView(ModelViewSet):
     serializer_class = ChildrenSerializer
 
     http_method_names = ['get', 'post', 'put', 'delete','path']
+
+    def list(self, request):
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+
+            # Pobierz listę dzieci
+            children = queryset.all()
+
+            # Aktualizuj ścieżki zdjęć dla każdego dziecka
+            for child in children:
+                child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
+
+            # Serializuj listę dzieci
+            serializer = self.get_serializer(children, many=True)
+
+            # Zwróć odpowiedź z zaktualizowanymi danymi
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Children.DoesNotExist:
+            return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def retrieve(self, request, pk=None):
+        try:
+            # Pobierz dziecko z bazy danych
+            child = self.get_object()
+
+            # Pobierz ścieżkę zdjęcia z bazy danych
+            photo_path = child.photo_path
+
+            # Zmień ścieżkę na adres URL
+            photo_url = f"http://localhost:8000/children/{child.id}/photo"
+
+            # Zaktualizuj ścieżkę zdjęcia w obiekcie
+            child.photo_path = photo_url
+
+            # Serializuj obiekt dziecka
+            serializer = self.get_serializer(child)
+
+            # Zwróć odpowiedź z zaktualizowanymi danymi
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Children.DoesNotExist:
+            return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
@@ -27,22 +70,33 @@ class ChildrenAPIView(ModelViewSet):
             if Children.objects.filter(pesel=pesel).exists():
                 return Response({'error': 'Dziecko o podanym PESEL już istnieje.'}, status=status.HTTP_400_BAD_REQUEST)
             
+            # Przetworzenie przesłanego zdjęcia i zapisanie go na serwerze
+            if 'photo' in request.FILES:
+                photo = request.FILES['photo']
+                with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
+                    for chunk in photo.chunks():
+                        destination.write(chunk)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    
     @action(methods=['get'], detail=False, url_path='current', url_name='current')
     def current(self, request, *args, **kwargs):
-        children = Children.objects.exclude(leaving_date__isnull=True)
+        children = Children.objects.filter(leaving_date__isnull=True)
         serializer = ChildrenSerializer2(children, many=True)
-        return Response(serializer.data)
+        data = serializer.data
+        for child_data in data:
+            child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
+        return Response(data, status=status.HTTP_200_OK)
     
-    @action(methods=['get'], detail=False,url_path='archival', url_name='archival')
+    @action(methods=['get'], detail=False, url_path='archival', url_name='archival')
     def archival(self, request, *args, **kwargs):
-       
         children = Children.objects.exclude(leaving_date__isnull=True)
         serializer = ChildrenSerializer2(children, many=True)
-        return Response(serializer.data)
+        data = serializer.data
+        for child_data in data:
+            child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
+        return Response(data, status=status.HTTP_200_OK)
     
     @action(methods=['get', 'delete','put'], detail=True,url_path='photo', url_name='photo')
     def photo(self, request, pk=None):
@@ -86,57 +140,6 @@ class ChildrenAPIView(ModelViewSet):
                 return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
             else:
                 return Response({'error': 'Nie przesłano nowego zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-            
-
-
-    
-    #     elif request.method == 'POST':
-    #     # Odczytaj i zapisz zdjęcie z żądania POST
-    #         encoded_image = request.data.get('photo_blob')
-    #         if encoded_image:
-    #             try:
-    #             # Dekoduj obraz
-    #                 decoded_image = base64.b64decode(encoded_image)
-                
-    #             # Zapisz zdjęcie na serwerze
-    #                 photo_name = f"{child.id}_photo.jpg"
-    #                 photo_path = os.path.join('./media/', photo_name)
-    #                 with open(photo_path, 'wb') as photo_file:
-    #                     photo_file.write(decoded_image)
-
-    #             # Zapisz ścieżkę do zdjęcia w bazie danych
-    #                 child.photo_path = photo_path
-    #                 child.save()
-
-    #                 return Response({'success': 'Zdjęcie zostało pomyślnie zapisane'}, status=status.HTTP_201_CREATED)
-    #             except Exception as e:
-    #                 return Response({'error': f'Błąd podczas zapisywania zdjęcia: {str(e)}'}, status=status.HTTP_400_BAD_REQUEST)
-    #         else:
-    #             return Response({'error': 'Nieprawidłowe dane zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-
-    @action(methods=['get'], detail=True, url_path='associations', url_name='associations')
-    def associations(self, request, *args, **kwargs):
-        child = self.get_object()
-        
-        # Pobierz wszystkie powiązane obiekty Association dla danego dziecka
-        associations = Association.objects.filter(child_id=child)
-        
-        # Lista na dane powiązań z krewnymi
-        associations_data = []
-        
-        # Iteruj przez wszystkie powiązane obiekty Association
-        for association in associations:
-            # Pobierz dane powiązanego krewnego
-            relative_data = RelativesSerializer(association.relative_id).data
-            
-            # Dodaj informacje o typie powiązania
-            relative_data['association_type'] = association.association_type
-            
-            # Dodaj dane do listy
-            associations_data.append(relative_data)
-        
-        # Zwróć dane powiązań z krewnymi
-        return Response(associations_data)
     
     @action(methods=['get', 'post'], detail=True, url_path='notes', url_name='notes')
     def notes(self, request, pk=None):
@@ -185,6 +188,36 @@ class ChildrenAPIView(ModelViewSet):
                 return Response(serializer.data, status=status.HTTP_200_OK)
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+    @action(methods=['get', 'delete'], detail=True, url_path='associations', url_name='associations')
+    def associations(self, request, *args, **kwargs):
+        if request.method == 'GET':
+            child = self.get_object()
+        
+            # Pobierz wszystkie powiązane obiekty Association dla danego dziecka
+            associations = Association.objects.filter(child_id=child)
+        
+            # Lista na dane powiązań z krewnymi
+            associations_data = []
+        
+            # Iteruj przez wszystkie powiązane obiekty Association
+            for association in associations:
+                # Pobierz dane powiązanego krewnego
+                data = RelativesSerializer1(association.relative_id).data
+            
+                # Dodaj informacje o typie powiązania
+                data['id'] = association.id
+                data['association_type'] = association.association_type
+                data['relative_id'] = association.relative_id.id
+                data['child_id'] = association.child_id.id
+            
+                # Dodaj dane do listy
+                associations_data.append(data)
+        
+            # Zwróć dane powiązań z krewnymi
+            return Response(associations_data)
+        # if request.method == 'DELETE':
+
 
 
 
