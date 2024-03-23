@@ -19,16 +19,23 @@ from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView
 from drf_spectacular.views import SpectacularRedocView, SpectacularSwaggerView
 from fundacjaROZ.routers import router
-# from fundacjaROZ.views import NotesDetailView
+# from fundacjaROZ.views import AuthenticationView
+
+# from rest_framework_simplejwt.views import (
+#     TokenObtainPairView,
+#     TokenRefreshView,
+#     TokenVerifyView,
+# )
+
 urlpatterns = [
     path('admin/', admin.site.urls),
-    # path('fundacjaROZ/', include('fundacjaROZ.urls')),
+    # path('login/', AuthenticationView.as_view()),
+    # path('logout/', AuthenticationView.as_view()),
+    # path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    # path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    # path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
     path('api/schema/', SpectacularAPIView.as_view(), name='schema'),
     path('api/schema/swagger-ui/', SpectacularSwaggerView.as_view(url_name='schema'), name='swagger-ui'),
     path('api/schema/redoc/', SpectacularRedocView.as_view(url_name='schema'), name='redoc'),
-    path('', include(router.urls)),
-    # path('children/<int:pk>/notes/<int:note_id>/', NotesDetailView.as_view(), name='notes-detail'),
-
-
-    
+    path('', include(router.urls)),    
 ]

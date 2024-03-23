@@ -36,6 +36,14 @@ def validate_admission_date(admission_date):
     if admission_date > datetime.date.today():
         raise ValidationError("Wrong admission date!!!")
     
+class Relatives(models.Model):
+    first_name = models.CharField(max_length=50)
+    second_name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=100)
+    phone_number = models.CharField(max_length=15)
+    residential_address = models.CharField(max_length=200)
+    e_mail = models.CharField(max_length=100, validators=[validate_email])
+
 class Children(models.Model):
     pesel = models.CharField(unique=True, max_length=11)#, validators=[validate_pesel]
     first_name = models.CharField(max_length=50)
@@ -48,6 +56,7 @@ class Children(models.Model):
     admission_date = models.DateField(validators=[validate_admission_date])
     leaving_date = models.DateField(blank=True, null=True)#, validators=[validate_leaving_date])
     photo_path = models.CharField(null=True, max_length = 100)
+    relatives = models.ManyToManyField(Relatives)
 
     def clean(self):
         super().clean()
@@ -59,19 +68,6 @@ class Notes(models.Model):
     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     contents = models.TextField()
-
-class Relatives(models.Model):
-    first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
-    surname = models.CharField(max_length=100)
-    phone_number = models.CharField(max_length=15)
-    residential_address = models.CharField(max_length=200)
-    e_mail = models.CharField(max_length=100, validators=[validate_email])
-
-class Association(models.Model):
-    relative_id = models.ForeignKey(Relatives, on_delete=models.CASCADE)
-    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
-    association_type = models.CharField(max_length=20)
 
 class Users(models.Model):
     first_name = models.CharField(max_length=50)

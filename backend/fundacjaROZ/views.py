@@ -17,9 +17,14 @@ from rest_framework.decorators import action
 
 from .serializers import *
 
-# class AuthenticationView(APIView):
+# class AuthenticationView(ModelViewSet):
 #     authentication_classes = [SessionAuthentication, BasicAuthentication]
 #     permission_classes = [IsAuthenticated]
+
+#     def post(self, request, format=None):
+#         # Wyloguj użytkownika
+#         request.user.auth_token.delete()
+#         return Response(status=status.HTTP_200_OK)
 
 #     def get(self, request, format=None):
 #         content = {
@@ -175,7 +180,7 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.errors, status=400)
         
     @action(methods=['put','delete'], detail=True, url_path='notes/(?P<note_id>\d+)', url_name='notes')
-    def actions(self, request, pk=None, note_id=None):
+    def notes1(self, request, pk=None, note_id=None):
         
         if request.method == 'DELETE':
             try:
@@ -203,45 +208,52 @@ class ChildrenAPIView(ModelViewSet):
 
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
-    @action(methods=['get'], detail=True, url_path='associations', url_name='associations')
-    def associations(self, request, *args, **kwargs):
+    @action(methods=['get', 'post'], detail=True, url_path='relatives', url_name='relatives')
+    def relatives(self, request, pk=None):
+        child = self.get_object()
+
         if request.method == 'GET':
-            child = self.get_object()
+            # Pobierz wszystkie notatki dla danego dziecka
+            relatives = child.relatives
+            serializer = RelativesSerializer(relatives, many=True)
+            return Response(serializer.data)
+        elif request.method == 'POST':
+            # Utwórz nową notatkę dla danego dziecka
+            serializer = RelativesSerializer(data=request.data)
+            if serializer.is_valid():
+                relative = serializer.save()
+                child.relatives.add(relative)
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
         
-            # Pobierz wszystkie powiązane obiekty Association dla danego dziecka
-            associations = Association.objects.filter(child_id=child)
+    @action(methods=['put','delete'], detail=True, url_path='relatives/(?P<relatives_id>\d+)', url_name='relatives')
+    def relatives1(self, request, pk=None, relatives_id=None):
         
-            # Lista na dane powiązań z krewnymi
-            associations_data = []
-        
-            # Iteruj przez wszystkie powiązane obiekty Association
-            for association in associations:
-                # Pobierz dane powiązanego krewnego
-                data = RelativesSerializer1(association.relative_id).data
-            
-                # Dodaj informacje o typie powiązania
-                data['id'] = association.id
-                data['association_type'] = association.association_type
-                data['relative_id'] = association.relative_id.id
-                data['child_id'] = association.child_id.id
-            
-                # Dodaj dane do listy
-                associations_data.append(data)
-        
-            # Zwróć dane powiązań z krewnymi
-            return Response(associations_data)
-        
-    @action(methods=['delete'], detail=True, url_path='associations/(?P<id>[^/.]+)', url_name='associations')
-    def associations1(self, request, pk=None, id=None):
         if request.method == 'DELETE':
             try:
-                # Spróbuj znaleźć i usunąć obiekt Association
-                association = Association.objects.get(id=id)
-                association.delete()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            except Association.DoesNotExist:
-                # Jeśli obiekt nie istnieje, zwróć odpowiedni komunikat
-                return Response({"detail": "Association not found."}, status=status.HTTP_404_NOT_FOUND)
+                relative = Relatives.objects.get(id=relatives_id)
+            except Relatives.DoesNotExist:
+                return Response({'error': 'Rel nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+
+            relative.delete()
+    
+            return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
+        if request.method == 'PUT':
+
+            self.serializer_class=RelativesSerializer
+            
+            try:
+                relative = Relatives.objects.get(id=relatives_id)
+            except (Relatives.DoesNotExist):
+                return Response({'error': 'Nie znaleziono rela'}, status=status.HTTP_404_NOT_FOUND)
+
+            serializer = RelativesSerializer(relative, data=request.data, partial=True)
+
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_200_OK)
+
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -256,35 +268,6 @@ class ChildrenAPIView(ModelViewSet):
 class RelativeAPIView(ModelViewSet):
     queryset = Relatives.objects.all()
     serializer_class = RelativesSerializer
-    
-    def create(self, request,*args, **kwargs):
-        print(request.data)
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
-
-class AssociationAPIView(ModelViewSet):
-    queryset = Association.objects.all()
-    serializer_class = AssociationSerializer
-    
-    def create(self, request,*args, **kwargs):
-        print(request.data)
-        serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
