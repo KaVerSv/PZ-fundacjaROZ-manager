@@ -9,8 +9,9 @@ type props = {
     shift?: number[];
     alwaysShowLabel?: boolean;
     error?: FieldError;
+    labelColor?: string;
 }
-const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel, error}: props) => {
+const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel, error, labelColor}: props) => {
     const [inputValue, setInputValue] = useState('');
 
 
@@ -19,7 +20,7 @@ const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel, er
     };
     return (
         <div className={`flex flex-col ${alwaysShowLabel? 'min-w-56 sm:min-w-56 md:min-w-72':''} mx-5 my-3 relative mb-3 mt-6`} onChange={handleChange}>
-            <LabelForInput labelFor={labelFor} labelNote={labelNote} isDirty={alwaysShowLabel || !!inputValue} shift={!!shift? shift : [0,0]}/>
+            <LabelForInput labelFor={labelFor} labelNote={labelNote} isDirty={alwaysShowLabel || !!inputValue} shift={!!shift? shift : [0,0]} labelColor={labelColor}/>
             {children}
             {error && <div
                 className={`text-red-600 absolute bottom-11 self-end`}>
