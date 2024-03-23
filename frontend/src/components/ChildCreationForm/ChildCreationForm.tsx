@@ -1,7 +1,7 @@
 import {SubmitHandler, useForm} from "react-hook-form";
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import InputWrapper from "./InputWrapper.tsx";
-import FormInput from "./FormInput.tsx";
+import FormInput from "../common/FormInput.tsx";
 import {useState} from "react";
 import {GenderEnum} from "../../models/GenderEnum.tsx";
 import {ChildModelMaximized, currentChildrenFull} from "../../models/ChildModelMaximized.tsx";
@@ -12,7 +12,7 @@ interface FormData extends ChildModelMaximized {
     secondName: string;
     surname: string;
     birthDate: string;
-    birthplace: string;
+    birthPlace: string;
     residentialAddress: string;
     registeredAddress: string;
     admissionDate: string;
@@ -103,9 +103,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
                                 <FormInput name={"birthDate"} type={"date"} label={"Data urodzenia"} register={register}
                                            rules={{required: 'Pole Obowiązkowe'}} error={errors.birthDate}/>
-                                <FormInput name={"birthplace"} type={"text"} label={"Miejsce urodzenia"}
+                                <FormInput name={"birthPlace"} type={"text"} label={"Miejsce urodzenia"}
                                            register={register} rules={{required: 'Pole Obowiązkowe'}}
-                                           error={errors.birthplace}/>
+                                           error={errors.birthPlace}/>
                                 <FormInput name={"pesel"} type={"text"} label={"PESEL"} register={register}
                                            rules={{required: 'Pole Obowiązkowe'}} error={errors.pesel}/>
                             </div>

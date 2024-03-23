@@ -13,8 +13,8 @@ type props = {
 const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel, error}: props) => {
     const [inputValue, setInputValue] = useState('');
 
-    // @ts-ignore
-    const handleChange = (event) => {
+
+    const handleChange = (event: React.ChangeEvent<HTMLInputElement>) => {
         setInputValue(event.target.value.trim()); // Update input value state
     };
     return (
