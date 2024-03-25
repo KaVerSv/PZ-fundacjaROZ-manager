@@ -31,12 +31,11 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 ## custom user model
-# AUTH_USER_MODEL = 'fundacjaROZ.User'
+AUTH_USER_MODEL = 'fundacjaROZ.User'
 
 # Application definition
 
 INSTALLED_APPS = [
-    # 'fundacjaROZ.apps.FundacjarozConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -47,8 +46,9 @@ INSTALLED_APPS = [
     'rest_framework',
     'fundacjaROZ',
     'drf_spectacular',
-    # 'fundacjaROZ.apps.FundacjarozConfig',
 ]
+
+ROOT_URLCONF = 'backend.urls'
 
 REST_FRAMEWORK = {
     # other DRF settings here
@@ -71,10 +71,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# ['http://localhost:8080']
-
-ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
