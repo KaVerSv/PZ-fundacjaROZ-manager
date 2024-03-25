@@ -49,6 +49,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         const urlImage = URL.createObjectURL(file);
 
 
+        // @ts-ignore
         setPreview(urlImage);
     };
 
