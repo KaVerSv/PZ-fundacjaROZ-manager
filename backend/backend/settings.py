@@ -50,6 +50,14 @@ INSTALLED_APPS = [
     # 'fundacjaROZ.apps.FundacjarozConfig',
 ]
 
+REST_FRAMEWORK = {
+    # other DRF settings here
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    # 'DEFAULT_AUTHENTICATION_CLASSES': (
+    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
+    #)
+}
+
 CORS_ALLOWED_ORIGINS=['http://localhost:8080']
 
 
