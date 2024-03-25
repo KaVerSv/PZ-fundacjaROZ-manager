@@ -7,6 +7,7 @@ RUN npm install
 
 RUN npm install @reduxjs/toolkit react-router-dom tailwindcss @headlessui/react && \
     npm install && \
+    npm i react-router-dom && \
     npm install --cpu=x64 --os=linux sharp && \
     npm install --cpu=x64 --os=linux --libc=musl sharp
 
