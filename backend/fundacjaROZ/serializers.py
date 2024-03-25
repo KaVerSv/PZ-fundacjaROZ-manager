@@ -1,7 +1,7 @@
 from rest_framework.serializers import ModelSerializer
 from .models import *
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
+# from django.contrib.auth import get_user_model
 
 class ChildrenSerializer(ModelSerializer):
     class Meta:

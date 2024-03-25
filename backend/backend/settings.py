@@ -31,7 +31,7 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 ## custom user model
-AUTH_USER_MODEL = 'fundacjaROZ.User'
+# AUTH_USER_MODEL = 'fundacjaROZ.User'
 
 # Application definition
 
@@ -47,7 +47,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'fundacjaROZ',
     'drf_spectacular',
-    'fundacjaROZ.apps.FundacjarozConfig',
+    # 'fundacjaROZ.apps.FundacjarozConfig',
 ]
 
 CORS_ALLOWED_ORIGINS=['http://localhost:8080']

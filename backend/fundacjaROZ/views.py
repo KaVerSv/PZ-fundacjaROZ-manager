@@ -1,9 +1,9 @@
 # django-react-docker/backend/backend/views.py
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import AllowAny
+# from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+# from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework import generics
-from rest_framework.views import APIView
+# from rest_framework import generics
+# from rest_framework.views import APIView
 import os
 from django.http import FileResponse
 from rest_framework.decorators import api_view
@@ -15,17 +15,17 @@ from rest_framework import status
 from django.conf import settings
 
 from django.shortcuts import render
-from fundacjaROZ.serializers import UserRegistrationSerializer, UserLoginSerializer
-from rest_framework.views import APIView
-from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import AllowAny, IsAuthenticated
+# from fundacjaROZ.serializers import UserRegistrationSerializer, UserLoginSerializer
+# from rest_framework.views import APIView
+# from rest_framework.authentication import TokenAuthentication
+# from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework.response import Response
 from rest_framework import status
-from rest_framework.exceptions import AuthenticationFailed
-from django.contrib.auth import authenticate
+# from rest_framework.exceptions import AuthenticationFailed
+# from django.contrib.auth import authenticate
 from django.conf import settings
-from django.contrib.auth import get_user_model
-from .utils import generate_access_token
+# from django.contrib.auth import get_user_model
+# from .utils import generate_access_token
 import jwt
 
 from rest_framework.decorators import action
