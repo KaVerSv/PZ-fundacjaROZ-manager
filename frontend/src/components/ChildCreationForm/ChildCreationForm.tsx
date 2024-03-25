@@ -38,7 +38,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         console.log(data)
     };
     const validateGender = (value: GenderEnum) => {
-        return value === GenderEnum.notDefined ? 'Pole Obowiązkowe' : true;
+        return value === GenderEnum.notDefined ? 'Pole wymagane' : true;
     };
 
 
@@ -49,6 +49,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         const urlImage = URL.createObjectURL(file);
 
 
+        // @ts-ignore
         setPreview(urlImage);
     };
 
@@ -76,11 +77,11 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                         <div className='flex flex-col sm:w-[90%] md:w-auto'>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
                                 <FormInput name={'firstName'} type={'text'} label={'Imie'} register={register}
-                                           rules={{required: 'Pole Obowiązkowe'}} error={errors.firstName}/>
+                                           rules={{required: 'Pole wymagane'}} error={errors.firstName}/>
                                 <FormInput name={"secondName"} type={"text"} label={"Drugie Imie"} register={register}
                                            rules={{}} error={errors.secondName}/>
                                 <FormInput name={"surname"} type={"text"} label={"Nazwisko"} register={register}
-                                           rules={{required: 'Pole Obowiązkowe'}} error={errors.surname}/>
+                                           rules={{required: 'Pole wymagane'}} error={errors.surname}/>
                                 <InputWrapper labelFor="gender" labelNote="Płeć" error={errors.gender}>
                                     <select
                                         className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -102,27 +103,27 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                             </div>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
                                 <FormInput name={"birthDate"} type={"date"} label={"Data urodzenia"} register={register}
-                                           rules={{required: 'Pole Obowiązkowe'}} error={errors.birthDate}/>
+                                           rules={{required: 'Pole wymagane'}} error={errors.birthDate}/>
                                 <FormInput name={"birthPlace"} type={"text"} label={"Miejsce urodzenia"}
-                                           register={register} rules={{required: 'Pole Obowiązkowe'}}
+                                           register={register} rules={{required: 'Pole wymagane'}}
                                            error={errors.birthPlace}/>
                                 <FormInput name={"pesel"} type={"text"} label={"PESEL"} register={register}
-                                           rules={{required: 'Pole Obowiązkowe'}} error={errors.pesel}/>
+                                           rules={{required: 'Pole wymagane'}} error={errors.pesel}/>
                             </div>
                             <div className='flex flex-col'>
                                 <FormInput name={"residentialAddress"} type={"text"} label={"Adres zamieszkania"}
-                                           register={register} rules={{required: 'Pole Obowiązkowe'}}
+                                           register={register} rules={{required: 'Pole wymagane'}}
                                            error={errors.residentialAddress}/>
                                 <FormInput name={"registeredAddress"} type={"text"} label={"Adres zameldowania"}
-                                           register={register} rules={{required: 'Pole Obowiązkowe'}}
+                                           register={register} rules={{required: 'Pole wymagane'}}
                                            error={errors.registeredAddress}/>
                             </div>
                             <div className='flex flex-col sm:flex-row'>
                                 <FormInput name={"admissionDate"} type={"date"} label={"Data przyjęcia"}
-                                           register={register} rules={{required: 'Pole Obowiązkowe'}}
+                                           register={register} rules={{required: 'Pole wymagane'}}
                                            error={errors.admissionDate}/>
                                 <FormInput name={"leavingDate"} type={"date"} label={"Data opuszczenia"}
-                                           register={register} rules={{required: 'Pole Obowiązkowe'}}
+                                           register={register} rules={{required: 'Pole wymagane'}}
                                            error={errors.leavingDate}/>
                             </div>
                         </div>
