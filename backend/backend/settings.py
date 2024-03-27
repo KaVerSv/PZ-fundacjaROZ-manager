@@ -10,7 +10,6 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
-from datetime import timedelta
 from pathlib import Path
 import os
 
@@ -51,11 +50,7 @@ INSTALLED_APPS = [
 ROOT_URLCONF = 'backend.urls'
 
 REST_FRAMEWORK = {
-    # other DRF settings here
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
-    # 'DEFAULT_AUTHENTICATION_CLASSES': (
-    #     'rest_framework_simplejwt.authentication.JWTAuthentication',
-    #)
 }
 
 CORS_ALLOWED_ORIGINS=['http://localhost:8080']
