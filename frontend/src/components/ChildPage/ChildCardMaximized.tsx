@@ -2,6 +2,7 @@ import {ChildModelMaximized, currentChildrenFull} from "../../models/ChildModelM
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import ChildInfoContainer from "./ChildInfoContainer.tsx";
 import {Link} from "react-router-dom";
+import {useEffect} from "react";
 
 interface ChildCardProps {
     childId: string;
@@ -11,14 +12,18 @@ interface ChildCardProps {
 function ChildCardMaximized(props: ChildCardProps) {
 
     const child: ChildModelMaximized = currentChildrenFull[parseInt(props.childId) - 1];
-
+    useEffect(() => {
+        document.title = child.firstName + ' ' + child.surname;
+    }, []);
 
     return (
         <div className=''>
             <WidthWrapper>
-                <div className='flex flex-col lg:flex-row gap-4 border-main_red border-4 p-4 rounded-2xl justify-center'>
+                <div
+                    className='flex flex-col lg:flex-row gap-4 border-main_red border-4 p-4 rounded-2xl justify-center'>
                     <div className='flex md:block justify-center'>
-                        <img className='pb-2 w-56 sm:w-72 lg:w-80 rounded-2xl' src={child.photoPath} alt='profilePhoto'/>
+                        <img className='pb-2 w-56 sm:w-72 lg:w-80 rounded-2xl' src={child.photoPath}
+                             alt='profilePhoto'/>
                     </div>
                     <div className='flex flex-col mt-4 gap-7'>
                         <div className='flex flex-row gap-1.5 mb-5'>
