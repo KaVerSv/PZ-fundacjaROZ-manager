@@ -2,22 +2,13 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
 import InputWrapper from "./InputWrapper.tsx";
 import FormInput from "../common/FormInput.tsx";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import {GenderEnum} from "../../models/GenderEnum.tsx";
-import {ChildModelMaximized, currentChildrenFull} from "../../models/ChildModelMaximized.tsx";
+import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
+import {BASE_API_URL} from "../../api/contst.ts";
+import {useNavigate} from "react-router-dom";
 
 interface FormData extends ChildModelMaximized {
-    pesel: string;
-    firstName: string;
-    secondName: string;
-    surname: string;
-    birthDate: string;
-    birthPlace: string;
-    residentialAddress: string;
-    registeredAddress: string;
-    admissionDate: string;
-    leavingDate: string;
-    photoPath: string;
     image: File
     gender: GenderEnum;
 }
@@ -28,14 +19,81 @@ interface ChildCreationFormProps {
 }
 
 function ChildCreationForm(props: ChildCreationFormProps) {
-    const currentChild: ChildModelMaximized | null = props.editMode && props.childId ? currentChildrenFull[parseInt(props.childId) -1] : null;
-    const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
-        mode: 'onChange',
-        defaultValues: currentChild
+    //const currentChild: ChildModelMaximized | null = props.editMode && props.childId ? currentChildrenFull[parseInt(props.childId) -1] : null;
+    // const fetcher: (url: string) => Promise<ChildModelMaximized> = async (url) => {
+    //     const response = await fetch(url);
+    //     if (!response.ok) {
+    //         throw new Error(`API request failed with status ${response.status}`);
+    //     }
+    //     const jsonData: ChildModelMaximized = await response.json();
+    //     Object.keys(jsonData).forEach(key => {
+    //         setValue(key, jsonData[key]);
+    //     });
+    //     document.title = jsonData.first_name + ' ' + jsonData.surname;
+    //
+    //     return jsonData;
+    // };
+    // const {data} = useSWR<ChildModelMaximized>(BASE_API_URL + `/children/${parseInt(props.childId)}`, fetcher, );
+    const navigate = useNavigate();
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                // Perform your API call or any asynchronous operation to fetch data
+                const response = await fetch(`${BASE_API_URL}/children/${parseInt(props.childId)}`);
+                const jsonData: ChildModelMaximized = await response.json();
+                Object.keys(jsonData).forEach(key => {
+                    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+                    // @ts-expect-error
+                    setValue(key, jsonData[key]);
+                });
+                setPreview(jsonData.photo_path);
+            } catch (error) {
+                console.error('Error fetching data:', error);
+            }
+        };
+
+        // Call the fetchData function when the component mounts
+        if (props.editMode) fetchData();
+    }, []);
+
+
+    const {
+        register,
+        handleSubmit,
+        formState: {errors},
+        setValue,
+    } = useForm<FormData>({
+        mode: 'onChange'
     })
-    const [preview, setPreview] = useState();
-    const onSubmit: SubmitHandler<FormData> = (data) => {
-        console.log(data)
+    const [preview, setPreview] = useState<string>();
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState(false);
+    const onSubmit: SubmitHandler<FormData> = async (formData) => {
+        console.log(formData)
+        setValue("relatives", [1]);
+        setLoading(true);
+        try {
+
+            // Make POST request using Fetch API
+            const response = await fetch(`${BASE_API_URL}/children/${props.editMode? parseInt(props.childId) + '/' : ''}`, {
+                method: props.editMode ? 'PUT' : 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(formData),
+            });
+
+            // Check if request was successful
+            if (!response.ok) throw new Error('Network response was not ok');
+
+            navigate('/');
+
+        } catch (error) {
+            console.error('Error:', error.message);
+            setError(true);
+        } finally {
+            setLoading(false);
+        }
     };
     const validateGender = (value: GenderEnum) => {
         return value === GenderEnum.notDefined ? 'Pole wymagane' : true;
@@ -49,7 +107,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         const urlImage = URL.createObjectURL(file);
 
 
-        // @ts-ignore
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         setPreview(urlImage);
     };
 
@@ -57,14 +115,15 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         <div className='mt-3'>
             <WidthWrapper>
                 <form className='flex flex-col items-center border-main_red border-4 p-2 rounded-2xl'
-                      onSubmit={handleSubmit(onSubmit)}>
+                      onSubmit={handleSubmit(onSubmit)} onChange={()=>{setError(false)}}>
                     <div className='flex flex-col lg:flex-row items-center'>
                         <div className='flex flex-col px-2 items-center'>
                             <div>
                                 {!preview && <img className='px-1 rounded-2xl pb-2 w-56 sm:w-72'
-                                                  src={currentChild ? currentChild!.photoPath : 'src/components/ChildCreationForm/profilowe.png'}
+                                                  src="../../../public/profilowe.png"
                                                   alt='profileImg'/>}
-                                {preview && <img className='px-1 rounded-2xl pb-2 w-56 sm:w-72' src={preview} alt='profileImg'/>}
+                                {preview && <img className='px-1 rounded-2xl pb-2 w-56 sm:w-72' src={preview}
+                                                 alt='profileImg'/>}
                             </div>
                             <input
                                 className="appearance-none block w-64 sm:w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
@@ -76,10 +135,10 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                         </div>
                         <div className='flex flex-col sm:w-[90%] md:w-auto'>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
-                                <FormInput name={'firstName'} type={'text'} label={'Imie'} register={register}
-                                           rules={{required: 'Pole wymagane'}} error={errors.firstName}/>
-                                <FormInput name={"secondName"} type={"text"} label={"Drugie Imie"} register={register}
-                                           rules={{}} error={errors.secondName}/>
+                                <FormInput name={'first_name'} type={'text'} label={'Imie'} register={register}
+                                           rules={{required: 'Pole wymagane'}} error={errors.first_name}/>
+                                <FormInput name={"second_name"} type={"text"} label={"Drugie Imie"} register={register}
+                                           rules={{}} error={errors.second_name}/>
                                 <FormInput name={"surname"} type={"text"} label={"Nazwisko"} register={register}
                                            rules={{required: 'Pole wymagane'}} error={errors.surname}/>
                                 <InputWrapper labelFor="gender" labelNote="Płeć" error={errors.gender}>
@@ -102,37 +161,42 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                                 </InputWrapper>
                             </div>
                             <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
-                                <FormInput name={"birthDate"} type={"date"} label={"Data urodzenia"} register={register}
-                                           rules={{required: 'Pole wymagane'}} error={errors.birthDate}/>
-                                <FormInput name={"birthPlace"} type={"text"} label={"Miejsce urodzenia"}
+                                <FormInput name={"birth_date"} type={"date"} label={"Data urodzenia"}
+                                           register={register}
+                                           rules={{required: 'Pole wymagane'}} error={errors.birth_date}/>
+                                <FormInput name={"birthplace"} type={"text"} label={"Miejsce urodzenia"}
                                            register={register} rules={{required: 'Pole wymagane'}}
-                                           error={errors.birthPlace}/>
+                                           error={errors.birthplace}/>
                                 <FormInput name={"pesel"} type={"text"} label={"PESEL"} register={register}
                                            rules={{required: 'Pole wymagane'}} error={errors.pesel}/>
                             </div>
                             <div className='flex flex-col'>
-                                <FormInput name={"residentialAddress"} type={"text"} label={"Adres zamieszkania"}
+                                <FormInput name={"residential_address"} type={"text"} label={"Adres zamieszkania"}
                                            register={register} rules={{required: 'Pole wymagane'}}
-                                           error={errors.residentialAddress}/>
-                                <FormInput name={"registeredAddress"} type={"text"} label={"Adres zameldowania"}
+                                           error={errors.residential_address}/>
+                                <FormInput name={"registered_address"} type={"text"} label={"Adres zameldowania"}
                                            register={register} rules={{required: 'Pole wymagane'}}
-                                           error={errors.registeredAddress}/>
+                                           error={errors.registered_address}/>
                             </div>
                             <div className='flex flex-col sm:flex-row'>
-                                <FormInput name={"admissionDate"} type={"date"} label={"Data przyjęcia"}
+                                <FormInput name={"admission_date"} type={"date"} label={"Data przyjęcia"}
                                            register={register} rules={{required: 'Pole wymagane'}}
-                                           error={errors.admissionDate}/>
-                                <FormInput name={"leavingDate"} type={"date"} label={"Data opuszczenia"}
-                                           register={register} rules={{required: 'Pole wymagane'}}
-                                           error={errors.leavingDate}/>
+                                           error={errors.admission_date}/>
+                                <FormInput name={"leaving_date"} type={"date"} label={"Data opuszczenia"}
+                                           register={register}
+                                           error={errors.leaving_date}/>
                             </div>
                         </div>
                     </div>
                     <div>
+                        {error && <div className='flex justify-center'>
+                            <span className='text-sm text-red-800'>Coś poszło nie tak.<br/>Sprobuj ponownie</span>
+                        </div>}
                         <button
-                            className='mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded'
-                            type="submit">
-                            {currentChild? 'Zapisz zmiany' : 'Dodaj dziecko'}
+                            className='mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded disabled:opacity-30'
+                            type="submit"
+                            disabled={loading}>
+                            {props.editMode ? 'Zapisz zmiany' : 'Dodaj dziecko'}
                         </button>
                     </div>
                 </form>
