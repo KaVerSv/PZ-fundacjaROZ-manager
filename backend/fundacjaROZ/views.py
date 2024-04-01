@@ -113,20 +113,21 @@ class UserLogoutViewAPI(APIView):
 		return response
 
 class ChildrenAPIView(ModelViewSet):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (AllowAny,)
-    
     queryset = Children.objects.all()
     serializer_class = ChildrenSerializer
 
     http_method_names = ['get', 'post', 'put', 'delete','path']
 
-    def list(self, request):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [AllowAny]
+
+    def dispatch(self, request, *args, **kwargs):
         user_token = request.COOKIES.get('access_token')
-    
         if not user_token:
             raise AuthenticationFailed('Unauthenticated user.')
-    
+        return super().dispatch(request, *args, **kwargs)
+
+    def list(self, request):    
         try:
             queryset = self.filter_queryset(self.get_queryset())
 
@@ -146,12 +147,7 @@ class ChildrenAPIView(ModelViewSet):
         except Children.DoesNotExist:
             return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
 
-    def retrieve(self, request, pk=None):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def retrieve(self, request, pk=None):        
         try:
             # Pobierz dziecko z bazy danych
             child = self.get_object()
@@ -174,12 +170,7 @@ class ChildrenAPIView(ModelViewSet):
         except Children.DoesNotExist:
             return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
-    def create(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def create(self, request, *args, **kwargs):        
         serializer = self.get_serializer(data=request.data)
         if serializer.is_valid():
             pesel = serializer.validated_data.get('pesel')
@@ -197,12 +188,7 @@ class ChildrenAPIView(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(methods=['get'], detail=False, url_path='current', url_name='current')
-    def current(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def current(self, request, *args, **kwargs):        
         children = Children.objects.filter(leaving_date__isnull=True)
         serializer = ChildrenSerializer2(children, many=True)
         data = serializer.data
@@ -211,12 +197,7 @@ class ChildrenAPIView(ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
     
     @action(methods=['get'], detail=False, url_path='archival', url_name='archival')
-    def archival(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def archival(self, request, *args, **kwargs):       
         children = Children.objects.exclude(leaving_date__isnull=True)
         serializer = ChildrenSerializer2(children, many=True)
         data = serializer.data
@@ -225,12 +206,7 @@ class ChildrenAPIView(ModelViewSet):
         return Response(data, status=status.HTTP_200_OK)
     
     @action(methods=['get', 'delete','put'], detail=True,url_path='photo', url_name='photo')
-    def photo(self, request, pk=None):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def photo(self, request, pk=None):        
         child = self.get_object()
 
         if request.method == 'GET':
@@ -273,12 +249,7 @@ class ChildrenAPIView(ModelViewSet):
                 return Response({'error': 'Nie przesłano nowego zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
     
     @action(methods=['get', 'post'], detail=True, url_path='notes', url_name='notes')
-    def notes(self, request, pk=None):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def notes(self, request, pk=None):        
         child = self.get_object()
 
         if request.method == 'GET':
@@ -297,12 +268,7 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.errors, status=400)
         
     @action(methods=['put','delete'], detail=True, url_path='notes/(?P<note_id>\d+)', url_name='notes')
-    def notes1(self, request, pk=None, note_id=None):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def notes1(self, request, pk=None, note_id=None):        
         if request.method == 'DELETE':
             try:
                 note = Notes.objects.get(id=note_id)
@@ -330,12 +296,7 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
     @action(methods=['get', 'post'], detail=True, url_path='relatives', url_name='relatives')
-    def relatives(self, request, pk=None):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def relatives(self, request, pk=None):       
         child = self.get_object()
 
         if request.method == 'GET':
@@ -371,12 +332,7 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.errors, status=400)
         
     @action(methods=['put','delete'], detail=True, url_path='relatives/(?P<relatives_id>\d+)', url_name='relatives')
-    def relatives1(self, request, pk=None, relatives_id=None):
-        user_token = request.COOKIES.get('access_token')
-    
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        
+    def relatives1(self, request, pk=None, relatives_id=None):        
         if request.method == 'DELETE':
             try:
                 relative = Relatives.objects.get(id=relatives_id)
@@ -414,7 +370,15 @@ class ChildrenAPIView(ModelViewSet):
 
 
 class RelativeAPIView(ModelViewSet):
-    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [AllowAny]
+
+    def dispatch(self, request, *args, **kwargs):
+        user_token = request.COOKIES.get('access_token')
+        if not user_token:
+            raise AuthenticationFailed('Unauthenticated user.')
+        return super().dispatch(request, *args, **kwargs)
+    
     queryset = Relatives.objects.all()
     serializer_class = RelativesSerializer
 
@@ -428,6 +392,14 @@ class RelativeAPIView(ModelViewSet):
 
 
 class NotesAPIView(ModelViewSet):
-    permission_classes = [IsAuthenticated] 
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [AllowAny]
+
+    def dispatch(self, request, *args, **kwargs):
+        user_token = request.COOKIES.get('access_token')
+        if not user_token:
+            raise AuthenticationFailed('Unauthenticated user.')
+        return super().dispatch(request, *args, **kwargs)
+    
     queryset = Notes.objects.all()
     serializer_class = NotesSerializer
