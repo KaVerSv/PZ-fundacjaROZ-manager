@@ -9,9 +9,10 @@ interface FormData {
 }
 
 function LoginForm() {
-    const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
+    const {register, handleSubmit, formState: { errors, isValid }} = useForm<FormData>({
         mode: 'onChange'
     });
+
 
     const onSubmit: SubmitHandler<FormData> = (data) => {
         console.log(data)
@@ -30,11 +31,21 @@ function LoginForm() {
                 <div>
                     <form className='flex flex-col gap-3' onSubmit={handleSubmit(onSubmit)}>
                         <FormInput name={'email'} type={'text'} label={'Email'} register={register}
-                                   error={errors.email} labelColor='text-main_white'></FormInput>
+                                   error={errors.email}
+                                   rules={{
+                                       required: 'Pole wymagane',
+                                       pattern: {
+                                           value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                                           message: 'Niewłaściwy adres e-mail',
+                                       }
+                                   }}
+                                   labelColor='text-main_white'/>
                         <FormInput name={'password'} type={'password'} label={'Hasło'} register={register}
-                                   error={errors.password} labelColor='text-main_white'/>
+                                   error={errors.password} rules={{required: 'Pole wymagane'}}
+                                   labelColor='text-main_white'/>
                         <button
-                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline"
+                            disabled={!isValid}
+                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey"
                             type="submit">
                             Zalogouj się
                         </button>
@@ -50,7 +61,7 @@ function LoginForm() {
 
                         <Link to={'/registration'}>
                             <div>
-                            <span className='text-main_white opacity-70 hover:underline'>Utwórz konto</span>
+                                <span className='text-main_white opacity-70 hover:underline'>Utwórz konto</span>
                             </div>
                         </Link>
                     </div>
