@@ -91,7 +91,7 @@ function RegistrationForm() {
                                    labelColor='text-main_white'/>
                         <button
                             disabled={!isValid}
-                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline"
+                            className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey"
                             type="submit">
                             Utwórz konto
                         </button>
