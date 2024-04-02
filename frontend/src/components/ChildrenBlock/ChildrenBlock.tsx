@@ -10,52 +10,6 @@ interface ChildBlockProps {
     header: React.ReactNode
 }
 
-/*
-export const currentChildren: ChildModelMinimized[] = [
-    {
-        id: "1",
-        childName: "Alice",
-        childLastName: "Smith",
-        childSurname: "Johnson",
-        childPhotoLink: 'src/assets/2.jpg'
-    },
-    {
-        id: "2",
-        childName: "Bob",
-        childLastName: "Brown",
-        childSurname: "Miller",
-        childPhotoLink: 'src/assets/2.jpg'
-    },
-    {
-        id: "3",
-        childName: "Charlie",
-        childLastName: "Jones",
-        childSurname: "Williams",
-        childPhotoLink: 'src/assets/2.jpg'
-    },
-    {
-        id: "4",
-        childName: "Emma",
-        childLastName: "Davis",
-        childSurname: "Anderson",
-        childPhotoLink: 'src/assets/2.jpg'
-    },
-    {
-        id: "5",
-        childName: "Finn",
-        childLastName: "Wilson",
-        childSurname: "Thompson",
-        childPhotoLink: 'src/assets/2.jpg'
-    },
-    {
-        id: "6",
-        childName: "Grace",
-        childLastName: "Taylor",
-        childSurname: "Harris",
-        childPhotoLink: 'src/assets/2.jpg'
-    },
-];
-*/
 
 function ChildrenBlock(props: ChildBlockProps) {
     const fetcher: (url: string) => Promise<ChildModelMinimized[]> = async (url) => {
@@ -66,7 +20,7 @@ function ChildrenBlock(props: ChildBlockProps) {
         return response.json();
     };
     const { data, error, isLoading } = useSWR<ChildModelMinimized[]>(BASE_API_URL +
-        `/children/${React.isValidElement(props.header) && props.header.type === CurrentBlockHeader ? 'archival/' : 'current/'}`, fetcher);
+        `/children/${React.isValidElement(props.header) && props.header.type === CurrentBlockHeader ? 'current/' : 'archival/'}`, fetcher);
     if (error) return <div>failed to load</div>
     if (isLoading) return <div>loading...</div>
     return (
