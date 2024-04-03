@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import os
-from django.http import FileResponse
+from django.http import FileResponse, HttpResponse
 from rest_framework.decorators import api_view
 from .models import *
 from rest_framework.viewsets import ModelViewSet
@@ -91,8 +91,6 @@ class UserViewAPI(APIView):
 		user_serializer = UserRegistrationSerializer(user)
 		return Response(user_serializer.data)
 
-
-
 class UserLogoutViewAPI(APIView):
 	authentication_classes = (TokenAuthentication,)
 	permission_classes = (AllowAny,)
@@ -131,17 +129,13 @@ class ChildrenAPIView(ModelViewSet):
         try:
             queryset = self.filter_queryset(self.get_queryset())
 
-            # Pobierz listę dzieci
             children = queryset.all()
 
-            # Aktualizuj ścieżki zdjęć dla każdego dziecka
             for child in children:
                 child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
 
-            # Serializuj listę dzieci
             serializer = self.get_serializer(children, many=True)
 
-            # Zwróć odpowiedź z zaktualizowanymi danymi
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Children.DoesNotExist:
@@ -149,22 +143,16 @@ class ChildrenAPIView(ModelViewSet):
 
     def retrieve(self, request, pk=None):        
         try:
-            # Pobierz dziecko z bazy danych
             child = self.get_object()
 
-            # Pobierz ścieżkę zdjęcia z bazy danych
             photo_path = child.photo_path
 
-            # Zmień ścieżkę na adres URL
             photo_url = f"http://localhost:8000/children/{child.id}/photo"
 
-            # Zaktualizuj ścieżkę zdjęcia w obiekcie
             child.photo_path = photo_url
 
-            # Serializuj obiekt dziecka
             serializer = self.get_serializer(child)
 
-            # Zwróć odpowiedź z zaktualizowanymi danymi
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Children.DoesNotExist:
@@ -177,7 +165,6 @@ class ChildrenAPIView(ModelViewSet):
             if Children.objects.filter(pesel=pesel).exists():
                 return Response({'error': 'Dziecko o podanym PESEL już istnieje.'}, status=status.HTTP_400_BAD_REQUEST)
             
-            # Przetworzenie przesłanego zdjęcia i zapisanie go na serwerze
             if 'photo' in request.FILES:
                 photo = request.FILES['photo']
                 with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
@@ -215,33 +202,31 @@ class ChildrenAPIView(ModelViewSet):
             else:
                 photo = 'default.png'
             file_path = os.path.join(settings.MEDIA_ROOT, photo)
-            return FileResponse(open(file_path, 'rb'), content_type='image/jpeg')
+            if photo.lower().endswith(('.png', '.jpg', '.jpeg')):
+                content_type = 'image/jpeg' if photo.lower().endswith(('.jpg', '.jpeg')) else 'image/png'
+                return FileResponse(open(file_path, 'rb'), content_type=content_type)
+            else:
+                return HttpResponse("Unsupported file format", status=400)
         if request.method == 'DELETE':
             if child.photo_path:
-                # Usuń plik z serwera
                 file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
                 if os.path.exists(file_path):
                     os.remove(file_path)
-                # Ustaw wartość pola photo_path na null
                 child.photo_path = None
                 child.save()
                 return Response(status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response({'message': 'Brak zdjęcia do usunięcia.'}, status=status.HTTP_404_NOT_FOUND)
         if request.method == 'PUT':
-            # Usunięcie bieżącego zdjęcia z serwera, jeśli istnieje
             if child.photo_path:
                 file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
                 if os.path.exists(file_path):
                     os.remove(file_path)
-
-            # Przetworzenie przesłanego zdjęcia i zapisanie go na serwerze
-            if 'photo' in request.FILES:
-                photo = request.FILES['photo']
+            if 'photo_path' in request.FILES:
+                photo = request.FILES['photo_path']
                 with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
                     for chunk in photo.chunks():
                         destination.write(chunk)
-                # Ustawienie nazwy zdjęcia w bazie danych
                 child.photo_path = photo.name
                 child.save()
                 return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
@@ -253,12 +238,10 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
 
         if request.method == 'GET':
-            # Pobierz wszystkie notatki dla danego dziecka
             notes = Notes.objects.filter(child_id=child)
             serializer = NotesSerializer(notes, many=True)
             return Response(serializer.data)
         elif request.method == 'POST':
-            # Utwórz nową notatkę dla danego dziecka
             serializer = NotesSerializer(data=request.data)
             serializer.initial_data['child_id'] = child.id
             
@@ -300,18 +283,15 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
 
         if request.method == 'GET':
-            # Pobierz wszystkie notatki dla danego dziecka
             relatives = child.relatives
             serializer = RelativesSerializer(relatives, many=True)
             return Response(serializer.data)
         elif request.method == 'POST':
-            # Utwórz nową notatkę dla danego dziecka
             serializer = RelativesSerializer(data=request.data)
             
             if serializer.is_valid():
-                relative_data = serializer.validated_data  # Pobierz dane zdeserializowane
+                relative_data = serializer.validated_data 
 
-                # Sprawdź, czy obiekt Relatives już istnieje w bazie danych
                 try:
                     relative = Relatives.objects.get(
                     first_name=relative_data['first_name'],
@@ -322,10 +302,8 @@ class ChildrenAPIView(ModelViewSet):
                     e_mail=relative_data['e_mail']
                 )
                 except Relatives.DoesNotExist:
-                    # Jeśli obiekt Relatives nie istnieje, utwórz nowy
                     relative = serializer.save()
 
-                # Dodaj powiązanie do dzieci
                 child.relatives.add(relative)
 
                 return Response(serializer.data, status=201)
