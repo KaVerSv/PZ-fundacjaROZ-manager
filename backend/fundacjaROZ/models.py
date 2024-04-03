@@ -55,6 +55,7 @@ class Children(models.Model):
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50)
     surname = models.CharField(max_length=100)
+    gender = models.CharField(max_length=10)
     birth_date = models.DateField()
     birthplace = models.CharField(max_length=100)
     residential_address = models.CharField(max_length=200)
@@ -105,15 +106,12 @@ class CustomUserManager(BaseUserManager):
 
 class User(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)
-    # first_name = models.CharField(max_length=50)
-    # surname = models.CharField(max_length=100)
+    first_name = models.CharField(max_length=50)
+    surname = models.CharField(max_length=100)
     email = models.EmailField(max_length=100, unique=True)
-    username = models.CharField(max_length=100)
-    is_active = models.BooleanField(default=True)
-    is_staff = models.BooleanField(default=False)
-    date_joined = models.DateField(auto_now_add=True)
+    # is_staff = models.BooleanField(default=False)
     USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['username']
+    REQUIRED_FIELDS = ['first_name', 'surname']
     objects = CustomUserManager()
 
     # Use django.contrib.auth.models.Group
@@ -124,12 +122,6 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
-# class Users(models.Model):
-#     first_name = models.CharField(max_length=50)
-#     surname = models.CharField(max_length=100)
-#     e_mail = models.CharField(max_length=100, validators=[validate_email])
-#     password = models.CharField()
 
 # class Documents(models.Model):
 #     name = models.CharField(max_length = 50)
