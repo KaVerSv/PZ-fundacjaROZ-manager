@@ -222,16 +222,23 @@ class ChildrenAPIView(ModelViewSet):
                 file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
                 if os.path.exists(file_path):
                     os.remove(file_path)
-            if 'photo_path' in request.FILES:
-                photo = request.FILES['photo_path']
-                with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
-                    for chunk in photo.chunks():
-                        destination.write(chunk)
-                child.photo_path = photo.name
-                child.save()
-                return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
+
+            if 'photo' in request.FILES:
+                photo = request.FILES['photo']
+                
+                if hasattr(photo, 'content_type') and photo.content_type in ['image/jpeg', 'image/png']:
+                    with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
+                        for chunk in photo.chunks():
+                            destination.write(chunk)
+                    child.photo_path = photo.name
+                    child.save()
+                    return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
+                else:
+                    return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
             else:
-                return Response({'error': 'Nie przesłano nowego zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
+                return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
+
+
     
     @action(methods=['get', 'post'], detail=True, url_path='notes', url_name='notes')
     def notes(self, request, pk=None):        
