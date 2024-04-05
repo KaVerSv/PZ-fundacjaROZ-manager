@@ -130,3 +130,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 #     path = models.CharField(max_length=100)
 #     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
     
+
