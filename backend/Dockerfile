@@ -12,8 +12,9 @@ RUN apk add --virtual .build-deps --no-cache postgresql-dev gcc python3-dev musl
         pip install --no-cache-dir -r requirements.txt && \
         apk --purge del .build-deps && \
         pip install drf-spectacular && \
-        pip install djangorestframework-simplejwt
+        pip install djangorestframework-simplejwt && \
+        pip install pyjwt
 
 COPY . /app/backend/
 
-CMD [ "python", "manage.py", "runserver", "0.0.0.0:8000" ]
+CMD ["sh", "-c", "python manage.py makemigrations fundacjaROZ && python manage.py migrate && python manage.py runserver 0.0.0.0:8000"]
