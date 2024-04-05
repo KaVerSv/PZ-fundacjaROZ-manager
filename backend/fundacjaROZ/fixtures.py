@@ -1,10 +1,11 @@
 # fixtures.py
+
 from django.utils import timezone
 from datetime import timedelta
 from django.contrib.auth import get_user_model
-from .models import Relatives, Children, Notes
 
-def add_example_data():
+def add_example_data(**kwargs):  # Dodano **kwargs jako argument
+    from .models import Relatives, Children, Notes
     # Tworzenie przykładowego krewnego
     relative = Relatives.objects.create(
         first_name='John',

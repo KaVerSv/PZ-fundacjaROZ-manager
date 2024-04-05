@@ -1,12 +1,12 @@
 from django.apps import AppConfig
+from django.db.models.signals import post_migrate
+from django.dispatch import receiver
+from .fixtures import add_example_data
 
 
 class FundacjarozConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'fundacjaROZ'
 
-# W pliku np. manage.py, apps.py, lub innym odpowiednim miejscu
-from fixtures import add_example_data
-
-# Wywołanie funkcji do dodawania przykładowych danych
-add_example_data()
+    def ready(self):
+        post_migrate.connect(add_example_data, sender=self)
