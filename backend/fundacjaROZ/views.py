@@ -117,6 +117,17 @@ class UsersViewAPI(ModelViewSet):
             new_user = serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def list(self, request):    
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+
+            serializer = UsersSerializer(queryset, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Children.DoesNotExist:
+            return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class UserLogoutViewAPI(APIView):
 	authentication_classes = (TokenAuthentication,)
