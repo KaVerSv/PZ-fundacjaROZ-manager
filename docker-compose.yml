@@ -16,34 +16,31 @@ services:
       - ./data/db:/var/lib/postgresql/data/
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+    image: roz_front:latest
 
     ports:
       - '8080:8080'
 
-    volumes:
-      - ./frontend:/app/frontend
 
     depends_on:
       - backend
 
-  backend: 
-    build: 
-      context: ./backend
-      dockerfile: Dockerfile
-
-    environment:
-      - POSTGRES_PASSWORD=postgres
-      - POSTGRES_USER=postgres
-      - POSTGRES_DB=postgres
-
+  backend:
+    image: zywczak1/backend:latest
+#    build: 
+#      context: ./backend
+#      dockerfile: Dockerfile
+#
+#    environment:
+#      - POSTGRES_PASSWORD=postgres
+#      - POSTGRES_USER=postgres
+#      - POSTGRES_DB=postgres
+#    volumes:
+#      - ./backend:/app/backend
     ports:
       - '8000:8000'
 
-    volumes:
-      - ./backend:/app/backend
+    
 
     depends_on:
       - db

@@ -1,4 +1,3 @@
-import React from 'react';
 import {SubmitHandler, useForm} from "react-hook-form";
 import BigLogo from "./BigLogo.tsx";
 import FormInput from "../common/FormInput.tsx";
@@ -15,12 +14,19 @@ interface FormData {
 
 function RegistrationForm() {
 
-    const {register, handleSubmit, formState: {errors}} = useForm<FormData>({
+    const {register, handleSubmit, formState: {errors}, getValues} = useForm<FormData>({
         mode: 'onChange'
     });
 
     const onSubmit: SubmitHandler<FormData> = (data) => {
         console.log(data)
+    };
+
+    const validatePasswordMatch = (value: string) => {
+        if (value !== getValues("password")) {
+            return "Hasłą musą się zgadzać";
+        }
+        return true;
     };
 
     return (
@@ -36,18 +42,53 @@ function RegistrationForm() {
                 <div>
                     <form className='flex flex-col gap-3' onSubmit={handleSubmit(onSubmit)}>
                         <FormInput name={'email'} type={'text'} label={'Email'} register={register}
-                                   error={errors.email} labelColor='text-main_white'></FormInput>
+                                   error={errors.email}
+                                   rules={{
+                                       required: 'Pole wymagane',
+                                       pattern: {
+                                           value: /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,4}$/,
+                                           message: 'Niewłaściwy adres e-mail',
+                                       }
+                                   }}
+                                   labelColor='text-main_white'></FormInput>
                         <FormInput name={'name'} type={'text'} label={'Imie'} register={register}
-                                   error={errors.password} labelColor='text-main_white'/>
+                                   error={errors.name}
+                                   rules={{
+                                       required: 'Pole wymagane'
+                                   }}
+                                   labelColor='text-main_white'/>
                         <FormInput name={'surname'} type={'text'} label={'Nazwisko'} register={register}
-                                   error={errors.password} labelColor='text-main_white'/>
+                                   error={errors.surname}
+                                   rules={{
+                                       required: 'Pole wymagane'
+                                   }}
+                                   labelColor='text-main_white'/>
                         <FormInput name={'pesel'} type={'text'} label={'Pesel'} register={register}
-                                   error={errors.password} labelColor='text-main_white'/>
+                                   error={errors.pesel}
+                                   rules={{
+                                       required: 'Pole wymagane',
+                                       minLength: {value: 11, message: 'Niewłaściwy PESEL'},
+                                       maxLength: {value: 11, message: 'Niewłaściwy PESEL'}
+                                   }}
+                                   labelColor='text-main_white'/>
                         <FormInput name={'password'} type={'password'} label={'Hasło'} register={register}
-                                   error={errors.password} labelColor='text-main_white'/>
+                                   error={errors.password}
+                                   rules={{
+                                       required: 'Pole wymagane',
+                                       minLength: {value: 6, message: 'Minimum 6 znaków'},
+                                       maxLength: {value: 18, message: 'Maximum 18 znaków'}
+                                   }}
+                                   labelColor='text-main_white'/>
                         <FormInput name={'password_confirm'} type={'password'} label={'Powtórz haslo'}
                                    register={register}
-                                   error={errors.password} labelColor='text-main_white'/>
+                                   error={errors.password_confirm}
+                                   rules={{
+                                       required: 'Pole wymagane',
+                                       validate: {
+                                           validatePasswordMatch
+                                       }
+                                   }}
+                                   labelColor='text-main_white'/>
                         <button
                             className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline"
                             type="submit">
