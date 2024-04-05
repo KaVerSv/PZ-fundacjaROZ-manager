@@ -124,6 +124,19 @@ class ChildrenAPIView(ModelViewSet):
         if not user_token:
             raise AuthenticationFailed('Unauthenticated user.')
         return super().dispatch(request, *args, **kwargs)
+    
+    @action(methods=['delete'], detail=True, url_path='delete', url_name='delete')
+    def delete_child(self, request, pk=None):
+        child = self.get_object()
+
+        if child.photo_path:
+            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        child.delete()
+
+        return Response({'message': 'Child and associated photo deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request):    
         try:
@@ -140,6 +153,20 @@ class ChildrenAPIView(ModelViewSet):
 
         except Children.DoesNotExist:
             return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
+    
+    @action(methods=['delete'], detail=False, url_path='delete-all', url_name='delete-all')
+    def delete_all_children(self, request):
+        try:
+            children = Children.objects.all()
+            for child in children:
+                if child.photo_path:
+                    file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                child.delete()
+            return Response({'message': 'All children deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     def retrieve(self, request, pk=None):        
         try:
@@ -191,6 +218,7 @@ class ChildrenAPIView(ModelViewSet):
         for child_data in data:
             child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
         return Response(data, status=status.HTTP_200_OK)
+    
     
     @action(methods=['get', 'delete','put'], detail=True,url_path='photo', url_name='photo')
     def photo(self, request, pk=None):        
@@ -367,6 +395,12 @@ class RelativeAPIView(ModelViewSet):
     queryset = Relatives.objects.all()
     serializer_class = RelativesSerializer
 
+    @action(methods=['delete'], detail=False, url_path='delete-all', url_name='delete-all')
+    def delete_all_relatives(self, request):
+        relatives = Relatives.objects.all()
+        relatives.delete()
+        return Response({'message': 'All relatives deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
 
 
 
@@ -388,3 +422,9 @@ class NotesAPIView(ModelViewSet):
     
     queryset = Notes.objects.all()
     serializer_class = NotesSerializer
+
+    @action(methods=['delete'], detail=False, url_path='delete-all', url_name='delete-all')
+    def delete_all_notes(self, request):
+        notes = Notes.objects.all()
+        notes.delete()
+        return Response({'message': 'All notes deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
