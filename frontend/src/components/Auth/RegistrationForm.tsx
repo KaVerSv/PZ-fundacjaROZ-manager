@@ -7,7 +7,7 @@ interface FormData {
     email: string;
     name: string;
     surname: string;
-    pesel: string;
+    //pesel: string;
     password: string;
     password_confirm: string;
 }
@@ -63,14 +63,14 @@ function RegistrationForm() {
                                        required: 'Pole wymagane'
                                    }}
                                    labelColor='text-main_white'/>
-                        <FormInput name={'pesel'} type={'text'} label={'Pesel'} register={register}
-                                   error={errors.pesel}
-                                   rules={{
-                                       required: 'Pole wymagane',
-                                       minLength: {value: 11, message: 'Niewłaściwy PESEL'},
-                                       maxLength: {value: 11, message: 'Niewłaściwy PESEL'}
-                                   }}
-                                   labelColor='text-main_white'/>
+                        {/*<FormInput name={'pesel'} type={'text'} label={'Pesel'} register={register}*/}
+                        {/*           error={errors.pesel}*/}
+                        {/*           rules={{*/}
+                        {/*               required: 'Pole wymagane',*/}
+                        {/*               minLength: {value: 11, message: 'Niewłaściwy PESEL'},*/}
+                        {/*               maxLength: {value: 11, message: 'Niewłaściwy PESEL'}*/}
+                        {/*           }}*/}
+                        {/*           labelColor='text-main_white'/>*/}
                         <FormInput name={'password'} type={'password'} label={'Hasło'} register={register}
                                    error={errors.password}
                                    rules={{
