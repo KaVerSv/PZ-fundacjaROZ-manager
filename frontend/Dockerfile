@@ -16,7 +16,7 @@ RUN npm install @reduxjs/toolkit react-router-dom tailwindcss @headlessui/react 
 
 COPY . /app/frontend/
 
-RUN npm run build
+RUN npm run
 
 EXPOSE 8080
 CMD [ "npm", "run", "dev" ]
