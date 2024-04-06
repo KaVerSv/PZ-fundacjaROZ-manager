@@ -411,7 +411,7 @@ def add_example_data(**kwargs):
             "email": "admin@admin.com",
             "first_name": "admin",
             "surname": "admin",
-            "password": "adminadmin"
+            "password": "pbkdf2_sha256$720000$stf4tCtVV21l2Ok6wHC3jL$ORQh/WrEoW8PKwJUuFH3AMZHQjTALZl9SS1ykrLUoM8="
         }
     ]
 
