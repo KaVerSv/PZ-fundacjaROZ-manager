@@ -412,17 +412,11 @@ def add_example_data(**kwargs):
             "first_name": "admin",
             "surname": "admin",
             "password": "adminadmin"
-        },
-        {
-            "email": "root@root.com",
-            "first_name": "root",
-            "surname": "root",
-            "password": "rootroot"
         }
     ]
 
-    User.objects.bulk_create(User(**data) for data in users_data)
     Notes.objects.bulk_create(Notes(**data) for data in notes_data)
+    User.objects.bulk_create(User(**data) for data in users_data)
 
     children[0].relatives.add(relatives[0])
     children[1].relatives.add(relatives[1], relatives[2])

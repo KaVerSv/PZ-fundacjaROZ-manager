@@ -94,11 +94,11 @@ class UsersViewAPI(ModelViewSet):
      
     http_method_names = ['get', 'post', 'delete', 'put']
     
-    def dispatch(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        return super().dispatch(request, *args, **kwargs)
+    # def dispatch(self, request, *args, **kwargs):
+    #     user_token = request.COOKIES.get('access_token')
+    #     if not user_token:
+    #         raise AuthenticationFailed('Unauthenticated user.')
+    #     return super().dispatch(request, *args, **kwargs)
     
     def delete(self, request):
         users = User.objects.all()
