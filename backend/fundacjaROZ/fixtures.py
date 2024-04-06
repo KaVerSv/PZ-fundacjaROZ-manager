@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 def add_example_data(**kwargs):
-    from .models import Relatives, Children, Notes
+    from .models import Relatives, Children, Notes, User
 
     relatives_data = [
         {
@@ -406,6 +406,22 @@ def add_example_data(**kwargs):
         },
     ]
 
+    users_data = [
+        {
+            "email": "admin@admin.com",
+            "first_name": "admin",
+            "surname": "admin",
+            "password": "adminadmin"
+        },
+        {
+            "email": "root@root.com",
+            "first_name": "root",
+            "surname": "root",
+            "password": "rootroot"
+        }
+    ]
+
+    User.objects.bulk_create(User(**data) for data in users_data)
     Notes.objects.bulk_create(Notes(**data) for data in notes_data)
 
     children[0].relatives.add(relatives[0])
