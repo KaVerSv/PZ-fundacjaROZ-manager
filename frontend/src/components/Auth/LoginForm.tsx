@@ -1,7 +1,10 @@
 import BigLogo from "./BigLogo.tsx";
 import FormInput from "../common/FormInput.tsx";
 import {SubmitHandler, useForm} from "react-hook-form";
-import {Link} from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
+import {BASE_API_URL} from "../../api/contst.ts";
+import AuthContext from "../../context/AuthProvider.tsx";
+import {useContext, useState} from "react";
 
 interface FormData {
     email: string;
@@ -9,14 +12,42 @@ interface FormData {
 }
 
 function LoginForm() {
-    const {register, handleSubmit, formState: { errors, isValid }} = useForm<FormData>({
+    const navigate = useNavigate();
+    const [loginError, setLoginError] = useState(false);
+    const {register, handleSubmit, formState: {errors, isValid}} = useForm<FormData>({
         mode: 'onChange'
     });
 
+    const {setAuth} = useContext(AuthContext);
+    const onSubmit: SubmitHandler<FormData> = async (formData) => {
+        try {
+            const response = await fetch(BASE_API_URL + 'api/user/login/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({email: formData.email, password: formData.password}),
+            });
 
-    const onSubmit: SubmitHandler<FormData> = (data) => {
-        console.log(data)
+            if (!response.ok) {
+                throw new Error('Invalid credentials');
+            }
+
+            const data = await response.json();
+            const jwtToken = data.access_token; // Assuming your API returns the token in this format
+            console.log(jwtToken)
+            // Store the token in local storage or state for later use
+            setAuth({token: jwtToken})
+
+            navigate('/')
+        } catch (error) {
+            setLoginError(true);
+        }
     };
+
+    const onFocus = ()=>{
+        setLoginError(false)
+    }
 
     return (
         <div className='flex gap-5 p-2'>
@@ -29,7 +60,7 @@ function LoginForm() {
                     <span className='text-2xl text-main_white'>Zaloguj się</span>
                 </div>
                 <div>
-                    <form className='flex flex-col gap-3' onSubmit={handleSubmit(onSubmit)}>
+                    <form className='flex flex-col gap-3' onSubmit={handleSubmit(onSubmit)} onFocus={onFocus}>
                         <FormInput name={'email'} type={'text'} label={'Email'} register={register}
                                    error={errors.email}
                                    rules={{
@@ -43,6 +74,9 @@ function LoginForm() {
                         <FormInput name={'password'} type={'password'} label={'Hasło'} register={register}
                                    error={errors.password} rules={{required: 'Pole wymagane'}}
                                    labelColor='text-main_white'/>
+                        {loginError && <div className='flex justify-center'>
+                            <span className='text-red-600'>Niepoprawny email lub hasło</span>
+                        </div>}
                         <button
                             disabled={!isValid}
                             className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey"
