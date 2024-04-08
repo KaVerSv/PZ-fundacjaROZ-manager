@@ -16,22 +16,21 @@ from rest_framework.decorators import action
 from .serializers import *
 
 class UserRegistrationAPIView(APIView):
-	serializer_class = UserRegistrationSerializer
-	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
+    serializer_class = UserRegistrationSerializer
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (AllowAny,)
 
-	def post(self, request):
-		serializer = self.serializer_class(data=request.data)
-		if serializer.is_valid(raise_exception=True):
-			new_user = serializer.save()
-			if new_user:
-				access_token = generate_access_token(new_user)
-				data = { 'access_token': access_token }
-				response = Response(data, status=status.HTTP_201_CREATED)
-				response.set_cookie(key='access_token', value=access_token, httponly=True)
-				return response
-		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
+    def post(self, request):
+        serializer = self.serializer_class(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            new_user = serializer.save()
+            if new_user:
+                access_token = generate_access_token(new_user)
+                data = { 'access_token': access_token }
+                response = Response(data, status=status.HTTP_201_CREATED)
+                response.set_cookie(key='access_token', value=access_token, httponly=True)
+                return response
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class UserLoginAPIView(APIView):
 	serializer_class = UserLoginSerializer
@@ -65,8 +64,6 @@ class UserLoginAPIView(APIView):
 		return Response({
 			'message': 'Something went wrong.'
 		})
-
-
 
 class UserViewAPI(APIView):
 	authentication_classes = (TokenAuthentication,)
@@ -222,7 +219,7 @@ class ChildrenAPIView(ModelViewSet):
             return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
     def create(self, request, *args, **kwargs):        
-        serializer = self.get_serializer(data=request.data)
+        serializer = ChildrenSerializer1(data=request.data)
         if serializer.is_valid():
             pesel = serializer.validated_data.get('pesel')
             if Children.objects.filter(pesel=pesel).exists():
