@@ -28,12 +28,10 @@ class NotesSerializer(ModelSerializer):
         model = Notes
         fields = ('id','child_id', 'title', 'contents')
 
-
-# class UserSerializer(ModelSerializer):
-#     class Meta:
-#         model = User
-#         fields = ('id', 'first_name', 'surname', 'e_mail', 'password')
-
+class UsersSerializer(ModelSerializer):
+    class Meta:
+        model = User
+        fields = ('user_id','first_name','surname','email')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
@@ -48,7 +46,6 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         first_name = validated_data.get('first_name')
         surname = validated_data.get('surname')
 
-        # Tworzenie nowej instancji modelu z przekazaniem wszystkich danych
         db_instance = self.Meta.model(
             email=email,
             first_name=first_name,

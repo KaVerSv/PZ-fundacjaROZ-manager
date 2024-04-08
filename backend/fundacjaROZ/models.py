@@ -53,7 +53,7 @@ class Relatives(models.Model):
 class Children(models.Model):
     pesel = models.CharField(unique=True, max_length=11)#, validators=[validate_pesel]
     first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
+    second_name = models.CharField(max_length=50, blank=True)
     surname = models.CharField(max_length=100)
     gender = models.CharField(max_length=10)
     birth_date = models.DateField()
@@ -130,3 +130,4 @@ class User(AbstractBaseUser, PermissionsMixin):
 #     path = models.CharField(max_length=100)
 #     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
     
+

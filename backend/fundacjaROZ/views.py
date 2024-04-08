@@ -2,11 +2,10 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 import os
 from django.http import FileResponse, HttpResponse
-from rest_framework.decorators import api_view
 from .models import *
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.authentication import TokenAuthentication
-from rest_framework.permissions import AllowAny, IsAuthenticated
+from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
@@ -21,10 +20,6 @@ class UserRegistrationAPIView(APIView):
 	authentication_classes = (TokenAuthentication,)
 	permission_classes = (AllowAny,)
 
-	def get(self, request):
-		content = { 'message': 'Hello!' }
-		return Response(content)
-
 	def post(self, request):
 		serializer = self.serializer_class(data=request.data)
 		if serializer.is_valid(raise_exception=True):
@@ -36,7 +31,6 @@ class UserRegistrationAPIView(APIView):
 				response.set_cookie(key='access_token', value=access_token, httponly=True)
 				return response
 		return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 class UserLoginAPIView(APIView):
@@ -90,6 +84,50 @@ class UserViewAPI(APIView):
 		user = user_model.objects.filter(user_id=payload['user_id']).first()
 		user_serializer = UserRegistrationSerializer(user)
 		return Response(user_serializer.data)
+     
+class UsersViewAPI(ModelViewSet):
+    authentication_classes = (TokenAuthentication,)
+    permission_classes = (AllowAny,)
+     
+    queryset = User.objects.all()
+    serializer_class = UserRegistrationSerializer
+     
+    http_method_names = ['get', 'post', 'delete', 'put']
+    
+    def dispatch(self, request, *args, **kwargs):
+        user_token = request.COOKIES.get('access_token')
+        if not user_token:
+            raise AuthenticationFailed('Unauthenticated user.')
+        return super().dispatch(request, *args, **kwargs)
+    
+    def delete(self, request):
+        users = User.objects.all()
+
+        user_token = request.COOKIES.get('access_token')
+        payload = jwt.decode(user_token, settings.SECRET_KEY, algorithms=['HS256'])
+
+        for user in users:
+            if user.user_id != payload['user_id']:
+                user.delete()
+        return Response({'message': 'All relatives deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    
+    def post(self, request):
+        serializer = UserRegistrationSerializer(data=request.data)
+        if serializer.is_valid(raise_exception=True):
+            new_user = serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def list(self, request):    
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+
+            serializer = UsersSerializer(queryset, many=True)
+
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Children.DoesNotExist:
+            return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class UserLogoutViewAPI(APIView):
 	authentication_classes = (TokenAuthentication,)
@@ -124,6 +162,31 @@ class ChildrenAPIView(ModelViewSet):
         if not user_token:
             raise AuthenticationFailed('Unauthenticated user.')
         return super().dispatch(request, *args, **kwargs)
+    
+    def delete(self, request):
+        try:
+            children = Children.objects.all()
+            for child in children:
+                if child.photo_path:
+                    file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+                    if os.path.exists(file_path):
+                        os.remove(file_path)
+                child.delete()
+            return Response({'message': 'All children deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+        except Exception as e:
+             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+    
+    def delete(self, request, pk=None):
+        child = self.get_object()
+
+        if child.photo_path:
+            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        child.delete()
+
+        return Response({'message': 'Child and associated photo deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request):    
         try:
@@ -191,6 +254,7 @@ class ChildrenAPIView(ModelViewSet):
         for child_data in data:
             child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
         return Response(data, status=status.HTTP_200_OK)
+    
     
     @action(methods=['get', 'delete','put'], detail=True,url_path='photo', url_name='photo')
     def photo(self, request, pk=None):        
@@ -367,6 +431,13 @@ class RelativeAPIView(ModelViewSet):
     queryset = Relatives.objects.all()
     serializer_class = RelativesSerializer
 
+    http_method_names = ['get', 'post', 'put', 'delete']
+
+    def delete(self, request):
+        relatives = Relatives.objects.all()
+        relatives.delete()
+        return Response({'message': 'All relatives deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
 
 
 
@@ -388,3 +459,10 @@ class NotesAPIView(ModelViewSet):
     
     queryset = Notes.objects.all()
     serializer_class = NotesSerializer
+
+    http_method_names = ['get', 'post', 'put', 'delete']
+    
+    def delete(self, request):
+        notes = Notes.objects.all()
+        notes.delete()
+        return Response({'message': 'All notes deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
