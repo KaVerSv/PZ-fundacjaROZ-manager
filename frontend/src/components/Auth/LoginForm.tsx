@@ -1,7 +1,7 @@
 import BigLogo from "./BigLogo.tsx";
 import FormInput from "../common/FormInput.tsx";
 import {SubmitHandler, useForm} from "react-hook-form";
-import {Link, useNavigate} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useState} from "react";
 import useAuth from "../../hooks/useAuth.ts";
@@ -13,6 +13,7 @@ interface FormData {
 
 function LoginForm() {
     const navigate = useNavigate();
+    const location = useLocation();
     const [loginError, setLoginError] = useState(false);
     const {register, handleSubmit, formState: {errors, isValid}} = useForm<FormData>({
         mode: 'onChange'
@@ -35,11 +36,11 @@ function LoginForm() {
 
             const data = await response.json();
             const jwtToken = data.access_token; // Assuming your API returns the token in this format
-            console.log(jwtToken)
             // Store the token in local storage or state for later use
             setAuth({token: jwtToken})
 
-            navigate('/')
+            const from = location.state?.from?.pathname || '/'
+            navigate(from, {replace: true});
         } catch (error) {
             setLoginError(true);
         }
