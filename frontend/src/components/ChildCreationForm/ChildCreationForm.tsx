@@ -73,9 +73,8 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         setValue("relatives", [1]);
         setLoading(true);
         try {
-
             // Make POST request using Fetch API
-            const response = await fetch(`${BASE_API_URL}/children/${props.editMode? parseInt(props.childId) + '/' : ''}`, {
+            let response = await fetch(`${BASE_API_URL}/children/${props.editMode? parseInt(props.childId) + '/' : ''}`, {
                 method: props.editMode ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -85,6 +84,20 @@ function ChildCreationForm(props: ChildCreationFormProps) {
 
             // Check if request was successful
             if (!response.ok) throw new Error('Network response was not ok');
+            if(formData.image){
+                const data = await response.json();
+                const id = data.id;
+                const formDataToSend = new FormData();
+                formDataToSend.append('photo', formData.image)
+
+
+                response = await fetch(`${BASE_API_URL}children/${id}/photo/`, {
+                    method: 'PUT',
+                    body: formDataToSend,
+                });
+                if (!response.ok) throw new Error('Network response was not ok');
+            }
+
 
             navigate('/');
 
@@ -103,9 +116,8 @@ function ChildCreationForm(props: ChildCreationFormProps) {
     const handleUploadedFile = (event) => {
         const file = event.target.files[0];
 
-
+        setValue('image', file);
         const urlImage = URL.createObjectURL(file);
-
 
         // eslint-disable-next-line @typescript-eslint/ban-ts-comment
         setPreview(urlImage);
@@ -128,7 +140,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                             <input
                                 className="appearance-none block w-64 sm:w-auto bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                                 type="file"
-                                {...register('image', {})}
                                 accept="image/*" // Allow only image files
                                 onChange={handleUploadedFile}
                             />
