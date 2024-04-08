@@ -3,8 +3,8 @@ import FormInput from "../common/FormInput.tsx";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {Link, useNavigate} from "react-router-dom";
 import {BASE_API_URL} from "../../api/contst.ts";
-import AuthContext from "../../context/AuthProvider.tsx";
-import {useContext, useState} from "react";
+import {useState} from "react";
+import useAuth from "../../hooks/useAuth.ts";
 
 interface FormData {
     email: string;
@@ -18,7 +18,7 @@ function LoginForm() {
         mode: 'onChange'
     });
 
-    const {setAuth} = useContext(AuthContext);
+    const {setAuth} = useAuth();
     const onSubmit: SubmitHandler<FormData> = async (formData) => {
         try {
             const response = await fetch(BASE_API_URL + 'api/user/login/', {
