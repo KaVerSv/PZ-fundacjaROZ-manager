@@ -3,10 +3,12 @@ FROM node:20.10.0-alpine
 WORKDIR /app/frontend/
 
 COPY package*.json /app/frontend/
+
 RUN npm install
 
+RUN npm install - vite 
+
 RUN npm install @reduxjs/toolkit react-router-dom tailwindcss @headlessui/react && \
-    npm install && \
     npm i react-router-dom && \
     npm install tailwindcss && \
     npm install react-hook-form && \
@@ -16,7 +18,8 @@ RUN npm install @reduxjs/toolkit react-router-dom tailwindcss @headlessui/react 
 
 COPY . /app/frontend/
 
-RUN npm run
+RUN npm run build
 
 EXPOSE 8080
-CMD [ "npm", "run", "dev" ]
+
+CMD [ "sh", "-c", "npm install && npm run dev" ]
