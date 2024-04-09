@@ -8,6 +8,7 @@ import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useNavigate} from "react-router-dom";
 
+//TODO: remove relatives from form
 interface FormData extends ChildModelMaximized {
     image: File
     gender: GenderEnum;
