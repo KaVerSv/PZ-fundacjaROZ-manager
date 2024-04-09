@@ -19,21 +19,7 @@ interface ChildCreationFormProps {
 }
 
 function ChildCreationForm(props: ChildCreationFormProps) {
-    //const currentChild: ChildModelMaximized | null = props.editMode && props.childId ? currentChildrenFull[parseInt(props.childId) -1] : null;
-    // const fetcher: (url: string) => Promise<ChildModelMaximized> = async (url) => {
-    //     const response = await fetch(url);
-    //     if (!response.ok) {
-    //         throw new Error(`API request failed with status ${response.status}`);
-    //     }
-    //     const jsonData: ChildModelMaximized = await response.json();
-    //     Object.keys(jsonData).forEach(key => {
-    //         setValue(key, jsonData[key]);
-    //     });
-    //     document.title = jsonData.first_name + ' ' + jsonData.surname;
-    //
-    //     return jsonData;
-    // };
-    // const {data} = useSWR<ChildModelMaximized>(BASE_API_URL + `/children/${parseInt(props.childId)}`, fetcher, );
+
     const navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
@@ -47,6 +33,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                     setValue(key, jsonData[key]);
                 });
                 setPreview(jsonData.photo_path);
+                setValue('gender', jsonData.gender === 'Female' ? GenderEnum.female : GenderEnum.male)
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -74,7 +61,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         setLoading(true);
         try {
             // Make POST request using Fetch API
-            let response = await fetch(`${BASE_API_URL}/children/${props.editMode? parseInt(props.childId) + '/' : ''}`, {
+            let response = await fetch(`${BASE_API_URL}/children/${props.editMode ? parseInt(props.childId) + '/' : ''}`, {
                 method: props.editMode ? 'PUT' : 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -84,7 +71,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
 
             // Check if request was successful
             if (!response.ok) throw new Error('Network response was not ok');
-            if(formData.image){
+            if (formData.image) {
                 const data = await response.json();
                 const id = data.id;
                 const formDataToSend = new FormData();
@@ -127,7 +114,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         <div className='mt-3'>
             <WidthWrapper>
                 <form className='flex flex-col items-center border-main_red border-4 p-2 rounded-2xl'
-                      onSubmit={handleSubmit(onSubmit)} onChange={()=>{setError(false)}}>
+                      onSubmit={handleSubmit(onSubmit)} onChange={() => {
+                    setError(false)
+                }}>
                     <div className='flex flex-col lg:flex-row items-center'>
                         <div className='flex flex-col px-2 items-center'>
                             <div>
