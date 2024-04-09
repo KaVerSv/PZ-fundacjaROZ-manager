@@ -7,6 +7,7 @@ import {GenderEnum} from "../../models/GenderEnum.tsx";
 import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useNavigate} from "react-router-dom";
+import {data} from "autoprefixer";
 
 interface FormData extends ChildModelMaximized {
     image: File
@@ -56,9 +57,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const onSubmit: SubmitHandler<FormData> = async (formData) => {
-        console.log(formData)
         setValue("relatives", [1]);
         setLoading(true);
+        setValue('leaving_date', formData.leaving_date === ""? null : formData.leaving_date)
         try {
             // Make POST request using Fetch API
             let response = await fetch(`${BASE_API_URL}/children/${props.editMode ? parseInt(props.childId) + '/' : ''}`, {
