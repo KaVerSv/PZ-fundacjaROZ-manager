@@ -14,7 +14,7 @@ export interface ChildModelMaximized {
     leaving_date: string,
     photo_path: string,
     relatives: number[]
-    gender: GenderEnum;
+    gender: GenderEnum | string;
 }
 //
 // export var currentChildrenFull: ChildModelMaximized[] = [
