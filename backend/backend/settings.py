@@ -24,6 +24,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/media/')
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&o*y(slzh!mvh*%+z1dl3jvtdx+*xigc^lo9fsjox16ex7jo5w'
 
+
+JWT_CONFIG = {
+    'TOKEN_LIFETIME_HOURS': 24,  # Ustaw tutaj odpowiedni czas życia tokena w godzinach
+    # Inne ustawienia JWT, jeśli potrzebne
+}
+
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
@@ -51,6 +57,13 @@ ROOT_URLCONF = 'backend.urls'
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'fundacjaROZ.authentication.JWTAuthentication',
+    ]
 }
 
 CORS_ALLOWED_ORIGINS=['http://localhost:8080']

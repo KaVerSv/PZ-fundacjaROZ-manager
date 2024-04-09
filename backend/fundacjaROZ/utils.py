@@ -6,6 +6,7 @@ import jwt
 def generate_access_token(user):
 	payload = {
 		'user_id': user.user_id,
+		
 		'exp': datetime.utcnow() + timedelta(days=1, minutes=0),
 		'iat': datetime.utcnow(),
 	}

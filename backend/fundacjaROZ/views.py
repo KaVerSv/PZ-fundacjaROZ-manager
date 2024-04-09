@@ -1,3 +1,4 @@
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 import os
@@ -14,10 +15,12 @@ from .utils import generate_access_token
 import jwt
 from rest_framework.decorators import action
 from .serializers import *
+from rest_framework.authentication import SessionAuthentication, BasicAuthentication
+from rest_framework.permissions import IsAuthenticated
+from .authentication import JWTAuthentication
 
 class UserRegistrationAPIView(APIView):
     serializer_class = UserRegistrationSerializer
-    authentication_classes = (TokenAuthentication,)
     permission_classes = (AllowAny,)
 
     def post(self, request):
@@ -25,16 +28,13 @@ class UserRegistrationAPIView(APIView):
         if serializer.is_valid(raise_exception=True):
             new_user = serializer.save()
             if new_user:
-                access_token = generate_access_token(new_user)
-                data = { 'access_token': access_token }
-                response = Response(data, status=status.HTTP_201_CREATED)
-                response.set_cookie(key='access_token', value=access_token, httponly=True)
-                return response
+                access_token = JWTAuthentication.create_jwt(new_user)
+                return Response(data={'token': access_token}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 class UserLoginAPIView(APIView):
 	serializer_class = UserLoginSerializer
-	authentication_classes = (TokenAuthentication,)
 	permission_classes = (AllowAny,)
 
 	def post(self, request):
@@ -53,21 +53,14 @@ class UserLoginAPIView(APIView):
 			raise AuthenticationFailed('User not found.')
 
 		if user_instance.is_active:
-			user_access_token = generate_access_token(user_instance)
-			response = Response()
-			response.set_cookie(key='access_token', value=user_access_token, httponly=True)
-			response.data = {
-				'access_token': user_access_token
-			}
-			return response
+			access_token = JWTAuthentication.create_jwt(user_instance)
+			return Response(data={'token': access_token}, status=status.HTTP_200_OK)
 
 		return Response({
 			'message': 'Something went wrong.'
 		})
 
 class UserViewAPI(APIView):
-	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
 
 	def get(self, request):
 		user_token = request.COOKIES.get('access_token')
@@ -83,18 +76,37 @@ class UserViewAPI(APIView):
 		return Response(user_serializer.data)
      
 class UsersViewAPI(ModelViewSet):
-    authentication_classes = (TokenAuthentication,)
-    permission_classes = (AllowAny,)
      
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
      
     http_method_names = ['get', 'post', 'delete', 'put']
+
+    def is_valid_token(token):
+        try:
+            decoded_token = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
+            
+            user_id = decoded_token['user_id']
+            user = User.objects.get(pk=user_id)
+            
+            # Tutaj możesz dodać dodatkowe sprawdzenia, np. czy konto użytkownika jest aktywne itp.
+            
+            return True
+        except jwt.ExpiredSignatureError:
+            # Obsługa wyjątku, gdy token wygasł
+            return False
+        except (jwt.InvalidTokenError, User.DoesNotExist):
+            # Obsługa innych błędów związanych z tokenem lub użytkownikiem
+            return False
     
     def dispatch(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
+        auth_header = request.headers.get('Authorization')
+        
+        if auth_header:
+            user_token = auth_header.split(' ')[1]
+            
+            if not self.is_valid_token(user_token):
+                raise AuthenticationFailed('Unauthenticated user.')
         return super().dispatch(request, *args, **kwargs)
     
     def delete(self, request):
@@ -127,8 +139,6 @@ class UsersViewAPI(ModelViewSet):
             return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
 
 class UserLogoutViewAPI(APIView):
-	authentication_classes = (TokenAuthentication,)
-	permission_classes = (AllowAny,)
 
 	def get(self, request):
 		user_token = request.COOKIES.get('access_token', None)
@@ -150,15 +160,6 @@ class ChildrenAPIView(ModelViewSet):
     serializer_class = ChildrenSerializer
 
     http_method_names = ['get', 'post', 'put', 'delete','path']
-
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [AllowAny]
-
-    def dispatch(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        return super().dispatch(request, *args, **kwargs)
     
     def delete(self, request):
         try:
@@ -187,6 +188,7 @@ class ChildrenAPIView(ModelViewSet):
 
     def list(self, request):    
         try:
+            # self.permission_classes = [IsAuthenticated]
             queryset = self.filter_queryset(self.get_queryset())
 
             children = queryset.all()
@@ -219,6 +221,7 @@ class ChildrenAPIView(ModelViewSet):
             return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
     def create(self, request, *args, **kwargs):        
+        # self.permission_classes = [IsAuthenticated]
         serializer = ChildrenSerializer1(data=request.data)
         if serializer.is_valid():
             pesel = serializer.validated_data.get('pesel')
@@ -235,6 +238,8 @@ class ChildrenAPIView(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     @action(methods=['get'], detail=False, url_path='current', url_name='current')
+    # @authentication_classes([SessionAuthentication, BasicAuthentication])
+    # @permission_classes([IsAuthenticated])
     def current(self, request, *args, **kwargs):        
         children = Children.objects.filter(leaving_date__isnull=True)
         serializer = ChildrenSerializer2(children, many=True)
@@ -406,60 +411,58 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
+# class CurrentChildrenAPIView(APIView):
+#     def get(self, request):
+#         children = Children.objects.filter(leaving_date__isnull=True)
+#         serializer = ChildrenSerializer2(children, many=True)
+#         data = serializer.data
+#         for child_data in data:
+#             child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
+#         return Response(data, status=status.HTTP_200_OK)
+
+class ArchivalChildrenAPIView(APIView):
+    def get(self, request):    
+        children = Children.objects.exclude(leaving_date__isnull=True)
+        serializer = ChildrenSerializer2(children, many=True)
+        data = serializer.data
+        print(data)
+        for child_data in data:
+            child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
+        return Response(data, status=status.HTTP_200_OK)
 
 
 
 
 
-
-
-
-
-class RelativeAPIView(ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [AllowAny]
-
-    def dispatch(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        return super().dispatch(request, *args, **kwargs)
-    
-    queryset = Relatives.objects.all()
-    serializer_class = RelativesSerializer
-
-    http_method_names = ['get', 'post', 'put', 'delete']
-
-    def delete(self, request):
+  
+class RelativesAPIView(APIView):
+    def get(self, request):
         relatives = Relatives.objects.all()
-        relatives.delete()
-        return Response({'message': 'All relatives deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-
-
-
-
-
-
-
-
-
-
-class NotesAPIView(ModelViewSet):
-    authentication_classes = [TokenAuthentication]
-    permission_classes = [AllowAny]
-
-    def dispatch(self, request, *args, **kwargs):
-        user_token = request.COOKIES.get('access_token')
-        if not user_token:
-            raise AuthenticationFailed('Unauthenticated user.')
-        return super().dispatch(request, *args, **kwargs)
+        serializer = RelativesSerializer(relatives, many=True)
+        return Response(serializer.data)
     
-    queryset = Notes.objects.all()
-    serializer_class = NotesSerializer
+    def post(self, request):
+        serializer = RelativesSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    http_method_names = ['get', 'post', 'put', 'delete']
+class RelativeDetailAPIView(APIView):
+    def get(self, request, pk):
+        relative = get_object_or_404(Relatives, pk=pk)
+        serializer = RelativesSerializer(relative)
+        return Response(serializer.data)
     
-    def delete(self, request):
-        notes = Notes.objects.all()
-        notes.delete()
-        return Response({'message': 'All notes deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+    def put(self, request, pk):
+        relative = get_object_or_404(Relatives, pk=pk)
+        serializer = RelativesSerializer(relative, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, pk):
+        relative = get_object_or_404(Relatives, pk=pk)
+        relative.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
