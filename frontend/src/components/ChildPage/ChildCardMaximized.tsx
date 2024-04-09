@@ -4,6 +4,7 @@ import ChildInfoContainer from "./ChildInfoContainer.tsx";
 import {Link} from "react-router-dom";
 import useSWR from "swr";
 import {BASE_API_URL} from "../../api/contst.ts";
+import {GenderEnum} from "../../models/GenderEnum.tsx";
 
 interface ChildCardProps {
     childId: string;
@@ -28,6 +29,7 @@ function ChildCardMaximized(props: ChildCardProps) {
 
     if (error) return <div>failed to load</div>
     if (isLoading) return <div>loading...</div>
+
     return (
         <div className=''>
             <WidthWrapper>
@@ -48,9 +50,8 @@ function ChildCardMaximized(props: ChildCardProps) {
 
                         {/*</div>*/}
                         <div className='flex flex-col gap-7 sm:grid xl:gap-4 sm:grid-cols-2 xl:grid-cols-3'>
-                            {/*<ChildInfoContainer note='Płeć' text={child.gender === "male" ? 'Mężczyzna' : 'Kobieta'}/>*/}
-                            <ChildInfoContainer note='Płeć' text={'Mężczyzna'}/>
-                            <ChildInfoContainer note='Data urodzenia' text={child.birth_date}/>
+                            <ChildInfoContainer note='Płeć' text={child.gender === 'Female' ? 'Kobieta' : 'Mężczyzna'}/>
+                            <ChildInfoContainer note='Data urodzenia' text={child.birth_date }/>
                             <ChildInfoContainer note='Miejsce urodzeina' text={child.birthplace}/>
                         </div>
                         <div className='flex flex-col gap-7'>
@@ -59,7 +60,7 @@ function ChildCardMaximized(props: ChildCardProps) {
                         </div>
                         <div className='flex flex-col sm:flex-row gap-7'>
                             <ChildInfoContainer note='Data przyjęcia' text={child.admission_date}/>
-                            <ChildInfoContainer note='Data opuszczenia' text={child.leaving_date}/>
+                            {child.leaving_date && <ChildInfoContainer note='Data opuszczenia' text={child.leaving_date}/>}
                         </div>
                     </div>
                 </div>
