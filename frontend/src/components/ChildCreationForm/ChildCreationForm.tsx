@@ -7,7 +7,6 @@ import {GenderEnum} from "../../models/GenderEnum.tsx";
 import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useNavigate} from "react-router-dom";
-import {data} from "autoprefixer";
 
 interface FormData extends ChildModelMaximized {
     image: File
