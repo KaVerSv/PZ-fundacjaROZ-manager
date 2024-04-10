@@ -5,7 +5,6 @@ import CurrentBlockHeader from "./childBlockHeaders/CurrentBlockHeader.tsx";
 import useSWR from "swr";
 import {ChildModelMinimized} from "../../models/ChildModelMinimized.tsx";
 import {BASE_API_URL} from "../../api/contst.ts";
-import useAuth from "../../hooks/useAuth.ts";
 
 interface ChildBlockProps {
     header: React.ReactNode
@@ -13,14 +12,13 @@ interface ChildBlockProps {
 
 
 function ChildrenBlock(props: ChildBlockProps) {
-    const auth = useAuth();
     const fetcher: (url: string) => Promise<ChildModelMinimized[]> = async (url) => {
-        const token = auth.auth.token; // Retrieve your JWT token from wherever you store it
-        console.log(token);
+        const token = localStorage.getItem("token");
 
         const response = await fetch(url, {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${token}`,
                 'Content-Type': 'application/json',
             },
         });
