@@ -6,8 +6,8 @@ import {useParams} from "react-router-dom";
 import NotesSection from "../components/Notes/NotesSection.tsx";
 
 function ChildPage() {
-    let { id } = useParams();
-    if(!id) id='0';
+    let {id} = useParams();
+    if (!id) id = '0';
     return (
         <HeightWrapper>
             <Top headerHeight={350}>
@@ -15,10 +15,12 @@ function ChildPage() {
             </Top>
             <div className='flex flex-col sm:flex-row justify-center'>
                 <ChildCardMaximized childId={id}/>
-                <NotesSection/>
+                <div className='flex justify-center'>
+                    <NotesSection childId={id}/>
+                </div>
             </div>
+            <div className='mt-96 flex-row'></div>
 
-            <div className='mt-96'></div>
         </HeightWrapper>
     );
 }
