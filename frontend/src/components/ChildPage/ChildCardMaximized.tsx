@@ -4,6 +4,7 @@ import ChildInfoContainer from "./ChildInfoContainer.tsx";
 import {Link} from "react-router-dom";
 import useSWR from "swr";
 import {BASE_API_URL} from "../../api/contst.ts";
+import fetchImage from "../../api/fetchImage.ts";
 
 interface ChildCardProps {
     childId: string;
@@ -12,7 +13,11 @@ interface ChildCardProps {
 
 function ChildCardMaximized(props: ChildCardProps) {
     const fetcher: (url: string) => Promise<ChildModelMaximized> = async (url) => {
-        const response = await fetch(url);
+        const response = await fetch(url,{
+            headers:{
+                'Authorization': `Bearer ${localStorage.getItem("token")}`
+            }
+        });
         if (!response.ok) {
             throw new Error(`API request failed with status ${response.status}`);
         }
@@ -21,9 +26,8 @@ function ChildCardMaximized(props: ChildCardProps) {
         return jsonData;
     };
     const { data, error, isLoading} = useSWR<ChildModelMaximized>(BASE_API_URL + `/children/${parseInt(props.childId)}`, fetcher);
-
+    const  {data: image} = useSWR<string>(`${BASE_API_URL}/children/${parseInt(props.childId)}/photo`, fetchImage);
     const child: ChildModelMaximized = data;
-
 
 
     if (error) return <div>failed to load</div>
@@ -36,7 +40,7 @@ function ChildCardMaximized(props: ChildCardProps) {
                     className='flex flex-col lg:flex-row gap-4 border-main_red border-4 p-4 rounded-2xl justify-center'>
                     <div className='flex md:block justify-center'>
                         <img className='pb-2 w-56 sm:w-72 lg:w-80 rounded-2xl'
-                             src={child.photo_path ? child.photo_path : 'profilowe.png'}
+                             src={image}
                              alt='profilePhoto'/>
                     </div>
                     <div className='flex flex-col mt-4 gap-7'>

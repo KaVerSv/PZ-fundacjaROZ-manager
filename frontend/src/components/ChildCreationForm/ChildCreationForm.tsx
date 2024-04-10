@@ -26,7 +26,11 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         const fetchData = async () => {
             try {
                 // Perform your API call or any asynchronous operation to fetch data
-                const response = await fetch(`${BASE_API_URL}/children/${parseInt(props.childId)}`);
+                const response = await fetch(`${BASE_API_URL}/children/${parseInt(props.childId)}`,{
+                    headers:{
+                        'Authorization': `Bearer ${localStorage.getItem("token")}`
+                    }
+                });
                 const jsonData: ChildModelMaximized = await response.json();
                 Object.keys(jsonData).forEach(key => {
                     // eslint-disable-next-line @typescript-eslint/ban-ts-comment
@@ -65,6 +69,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
             let response = await fetch(`${BASE_API_URL}/children/${props.editMode ? parseInt(props.childId) + '/' : ''}`, {
                 method: props.editMode ? 'PUT' : 'POST',
                 headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
                     'Content-Type': 'application/json',
                 },
                 body: JSON.stringify(formData),
@@ -81,6 +86,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
 
                 response = await fetch(`${BASE_API_URL}children/${id}/photo/`, {
                     method: 'PUT',
+                    headers:{
+                        'Authorization': `Bearer ${localStorage.getItem("token")}`
+                    },
                     body: formDataToSend,
                 });
                 if (!response.ok) throw new Error('Network response was not ok');
