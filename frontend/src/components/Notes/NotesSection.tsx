@@ -14,6 +14,7 @@ function NotesSection(props: NotesBlockProps) {
         const response = await fetch(url, {
             method: 'GET',
             headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
                 'Content-Type': 'application/json',
             },
         });
@@ -30,7 +31,7 @@ function NotesSection(props: NotesBlockProps) {
     if (isLoading) return <div>loading...</div>
 
     return (
-        <div className='flex flex-col gap-1.5 w-[90%] sm:max-w-72 border-main_red border-4 rounded-2xl m-3 p-3 sm:mb-auto'>
+        <div className='flex flex-col gap-1.5 w-[90%] sm:w-72 border-main_red border-4 rounded-2xl m-3 p-3 sm:mb-auto'>
             <div className='flex flex-row justify-between'>
                 <span className='font-bold text-lg'>Notatki</span>
                 <div className='text-main_red hover:text-red-600 cursor-pointer'>
@@ -41,7 +42,7 @@ function NotesSection(props: NotesBlockProps) {
                 <div className='w-[80%] border-[1px] border-red-700 rounded-[100%]'></div>
             </div>
 
-            <NotesBlock notes={data}></NotesBlock>
+            {data.length !== 0 ? <NotesBlock notes={data}></NotesBlock> : <span className='mx-auto'>Póki co nie ma notatek</span>}
         </div>
     );
 }
