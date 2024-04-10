@@ -4,7 +4,7 @@ const RequireAuth = () =>{
     const location = useLocation();
     const token = localStorage.getItem("token");
     return(
-        isTokenExpired(token) ?
+        !isTokenExpired(token) ?
             <Outlet/> :
             <Navigate to={'/login'} state={{from: location}} replace/>
     )
