@@ -12,27 +12,17 @@ interface FormProps {
     rules?: RegisterOptions;
 }
 
-function FormInput(props: FormProps) {
-    if (!props.placeholder) props.placeholder = props.label;
+function FormInput({name, type, label, placeholder, register, rules, error}: FormProps) {
+    if (!placeholder) placeholder = label;
     let alwaysShowLabels: boolean = false;
-    if (props.type === "date") alwaysShowLabels = true;
+    if (type === "date") alwaysShowLabels = true;
     return (
-        <InputWrapper labelFor={props.name} labelNote={props.label} error={props.error}
-                      alwaysShowLabel={alwaysShowLabels}>
-            {props.type === "textarea" ?
-                <textarea
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    id={props.name}
-                    placeholder={props.placeholder}
-                    {...props.register(props.name, props.rules)} />
-
-                :
-                <input
-                    className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                    type={props.type} id={props.name}
-                    placeholder={props.placeholder}
-                    {...props.register(props.name, props.rules)} />
-            }
+        <InputWrapper labelFor={name} labelNote={label} error={error} alwaysShowLabel={alwaysShowLabels}>
+            <input
+                className="appearance-none block w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                type={type} id={name}
+                placeholder={placeholder}
+                {...register(name, rules)} />
         </InputWrapper>
 
     );
