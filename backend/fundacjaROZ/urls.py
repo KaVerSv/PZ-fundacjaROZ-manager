@@ -1,16 +1,15 @@
 from django.urls import path
-from .views import  UserRegistrationAPIView, UserLoginAPIView, UserViewAPI, UserLogoutViewAPI
+from .views import  ArchivalChildrenAPIView, ChildrenRelativesAPIView, CurrentChildrenAPIView, UserRegistrationAPIView, UserLoginAPIView, UserLogoutViewAPI
 
 
 urlpatterns = [
-	path('api/user/register/', UserRegistrationAPIView.as_view()),
-	path('api/user/login/', UserLoginAPIView.as_view()),
-	path('api/user/', UserViewAPI.as_view()),
-	path('api/user/logout/', UserLogoutViewAPI.as_view()),
+	path('register/', UserRegistrationAPIView.as_view()),
+	path('login/', UserLoginAPIView.as_view()),
+	# path('api/user/', UserViewAPI.as_view()),
+	path('logout/', UserLogoutViewAPI.as_view()),
     
-	# path('children/current/', CurrentChildrenAPIView.as_view(), name='current-children'),
-    # path('children/archival/', ArchivalChildrenAPIView.as_view(), name='archival-children'),
-    
-    # path('relatives/', RelativesAPIView.as_view()),
-    # path('relatives/<int:pk>/', RelativeDetailAPIView.as_view()),
+	path('children/current/', CurrentChildrenAPIView.as_view()),
+    path('children/archival/', ArchivalChildrenAPIView.as_view()),
+ 	path('children/<int:pk>/relative/', ChildrenRelativesAPIView.as_view()),
+    # path('children/<int:child_id>/relative/<int:relative_id>/', ChildrenRelativesAPIView.as_view()), 
 ]

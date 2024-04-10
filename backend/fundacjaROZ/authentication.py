@@ -55,3 +55,11 @@ class JWTAuthentication(authentication.BaseAuthentication):
     def get_the_token_from_header(cls, token):
         token = token.replace('Bearer', '').replace(' ', '')
         return token
+    
+    @staticmethod
+    def get_user_id_from_token(token):
+        try:
+            payload = jwt.decode(token, settings.SECRET_KEY, algorithms=['HS256'])
+            return payload.get('user_id')
+        except jwt.exceptions.DecodeError:
+            raise ParseError('Invalid token')
