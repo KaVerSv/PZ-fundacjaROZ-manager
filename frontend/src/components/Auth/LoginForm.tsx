@@ -3,7 +3,7 @@ import FormInput from "../common/FormInput.tsx";
 import {SubmitHandler, useForm} from "react-hook-form";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {BASE_API_URL} from "../../api/contst.ts";
-import {useState} from "react";
+import {useEffect, useState} from "react";
 import useAuth from "../../hooks/useAuth.ts";
 
 interface FormData {
@@ -15,9 +15,13 @@ function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const [loginError, setLoginError] = useState(false);
-    const {register, handleSubmit, formState: {errors, isValid}} = useForm<FormData>({
+    const {register, handleSubmit, formState: {errors, isValid}, setFocus, trigger} = useForm<FormData>({
         mode: 'onChange'
     });
+
+    useEffect(() => {
+        setFocus('email');
+    }, [])
 
     const {setAuth} = useAuth();
     const onSubmit: SubmitHandler<FormData> = async (formData) => {
@@ -29,14 +33,12 @@ function LoginForm() {
                 },
                 body: JSON.stringify({email: formData.email, password: formData.password}),
             });
-
             if (!response.ok) {
                 throw new Error('Invalid credentials');
             }
 
             const data = await response.json();
-            const jwtToken = data.access_token; // Assuming your API returns the token in this format
-            // Store the token in local storage or state for later use
+            const jwtToken = data.token;
             setAuth({token: jwtToken})
 
             const from = location.state?.from?.pathname || '/'
@@ -46,7 +48,7 @@ function LoginForm() {
         }
     };
 
-    const onFocus = ()=>{
+    const onFocus = () => {
         setLoginError(false)
     }
 
