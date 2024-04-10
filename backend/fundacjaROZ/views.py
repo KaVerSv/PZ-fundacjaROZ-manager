@@ -1,6 +1,6 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.generics import CreateAPIView, ListAPIView, DestroyAPIView
+from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 import os
 from django.http import FileResponse, HttpResponse
@@ -11,10 +11,18 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.conf import settings
-import jwt
 from rest_framework.decorators import action
 from .serializers import *
 from .authentication import JWTAuthentication
+
+
+
+
+
+
+
+
+
 
 class UserRegistrationAPIView(APIView):
     serializer_class = UserRegistrationSerializer
@@ -28,6 +36,14 @@ class UserRegistrationAPIView(APIView):
                 access_token = JWTAuthentication.create_jwt(new_user)
                 return Response(data={'token': access_token}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
 
 
 class UserLoginAPIView(APIView):
@@ -57,56 +73,46 @@ class UserLoginAPIView(APIView):
 			'message': 'Something went wrong.'
 		})
 
-# class UserViewAPI(APIView):
 
-#     def get(self, request):
-#         # W tym momencie użytkownik jest już uwierzytelniony
-#         authenticated_user, payload = request.user
 
-#         # Sprawdź, czy identyfikator użytkownika z tokena JWT zgadza się z tym w żądaniu
-#         if not authenticated_user.user_id:
-#             return Response({'error': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
 
-#         user_model = get_user_model()
-#         user = user_model.objects.filter(user_id=authenticated_user.user_id).first()
-#         user_serializer = UserRegistrationSerializer(user)
-#         return Response(user_serializer.data)
 
-class UserLogoutViewAPI(APIView):
 
-	def get(self, request):
-		user_token = request.COOKIES.get('access_token', None)
-		if user_token:
-			response = Response()
-			response.delete_cookie('access_token')
-			response.data = {
-				'message': 'Logged out successfully.'
-			}
-			return response
-		response = Response()
-		response.data = {
-			'message': 'User is already logged out.'
-		}
-		return response
+
+
+
+
+class UserViewAPI(APIView):
+    def get(self, request):
+        user, payload = JWTAuthentication.authenticate(self, request)
+        user = get_object_or_404(User, pk=user.user_id)
+
+        user_serializer = UserRegistrationSerializer(user)
+        return Response(user_serializer.data)
+    
+    def put(self, request, pk):
+        user, payload = JWTAuthentication.authenticate(self, request)
+        user = get_object_or_404(User, pk=user.user_id)
+        serializer = UserRegistrationSerializer(user, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    
+
+
+
+
+
+
+
 
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
     serializer_class = ChildrenSerializer
-    permission_classes = (AllowAny,)
-    http_method_names = ['get', 'post', 'put', 'delete','path']
-    
-    def delete(self, request):
-        try:
-            children = Children.objects.all()
-            for child in children:
-                if child.photo_path:
-                    file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-                    if os.path.exists(file_path):
-                        os.remove(file_path)
-                child.delete()
-            return Response({'message': 'All children deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-        except Exception as e:
-             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    http_method_names = ['get', 'post', 'put', 'delete']
     
     def delete(self, request, pk=None):
         child = self.get_object()
@@ -117,21 +123,17 @@ class ChildrenAPIView(ModelViewSet):
                 os.remove(file_path)
 
         child.delete()
-
         return Response({'message': 'Child and associated photo deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
 
     def list(self, request):    
         try:
-            # self.permission_classes = [IsAuthenticated]
             queryset = self.filter_queryset(self.get_queryset())
-
             children = queryset.all()
 
             for child in children:
                 child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
 
             serializer = self.get_serializer(children, many=True)
-
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Children.DoesNotExist:
@@ -140,22 +142,17 @@ class ChildrenAPIView(ModelViewSet):
     def retrieve(self, request, pk=None):        
         try:
             child = self.get_object()
-
-            photo_path = child.photo_path
-
+            
             photo_url = f"http://localhost:8000/children/{child.id}/photo"
-
             child.photo_path = photo_url
-
+            
             serializer = self.get_serializer(child)
-
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         except Children.DoesNotExist:
             return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
     def create(self, request, *args, **kwargs):        
-        # self.permission_classes = [IsAuthenticated]
         serializer = ChildrenSerializer1(data=request.data)
         if serializer.is_valid():
             pesel = serializer.validated_data.get('pesel')
@@ -169,127 +166,138 @@ class ChildrenAPIView(ModelViewSet):
                         destination.write(chunk)
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)    
-    
-    @action(methods=['get', 'delete','put'], detail=True,url_path='photo', url_name='photo')
-    def photo(self, request, pk=None):        
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+    def update(self, request, *args, **kwargs):
         child = self.get_object()
-
-        if request.method == 'GET':
-            if child.photo_path:
-                photo = child.photo_path
-            else:
-                photo = 'default.png'
-            file_path = os.path.join(settings.MEDIA_ROOT, photo)
-            if photo.lower().endswith(('.png', '.jpg', '.jpeg')):
-                content_type = 'image/jpeg' if photo.lower().endswith(('.jpg', '.jpeg')) else 'image/png'
-                return FileResponse(open(file_path, 'rb'), content_type=content_type)
-            else:
-                return HttpResponse("Unsupported file format", status=400)
-        if request.method == 'DELETE':
-            if child.photo_path:
-                file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                child.photo_path = None
-                child.save()
-                return Response(status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({'message': 'Brak zdjęcia do usunięcia.'}, status=status.HTTP_404_NOT_FOUND)
-        if request.method == 'PUT':
-            if child.photo_path:
-                file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-
-            if 'photo' in request.FILES:
-                photo = request.FILES['photo']
-                
-                if hasattr(photo, 'content_type') and photo.content_type in ['image/jpeg', 'image/png']:
-                    with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
-                        for chunk in photo.chunks():
-                            destination.write(chunk)
-                    child.photo_path = photo.name
-                    child.save()
-                    return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
-                else:
-                    return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-            else:
-                return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-    
-    @action(methods=['get', 'post'], detail=True, url_path='notes', url_name='notes')
-    def notes(self, request, pk=None):        
-        child = self.get_object()
-
-        if request.method == 'GET':
-            notes = Notes.objects.filter(child_id=child)
-            serializer = NotesSerializer(notes, many=True)
-            return Response(serializer.data)
-        elif request.method == 'POST':
-            serializer = NotesSerializer(data=request.data)
-            serializer.initial_data['child_id'] = child.id
-            
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=201)
-            return Response(serializer.errors, status=400)
+        serializer = self.get_serializer(child, data=request.data)
         
-    @action(methods=['put','delete'], detail=True, url_path='notes/(?P<note_id>\d+)', url_name='notes')
-    def notes1(self, request, pk=None, note_id=None):        
-        if request.method == 'DELETE':
-            try:
-                note = Notes.objects.get(id=note_id)
-            except Notes.DoesNotExist:
-                return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+        if serializer.is_valid():
+            if 'photo' in request.FILES:
+                old_photo_path = child.photo_path
+                new_photo = request.FILES['photo']
 
-            note.delete()
+                if old_photo_path:
+                    if settings.MEDIA_ROOT.exists(old_photo_path):
+                        settings.MEDIA_ROOT.delete(old_photo_path)
+
+                with open(os.path.join(settings.MEDIA_ROOT, new_photo.name), 'wb') as destination:
+                    for chunk in new_photo.chunks():
+                        destination.write(chunk)
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-            return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
-        if request.method == 'PUT':
 
-            self.serializer_class=NotesSerializer
+
+
+
+
+
+
+
+
+class ChildrenPhotoAPIView(APIView):
+    def get(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        if child.photo_path:
+            photo = child.photo_path
+        else:
+            photo = 'default.png'
+        file_path = os.path.join(settings.MEDIA_ROOT, photo)
+        if photo.lower().endswith(('.png', '.jpg', '.jpeg')):
+            content_type = 'image/jpeg' if photo.lower().endswith(('.jpg', '.jpeg')) else 'image/png'
+            return FileResponse(open(file_path, 'rb'), content_type=content_type)
+        else:
+            return HttpResponse("Unsupported file format", status=400)
+        
+    def delete(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        if child.photo_path:
+            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            child.photo_path = None
+            child.save()
+            return Response(status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'message': 'Brak zdjęcia do usunięcia.'}, status=status.HTTP_404_NOT_FOUND)
+        
+    def put(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        if child.photo_path:
+            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        if 'photo' in request.FILES:
+            photo = request.FILES['photo']
             
-            try:
-                note = Notes.objects.get(id=note_id)
-            except (Notes.DoesNotExist):
-                return Response({'error': 'Nie znaleziono notatki'}, status=status.HTTP_404_NOT_FOUND)
+            if hasattr(photo, 'content_type') and photo.content_type in ['image/jpeg', 'image/png']:
+                with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
+                    for chunk in photo.chunks():
+                        destination.write(chunk)
+                child.photo_path = photo.name
+                child.save()
+                return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
+        else:
+            return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = NotesSerializer(note, data=request.data, partial=True)
 
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    @action(methods=['put','delete'], detail=True, url_path='relatives/(?P<relatives_id>\d+)', url_name='relatives')
-    def relatives1(self, request, pk=None, relatives_id=None):        
-        if request.method == 'DELETE':
-            try:
-                relative = Relatives.objects.get(id=relatives_id)
-            except Relatives.DoesNotExist:
-                return Response({'error': 'Rel nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
-            relative.delete()
+
+
+
+
+
+
+class ChildrenNotesAPIView(APIView):
+    def get(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        notes = Notes.objects.filter(child_id=child)
+        serializer = NotesSerializer(notes, many=True)
+        return Response(serializer.data)
     
-            return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
-        if request.method == 'PUT':
+    def post(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        serializer = NotesSerializer(data=request.data)
+        serializer.initial_data['child_id'] = child.id
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
-            self.serializer_class=RelativesSerializer
+
+
+
+
+
+
+
+
+
+class ChildrenNotesDetailsAPIView(APIView):
+    def delete(self, request, pk=None, note_id=None):
+        child = get_object_or_404(Children, pk=pk)
+        try:
+            note = Notes.objects.get(id=note_id)
+            if note.child_id == child:
+                note.delete()
+        except Notes.DoesNotExist:
+            return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)      
+        return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
             
-            try:
-                relative = Relatives.objects.get(id=relatives_id)
-            except (Relatives.DoesNotExist):
-                return Response({'error': 'Nie znaleziono rela'}, status=status.HTTP_404_NOT_FOUND)
+            
 
-            serializer = RelativesSerializer(relative, data=request.data, partial=True)
+    
+            
 
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_200_OK)
 
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 
 class ChildrenRelativesAPIView(APIView):
     def get(self, request, pk):
@@ -446,7 +454,6 @@ class UsersViewAPI(ModelViewSet):
 
     def destroy(self, request, pk):
         user, payload = JWTAuthentication.authenticate(self, request)
-        print(payload.get('user_id'))
 
         if int(pk) == payload.get('user_id'):
             return Response({'error': 'Cannot delete currently logged in user'}, status=status.HTTP_400_BAD_REQUEST)
@@ -468,9 +475,11 @@ class UsersViewAPI(ModelViewSet):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def update(self, request, pk):
-        user = get_object_or_404(User, pk=pk)
-        serializer = UsersSerializer(user, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        #tu bedzie zmiana uprawnien reszte bedzie zmienial sam user
+        pass
+        # user = get_object_or_404(User, pk=pk)
+        # serializer = UsersSerializer(user, data=request.data)
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data)
+        # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)

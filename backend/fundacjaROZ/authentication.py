@@ -8,7 +8,6 @@ from rest_framework.exceptions import AuthenticationFailed, ParseError
 
 User = get_user_model()
 
-
 class JWTAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
         jwt_token = request.META.get('HTTP_AUTHORIZATION')
