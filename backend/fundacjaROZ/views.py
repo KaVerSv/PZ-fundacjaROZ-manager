@@ -5,18 +5,14 @@ import os
 from django.http import FileResponse, HttpResponse
 from .models import *
 from rest_framework.viewsets import ModelViewSet
-from rest_framework.authentication import TokenAuthentication
 from rest_framework.permissions import AllowAny
 from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.conf import settings
-from .utils import generate_access_token
 import jwt
 from rest_framework.decorators import action
 from .serializers import *
-from rest_framework.authentication import SessionAuthentication, BasicAuthentication
-from rest_framework.permissions import IsAuthenticated
 from .authentication import JWTAuthentication
 
 class UserRegistrationAPIView(APIView):
@@ -81,35 +77,8 @@ class UsersViewAPI(ModelViewSet):
     serializer_class = UserRegistrationSerializer
      
     http_method_names = ['get', 'post', 'delete', 'put']
-
-    def is_valid_token(token):
-        try:
-            decoded_token = jwt.decode(token, settings.JWT_SECRET_KEY, algorithms=['HS256'])
-            
-            user_id = decoded_token['user_id']
-            user = User.objects.get(pk=user_id)
-            
-            # Tutaj możesz dodać dodatkowe sprawdzenia, np. czy konto użytkownika jest aktywne itp.
-            
-            return True
-        except jwt.ExpiredSignatureError:
-            # Obsługa wyjątku, gdy token wygasł
-            return False
-        except (jwt.InvalidTokenError, User.DoesNotExist):
-            # Obsługa innych błędów związanych z tokenem lub użytkownikiem
-            return False
     
-    def dispatch(self, request, *args, **kwargs):
-        auth_header = request.headers.get('Authorization')
-        
-        if auth_header:
-            user_token = auth_header.split(' ')[1]
-            
-            if not self.is_valid_token(user_token):
-                raise AuthenticationFailed('Unauthenticated user.')
-        return super().dispatch(request, *args, **kwargs)
-    
-    def delete(self, request):
+    def delete(self, request, pk):
         users = User.objects.all()
 
         user_token = request.COOKIES.get('access_token')
@@ -128,15 +97,9 @@ class UsersViewAPI(ModelViewSet):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
     def list(self, request):    
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-
-            serializer = UsersSerializer(queryset, many=True)
-
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except Children.DoesNotExist:
-            return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
+        queryset = self.filter_queryset(self.get_queryset())
+        serializer = UsersSerializer(queryset, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
 
 class UserLogoutViewAPI(APIView):
 
@@ -434,12 +397,16 @@ class ArchivalChildrenAPIView(APIView):
 
 
 
-  
-class RelativesAPIView(APIView):
-    def get(self, request):
-        relatives = Relatives.objects.all()
-        serializer = RelativesSerializer(relatives, many=True)
-        return Response(serializer.data)
+class RelativesViewAPI(ModelViewSet):
+    queryset = Relatives.objects.all()
+    serializer_class = RelativesSerializer
+     
+    http_method_names = ['get', 'post', 'delete', 'put']
+    
+    def delete(self, request, pk):
+        relative = get_object_or_404(Relatives, pk=pk)
+        relative.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
     def post(self, request):
         serializer = RelativesSerializer(data=request.data)
@@ -447,22 +414,45 @@ class RelativesAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-class RelativeDetailAPIView(APIView):
-    def get(self, request, pk):
-        relative = get_object_or_404(Relatives, pk=pk)
-        serializer = RelativesSerializer(relative)
-        return Response(serializer.data)
     
-    def put(self, request, pk):
-        relative = get_object_or_404(Relatives, pk=pk)
-        serializer = RelativesSerializer(relative, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def list(self, request):    
+        relatives = Relatives.objects.all()
+        serializer = RelativesSerializer(relatives, many=True)
+        return Response(serializer.data)
+        
+# class RelativesAPIView(APIView):
+#     http_method_names = ['get', 'post']
 
-    def delete(self, request, pk):
-        relative = get_object_or_404(Relatives, pk=pk)
-        relative.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+#     def get(self, request):
+#         relatives = Relatives.objects.all()
+#         serializer = RelativesSerializer(relatives, many=True)
+#         return Response(serializer.data)
+    
+#     def post(self, request):
+#         serializer = RelativesSerializer(data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data, status=status.HTTP_201_CREATED)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+# class RelativeDetailAPIView(APIView):
+#     http_method_names = ['get', 'post','delete']
+    
+    
+#     def get(self, request, pk):
+#         relative = get_object_or_404(Relatives, pk=pk)
+#         serializer = RelativesSerializer(relative)
+#         return Response(serializer.data)
+    
+#     def put(self, request, pk):
+#         relative = get_object_or_404(Relatives, pk=pk)
+#         serializer = RelativesSerializer(relative, data=request.data)
+#         if serializer.is_valid():
+#             serializer.save()
+#             return Response(serializer.data)
+#         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+#     def delete(self, request, pk):
+#         relative = get_object_or_404(Relatives, pk=pk)
+#         relative.delete()
+#         return Response(status=status.HTTP_204_NO_CONTENT)

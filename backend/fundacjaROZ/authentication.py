@@ -1,4 +1,3 @@
-#authentication.py 
 from datetime import datetime, timedelta
 
 import jwt
@@ -12,18 +11,11 @@ User = get_user_model()
 
 class JWTAuthentication(authentication.BaseAuthentication):
     def authenticate(self, request):
-        # Extract the JWT from the Authorization header
         jwt_token = request.META.get('HTTP_AUTHORIZATION')
-
         if jwt_token is None:
             return None
+        jwt_token = JWTAuthentication.get_the_token_from_header(jwt_token)
 
-
-        jwt_token = JWTAuthentication.get_the_token_from_header(jwt_token)  # clean the token
-        jwt_token= jwt_token[1:-1]
-
-
-        # Decode the JWT and verify its signature
         try:
             payload = jwt.decode(jwt_token, settings.SECRET_KEY, algorithms=['HS256'])
         except jwt.exceptions.InvalidSignatureError:
@@ -33,8 +25,7 @@ class JWTAuthentication(authentication.BaseAuthentication):
         except:
             raise ParseError()
 
-        # Get the user from the database
-        username_or_phone_number = payload.get('user_id')  # Użyj 'user_id' zamiast 'user_identifier'
+        username_or_phone_number = payload.get('user_id')
         if username_or_phone_number is None:
             raise AuthenticationFailed('User identifier not found in JWT')
 
@@ -49,21 +40,18 @@ class JWTAuthentication(authentication.BaseAuthentication):
 
     @classmethod
     def create_jwt(cls, user):
-        # Create the JWT payload
         payload = {
             'user_id': user.user_id,
             'exp': int((datetime.now() + timedelta(hours=getattr(settings, 'JWT_CONFIG', {}).get('TOKEN_LIFETIME_HOURS', 24))).timestamp()),
-            # set the expiration time for 5 hour from now
             'iat': datetime.now().timestamp(),
             'surname': user.surname
         }
 
-        # Encode the JWT with your secret key
         jwt_token = jwt.encode(payload, settings.SECRET_KEY, algorithm='HS256')
 
         return jwt_token
 
     @classmethod
     def get_the_token_from_header(cls, token):
-        token = token.replace('Bearer', '').replace(' ', '')  # clean the token
+        token = token.replace('Bearer', '').replace(' ', '')
         return token
