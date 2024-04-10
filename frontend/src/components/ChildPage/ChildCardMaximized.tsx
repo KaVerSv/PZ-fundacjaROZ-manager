@@ -4,7 +4,6 @@ import ChildInfoContainer from "./ChildInfoContainer.tsx";
 import {Link} from "react-router-dom";
 import useSWR from "swr";
 import {BASE_API_URL} from "../../api/contst.ts";
-import {GenderEnum} from "../../models/GenderEnum.tsx";
 
 interface ChildCardProps {
     childId: string;
