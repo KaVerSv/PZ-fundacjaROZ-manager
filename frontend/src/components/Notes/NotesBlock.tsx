@@ -10,7 +10,7 @@ function NotesBlock(props: NotesBlockProps) {
 
     return (
         <div className='flex flex-col gap-5'>
-            {props.notes.map((note)=><Note note={note}/>)}
+            {props.notes.map((note)=><Note key={note.id} note={note}/>)}
         </div>
     );
 }
