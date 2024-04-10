@@ -7,6 +7,7 @@ import {GenderEnum} from "../../models/GenderEnum.tsx";
 import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useNavigate} from "react-router-dom";
+import fetchImage from "../../api/fetchImage.ts";
 
 //TODO: remove relatives from form
 interface FormData extends ChildModelMaximized {
@@ -37,8 +38,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                     // @ts-expect-error
                     setValue(key, jsonData[key]);
                 });
-                setPreview(jsonData.photo_path);
                 setValue('gender', jsonData.gender === 'Female' ? GenderEnum.female : GenderEnum.male)
+                const  url = await fetchImage(`${BASE_API_URL}/children/${parseInt(props.childId)}/photo`);
+                setPreview(url);
             } catch (error) {
                 console.error('Error fetching data:', error);
             }
@@ -47,7 +49,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         // Call the fetchData function when the component mounts
         if (props.editMode) fetchData();
     }, []);
-
 
     const {
         register,
