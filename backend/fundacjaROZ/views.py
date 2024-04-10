@@ -11,7 +11,6 @@ from rest_framework import status
 from rest_framework.exceptions import AuthenticationFailed
 from django.contrib.auth import authenticate
 from django.conf import settings
-from rest_framework.decorators import action
 from .serializers import *
 from .authentication import JWTAuthentication
 
