@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import  ArchivalChildrenAPIView, ChildrenRelativesAPIView, CurrentChildrenAPIView, UserRegistrationAPIView, UserLoginAPIView, UserLogoutViewAPI
+from .views import  ArchivalChildrenAPIView, ChildrenRelativesAPIView, ChildrenRelativesDetailsAPIView, CurrentChildrenAPIView, UserRegistrationAPIView, UserLoginAPIView, UserLogoutViewAPI
 
 
 urlpatterns = [
@@ -10,6 +10,6 @@ urlpatterns = [
     
 	path('children/current/', CurrentChildrenAPIView.as_view()),
     path('children/archival/', ArchivalChildrenAPIView.as_view()),
- 	path('children/<int:pk>/relative/', ChildrenRelativesAPIView.as_view()),
-    # path('children/<int:child_id>/relative/<int:relative_id>/', ChildrenRelativesAPIView.as_view()), 
+ 	path('children/<int:pk>/relatives/', ChildrenRelativesAPIView.as_view()),
+    path('children/<int:pk>/relatives/<int:relative_id>/', ChildrenRelativesDetailsAPIView.as_view()), 
 ]
