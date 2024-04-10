@@ -4,7 +4,6 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {Link, useLocation, useNavigate} from "react-router-dom";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useEffect, useState} from "react";
-import useAuth from "../../hooks/useAuth.ts";
 
 interface FormData {
     email: string;
@@ -15,7 +14,7 @@ function LoginForm() {
     const navigate = useNavigate();
     const location = useLocation();
     const [loginError, setLoginError] = useState(false);
-    const {register, handleSubmit, formState: {errors, isValid}, setFocus, trigger} = useForm<FormData>({
+    const {register, handleSubmit, formState: {errors, isValid}, setFocus} = useForm<FormData>({
         mode: 'onChange'
     });
 
@@ -23,7 +22,6 @@ function LoginForm() {
         setFocus('email');
     }, [])
 
-    const {setAuth} = useAuth();
     const onSubmit: SubmitHandler<FormData> = async (formData) => {
         try {
             const response = await fetch(BASE_API_URL + 'api/user/login/', {
@@ -39,7 +37,7 @@ function LoginForm() {
 
             const data = await response.json();
             const jwtToken = data.token;
-            setAuth({token: jwtToken})
+            localStorage.setItem("token", jwtToken);
 
             const from = location.state?.from?.pathname || '/'
             navigate(from, {replace: true});
