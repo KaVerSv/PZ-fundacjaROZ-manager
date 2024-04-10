@@ -127,7 +127,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 #     name = models.CharField(max_length = 50)
 #     doc_type = models.CharField(max_length = 20)
 #     date = models.DateField()
-#     path = models.CharField(max_length=100)
-#     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
+#     file_name = models.CharField(max_length=100)
+#     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     
 
