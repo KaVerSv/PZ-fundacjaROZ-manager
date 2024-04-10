@@ -86,8 +86,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                 if (!response.ok) throw new Error('Network response was not ok');
             }
 
-
-            navigate('/');
+            if(props.editMode){
+                navigate(`/children/${props.childId}`)
+            } else navigate('/');
 
         } catch (error) {
             console.error('Error:', error.message);
