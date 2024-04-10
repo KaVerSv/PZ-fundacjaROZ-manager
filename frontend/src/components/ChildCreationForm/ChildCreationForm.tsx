@@ -9,7 +9,7 @@ import {BASE_API_URL} from "../../api/contst.ts";
 import {useNavigate} from "react-router-dom";
 import fetchImage from "../../api/fetchImage.ts";
 
-//TODO: remove relatives from form
+
 interface FormData extends ChildModelMaximized {
     image: File
     gender: GenderEnum;
@@ -26,7 +26,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                // Perform your API call or any asynchronous operation to fetch data
                 const response = await fetch(`${BASE_API_URL}/children/${parseInt(props.childId)}`,{
                     headers:{
                         'Authorization': `Bearer ${localStorage.getItem("token")}`
@@ -45,8 +44,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                 console.error('Error fetching data:', error);
             }
         };
-
-        // Call the fetchData function when the component mounts
         if (props.editMode) fetchData();
     }, []);
 
@@ -62,7 +59,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(false);
     const onSubmit: SubmitHandler<FormData> = async (formData) => {
-        setValue("relatives", [1]);
         setLoading(true);
         setValue('leaving_date', formData.leaving_date === ""? null : formData.leaving_date)
         try {
@@ -76,14 +72,12 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                 body: JSON.stringify(formData),
             });
 
-            // Check if request was successful
             if (!response.ok) throw new Error('Network response was not ok');
             if (formData.image) {
                 const data = await response.json();
                 const id = data.id;
                 const formDataToSend = new FormData();
                 formDataToSend.append('photo', formData.image)
-
 
                 response = await fetch(`${BASE_API_URL}children/${id}/photo/`, {
                     method: 'PUT',
