@@ -1,7 +1,9 @@
-import bell from './assets/dzwon.svg'
 import {useEffect, useState} from "react";
 import {BASE_API_URL} from "../../api/contst.ts";
-import { jwtDecode } from "jwt-decode";
+import {jwtDecode} from "jwt-decode";
+import {faArrowRightFromBracket} from "@fortawesome/free-solid-svg-icons";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {useNavigate} from "react-router-dom";
 
 interface User {
     email: "admin@admin.com";
@@ -11,6 +13,7 @@ interface User {
 
 function ProfileBlock() {
     const [user, setUser] = useState({});
+    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -31,7 +34,10 @@ function ProfileBlock() {
     return (
         <div className='flex gap-5 mt-3 mb-1 lg:mt-7 lg:mb-5'>
             <span className='flex text-nowrap items-center text-xl'>{user? user.first_name + " " + user.surname : "problem"}</span>
-            <img className='w-1/6 sm:w-1/5' src={bell} alt={'bell'}/>
+            <div className='cursor-pointer hover:text-main_red' onClick={()=>{localStorage.removeItem("token"); navigate('/')}}>
+                <FontAwesomeIcon icon={faArrowRightFromBracket} size='2xl'/>
+            </div>
+
         </div>
     );
 }
