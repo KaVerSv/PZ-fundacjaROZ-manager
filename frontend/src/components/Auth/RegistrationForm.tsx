@@ -1,11 +1,13 @@
 import {SubmitHandler, useForm} from "react-hook-form";
 import BigLogo from "./BigLogo.tsx";
 import FormInput from "../common/FormInput.tsx";
-import {Link} from "react-router-dom";
+import {Link, useLocation, useNavigate} from "react-router-dom";
+import {BASE_API_URL} from "../../api/contst.ts";
+import {useState} from "react";
 
 interface FormData {
     email: string;
-    name: string;
+    first_name: string;
     surname: string;
     //pesel: string;
     password: string;
@@ -13,13 +15,32 @@ interface FormData {
 }
 
 function RegistrationForm() {
-
-    const {register, handleSubmit, formState: { errors, isValid }, getValues} = useForm<FormData>({
+    const navigate = useNavigate();
+    const location = useLocation()
+    const [error, setError] = useState(false);
+    const {register, handleSubmit, formState: {errors, isValid}, getValues} = useForm<FormData>({
         mode: 'onChange'
     });
 
-    const onSubmit: SubmitHandler<FormData> = (data) => {
+    const onSubmit: SubmitHandler<FormData> = async (data) => {
         console.log(data)
+        try {
+            const response = await fetch(BASE_API_URL + 'api/user/register/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(data),
+            });
+            if (!response.ok) {
+                throw new Error('Invalid credentials');
+            }
+            const from = location.state?.from?.pathname || '/login'
+            navigate(from, {replace: true});
+        } catch (error) {
+            setError(true);
+        }
+        //navigate('/login')
     };
 
     const validatePasswordMatch = (value: string) => {
@@ -51,8 +72,8 @@ function RegistrationForm() {
                                        }
                                    }}
                                    labelColor='text-main_white'></FormInput>
-                        <FormInput name={'name'} type={'text'} label={'Imie'} register={register}
-                                   error={errors.name}
+                        <FormInput name={'first_name'} type={'text'} label={'Imie'} register={register}
+                                   error={errors.first_name}
                                    rules={{
                                        required: 'Pole wymagane'
                                    }}
@@ -75,7 +96,7 @@ function RegistrationForm() {
                                    error={errors.password}
                                    rules={{
                                        required: 'Pole wymagane',
-                                       minLength: {value: 6, message: 'Minimum 6 znaków'},
+                                       minLength: {value: 8, message: 'Minimum 8 znaków'},
                                        maxLength: {value: 18, message: 'Maximum 18 znaków'}
                                    }}
                                    labelColor='text-main_white'/>
@@ -89,6 +110,9 @@ function RegistrationForm() {
                                        }
                                    }}
                                    labelColor='text-main_white'/>
+                        {error && <div className='flex justify-center'>
+                            <span className='text-sm text-red-800'>Coś poszło nie tak.<br/>Sprobuj ponownie</span>
+                        </div>}
                         <button
                             disabled={!isValid}
                             className="bg-orange-500 hover:bg-orange-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey"
