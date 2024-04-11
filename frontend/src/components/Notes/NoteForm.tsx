@@ -2,19 +2,17 @@ import {SubmitHandler, useForm} from "react-hook-form";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useEffect, useState} from "react";
 import FormInput from "../common/FormInput.tsx";
+import {NoteModel} from "../../models/NoteModel.ts";
+import {Mode} from "./Mode.ts";
 
 interface Props {
     toggleReload: () => void;
     toggleShowForm: () => void;
     mode: Mode;
     childId: string;
-    noteId?: string;
+    note?: NoteModel;
 }
 
-export enum Mode {
-    edit,
-    create
-}
 
 interface NoteFormData {
     id?: string;
@@ -32,11 +30,14 @@ function NoteForm(props: Props) {
         handleSubmit,
         formState: {errors, isValid},
         setFocus,
-        setValue
+        getValues
     } = useForm<NoteFormData>({
         mode: "onChange",
         defaultValues: {
-            child_id: props.childId
+            child_id: props.childId,
+            id: props.note.id,
+            title: props.note?.title,
+            contents: props.note.contents
         }
     },);
 
@@ -46,10 +47,9 @@ function NoteForm(props: Props) {
 
     const onSubmit: SubmitHandler<NoteFormData> = async (noteFormData) => {
         setLoading(true);
-        if(props.mode === Mode.edit) setValue('id', props.noteId)
         console.log(noteFormData);
         try {
-            const response = await fetch(`${BASE_API_URL}/children/${props.childId}/notes/${props.noteId ? props.noteId : ''}`, {
+            const response = await fetch(`${BASE_API_URL}/children/${props.childId}/notes/${props.note ? props.note.id + '/' : ''}`, {
                 method: props.mode === Mode.edit ? 'PUT' : 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("token")}`,
@@ -59,7 +59,7 @@ function NoteForm(props: Props) {
             });
             if (!response.ok) {
                 throw new Error(`API request failed with status ${response.status}`);
-            }else {
+            } else {
                 props.toggleShowForm();
                 props.toggleReload();
             }
@@ -73,16 +73,20 @@ function NoteForm(props: Props) {
     }
 
     return (
-        <form onSubmit={handleSubmit(onSubmit)} className='bg-amber-500 bg-opacity-30 rounded-2xl py-1'>
-            <FormInput name={'title'} type={'text'} label={'Tytuł'} register={register}
-                       error={errors.contents}
+        <form onSubmit={handleSubmit(onSubmit)}
+              className={`${props.mode === Mode.create ? 'bg-amber-500' : ''} w-full bg-opacity-30 rounded-2xl py-1`}>
+            <FormInput name={"title"} type={"text"} label={"Tytuł"}
+                       register={register}
+                       error={errors.title}
                        rules={{
                            required: 'Pole wymagane'
                        }}/>
-            <FormInput name={'contents'} type={'textarea'} label={'Treść'} register={register}
+            <FormInput name={"contents"} type={"textarea"} label={'Treść'}
+                       register={register}
                        error={errors.contents}
+                       defaultValue={getValues('contents')}
                        rules={{
-                           required: 'Pole wymagane'
+                           required: 'Pole wymagane',
                        }}/>
             <div className='w-full text-right'>
                 {error && <div className='flex justify-center'>
@@ -92,7 +96,7 @@ function NoteForm(props: Props) {
                     disabled={!isValid || loading}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey mr-2 mb-1"
                     type="submit">
-                    Dodaj notatkę
+                    {props.mode === Mode.create ? 'Dodaj notatkę' : 'Zapisz zmiany'}
                 </button>
             </div>
 
