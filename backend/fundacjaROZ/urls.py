@@ -1,16 +1,20 @@
 from django.urls import path
-from .views import  UserRegistrationAPIView, UserLoginAPIView, UserViewAPI, UserLogoutViewAPI
+from .views import *
 
 
 urlpatterns = [
-	path('api/user/register/', UserRegistrationAPIView.as_view()),
-	path('api/user/login/', UserLoginAPIView.as_view()),
-	path('api/user/', UserViewAPI.as_view()),
-	path('api/user/logout/', UserLogoutViewAPI.as_view()),
+	path('register/', UserRegistrationAPIView.as_view()),
+	path('login/', UserLoginAPIView.as_view()),
+	path('user/', UserViewAPI.as_view()),
     
-	# path('children/current/', CurrentChildrenAPIView.as_view(), name='current-children'),
-    # path('children/archival/', ArchivalChildrenAPIView.as_view(), name='archival-children'),
+	path('children/current/', CurrentChildrenAPIView.as_view()),
+    path('children/archival/', ArchivalChildrenAPIView.as_view()),
     
-    # path('relatives/', RelativesAPIView.as_view()),
-    # path('relatives/<int:pk>/', RelativeDetailAPIView.as_view()),
+ 	path('children/<int:pk>/relatives/', ChildrenRelativesAPIView.as_view()),
+    path('children/<int:pk>/relatives/<int:relative_id>/', ChildrenRelativesDetailsAPIView.as_view()),
+    
+    path('children/<int:pk>/notes/', ChildrenNotesAPIView.as_view()),
+    path('children/<int:pk>/notes/<int:note_id>/', ChildrenNotesDetailsAPIView().as_view()),
+    
+	path('children/<int:pk>/photo/', ChildrenPhotoAPIView.as_view()),
 ]
