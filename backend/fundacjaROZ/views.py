@@ -14,15 +14,6 @@ from django.conf import settings
 from .serializers import *
 from .authentication import JWTAuthentication
 
-
-
-
-
-
-
-
-
-
 class UserRegistrationAPIView(APIView):
     serializer_class = UserRegistrationSerializer
     permission_classes = (AllowAny,)
