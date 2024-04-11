@@ -62,7 +62,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         setLoading(true);
         setValue('leaving_date', formData.leaving_date === "" ? null : formData.leaving_date)
         try {
-            // Make POST request using Fetch API
             let response = await fetch(`${BASE_API_URL}/children/${props.editMode ? parseInt(props.childId) + '/' : ''}`, {
                 method: props.editMode ? 'PUT' : 'POST',
                 headers: {
