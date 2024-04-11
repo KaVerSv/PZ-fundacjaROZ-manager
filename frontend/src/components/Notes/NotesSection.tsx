@@ -4,8 +4,9 @@ import {NoteModel} from "../../models/NoteModel.ts";
 import useSWR from "swr";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useState} from "react";
-import NoteForm, {Mode} from "./NoteForm.tsx";
+import NoteForm from "./NoteForm.tsx";
 import Note from "./Note.tsx";
+import {Mode} from "./Mode.ts";
 
 interface NotesBlockProps {
     childId: string
@@ -67,6 +68,7 @@ function NotesSection(props: NotesBlockProps) {
             {data.length !== 0 ?
                 <div className='flex flex-col gap-5'>
                     {data.map((note) => <Note toggleReload={mutate} key={note.id} note={note}/>)}
+
                 </div> :
                 <span className='mx-auto'>Póki co nie ma notatek</span>}
         </div>
