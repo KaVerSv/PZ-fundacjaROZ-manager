@@ -35,9 +35,9 @@ function NoteForm(props: Props) {
         mode: "onChange",
         defaultValues: {
             child_id: props.childId,
-            id: props.note.id,
+            id: props.note?.id,
             title: props.note?.title,
-            contents: props.note.contents
+            contents: props.note?.contents
         }
     },);
 
@@ -47,7 +47,6 @@ function NoteForm(props: Props) {
 
     const onSubmit: SubmitHandler<NoteFormData> = async (noteFormData) => {
         setLoading(true);
-        console.log(noteFormData);
         try {
             const response = await fetch(`${BASE_API_URL}/children/${props.childId}/notes/${props.note ? props.note.id + '/' : ''}`, {
                 method: props.mode === Mode.edit ? 'PUT' : 'POST',
@@ -75,6 +74,7 @@ function NoteForm(props: Props) {
     return (
         <form onSubmit={handleSubmit(onSubmit)}
               className={`${props.mode === Mode.create ? 'bg-amber-500' : ''} w-full bg-opacity-30 rounded-2xl py-1`}>
+            {JSON.stringify(props.childId)}
             <FormInput name={"title"} type={"text"} label={"Tytuł"}
                        register={register}
                        error={errors.title}
