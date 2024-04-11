@@ -52,15 +52,17 @@ function Note(props: NoteProps) {
                         </div>
                     </div>
                 }
-                {editMode &&
+                {editMode &&<>
                     <NoteForm toggleReload={props.toggleReload}
                               toggleShowForm={() => {
                                   setEditMode(false)
                               }}
                               mode={Mode.edit}
-                              childId={props.note.id}
+                              childId={props.note.child_id}
                               note={props.note}
                     />
+                </>
+
                 }
             </div>
             {!editMode && <div>
