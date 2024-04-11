@@ -74,7 +74,6 @@ function NoteForm(props: Props) {
     return (
         <form onSubmit={handleSubmit(onSubmit)}
               className={`${props.mode === Mode.create ? 'bg-amber-500' : ''} w-full bg-opacity-30 rounded-2xl py-1`}>
-            {JSON.stringify(props.childId)}
             <FormInput name={"title"} type={"text"} label={"Tytuł"}
                        register={register}
                        error={errors.title}
