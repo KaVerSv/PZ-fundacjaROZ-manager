@@ -339,6 +339,19 @@ class ChildrenRelativesDetailsAPIView(APIView):
             return Response({'success': 'Krewny został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+        
+    def put(self, request, pk=None, relative_id=None):
+        child = get_object_or_404(Children, pk=pk)
+        relative = get_object_or_404(Relatives, pk=relative_id)
+
+        if relative:
+            if relative not in child.relatives.all():
+                child.relatives.add(relative)
+                return Response({'success': 'Krewny został pomyślnie dodany'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({'error': 'Krewny jest już przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
