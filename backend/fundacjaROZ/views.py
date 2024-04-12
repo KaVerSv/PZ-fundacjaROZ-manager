@@ -507,9 +507,62 @@ class UsersViewAPI(ModelViewSet):
         #     return Response(serializer.data)
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ChildrenDocumentsAPIView(ModelViewSet):
-    queryset = Documents.objects.all()
-    serializer_class = DocumentsSerializer
-     
-    http_method_names = ['get', 'post', 'delete', 'put']
-    pass
+
+
+
+
+
+
+
+
+
+class ChildrenDocumentsAPIView(APIView):  
+    def get(self, request, pk):
+        pass
+        child = get_object_or_404(Children, pk=pk)
+        documents = Documents.objects.filter(child_id=child)
+        serializer = DocumentsSerializer(documents, many=True)
+        data = serializer.data
+        for document_data in data:
+            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}"
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk):
+        pass
+        # child = get_object_or_404(Children, pk=pk)
+        # serializer = NotesSerializer(data=request.data)
+        # serializer.initial_data['child_id'] = child.id
+        # if serializer.is_valid():
+        #     serializer.save()
+        #     return Response(serializer.data, status=201)
+        # return Response(serializer.errors, status=400)
+
+
+
+
+
+
+
+
+
+
+class ChildrenDocumentsDetailsAPIView(APIView):
+    def get(self, request, pk=None, note_id=None):
+        pass
+        # child = get_object_or_404(Children, pk=pk)
+        # notes = Notes.objects.filter(child_id=child)
+        # serializer = NotesSerializer(notes, many=True)
+        # return Response(serializer.data)
+    
+    def delete(self, request, pk=None, document_id=None):    
+        child = get_object_or_404(Children, pk=pk)
+        try:
+            document = Documents.objects.get(id=document_id)
+            if document.child_id == child:
+                file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
+                if os.path.exists(file_path):
+                    os.remove(file_path)
+                document.delete()
+        except document.DoesNotExist:
+            return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)      
+        return Response({'success': 'Document został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)

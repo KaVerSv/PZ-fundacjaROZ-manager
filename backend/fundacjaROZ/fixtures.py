@@ -4,7 +4,7 @@ from django.utils import timezone
 from datetime import timedelta
 
 def add_example_data(**kwargs):
-    from .models import Relatives, Children, Notes, User
+    from .models import Relatives, Children, Notes, Users
 
     relatives_data = [
         {
@@ -416,7 +416,7 @@ def add_example_data(**kwargs):
     ]
 
     Notes.objects.bulk_create(Notes(**data) for data in notes_data)
-    User.objects.bulk_create(User(**data) for data in users_data)
+    Users.objects.bulk_create(Users(**data) for data in users_data)
 
     children[0].relatives.add(relatives[0])
     children[1].relatives.add(relatives[1], relatives[2])
