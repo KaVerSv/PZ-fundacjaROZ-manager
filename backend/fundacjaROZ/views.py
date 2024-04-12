@@ -550,7 +550,7 @@ class ChildrenDocumentsAPIView(APIView):
 
 
 class ChildrenDocumentsDetailsAPIView(APIView):
-    def get(self, request, pk=None, document_id=None):
+    def get(self, pk=None, document_id=None):
         child = get_object_or_404(Children, pk=pk)
         document = Documents.objects.filter(id=document_id)
         if document.child_id == child:
