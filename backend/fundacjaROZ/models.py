@@ -125,11 +125,10 @@ class User(AbstractBaseUser, PermissionsMixin):
     def __str__(self):
         return self.email
 
-# class Documents(models.Model):
-#     name = models.CharField(max_length = 50)
-#     doc_type = models.CharField(max_length = 20)
-#     date = models.DateField()
-#     file_name = models.CharField(max_length=100)
-#     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
+class Documents(models.Model):
+    name = models.CharField(max_length = 50)
+    date = models.DateField()
+    file_name = models.CharField(max_length=100)
+    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     
 

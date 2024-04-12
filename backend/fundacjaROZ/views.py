@@ -1,3 +1,4 @@
+import time
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
@@ -151,10 +152,16 @@ class ChildrenAPIView(ModelViewSet):
             
             if 'photo' in request.FILES:
                 photo = request.FILES['photo']
-                with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
+                filename = photo.name                
+                if os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
+                    name, extension = os.path.splitext(filename)
+                    timestamp = int(time.time() * 1000)
+                    filename = f"{name}_{timestamp}{extension}"
+
+                with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
                     for chunk in photo.chunks():
                         destination.write(chunk)
-            serializer.save()
+            serializer.save(photo_path = filename)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
@@ -171,9 +178,16 @@ class ChildrenAPIView(ModelViewSet):
                     if settings.MEDIA_ROOT.exists(old_photo_path):
                         settings.MEDIA_ROOT.delete(old_photo_path)
 
-                with open(os.path.join(settings.MEDIA_ROOT, new_photo.name), 'wb') as destination:
+                filename = new_photo.name                
+                if os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
+                    name, extension = os.path.splitext(filename)
+                    timestamp = int(time.time() * 1000)
+                    filename = f"{name}_{timestamp}{extension}"
+
+                with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
                     for chunk in new_photo.chunks():
                         destination.write(chunk)
+            child.photo_path = filename
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -222,12 +236,18 @@ class ChildrenPhotoAPIView(APIView):
 
         if 'photo' in request.FILES:
             photo = request.FILES['photo']
+
+            filename = photo.name                
+            if os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
+                name, extension = os.path.splitext(filename)
+                timestamp = int(time.time() * 1000)
+                filename = f"{name}_{timestamp}{extension}"
             
             if hasattr(photo, 'content_type') and photo.content_type in ['image/jpeg', 'image/png']:
-                with open(os.path.join(settings.MEDIA_ROOT, photo.name), 'wb') as destination:
+                with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
                     for chunk in photo.chunks():
                         destination.write(chunk)
-                child.photo_path = photo.name
+                child.photo_path = filename
                 child.save()
                 return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
             else:
@@ -486,3 +506,10 @@ class UsersViewAPI(ModelViewSet):
         #     serializer.save()
         #     return Response(serializer.data)
         # return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class ChildrenDocumentsAPIView(ModelViewSet):
+    queryset = Documents.objects.all()
+    serializer_class = DocumentsSerializer
+     
+    http_method_names = ['get', 'post', 'delete', 'put']
+    pass

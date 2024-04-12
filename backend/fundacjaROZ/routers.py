@@ -5,6 +5,7 @@ from .views import *
 
 router = DefaultRouter()
 
+router.register(r'children/documents', ChildrenDocumentsAPIView)
 router.register(r'relatives', RelativesAPIView)
 router.register(r'children', ChildrenAPIView)
 router.register(r'users', UsersViewAPI)
