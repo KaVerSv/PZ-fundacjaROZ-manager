@@ -529,13 +529,13 @@ class ChildrenDocumentsAPIView(APIView):
 
     def post(self, request, pk):
         pass
-        # child = get_object_or_404(Children, pk=pk)
-        # serializer = NotesSerializer(data=request.data)
-        # serializer.initial_data['child_id'] = child.id
-        # if serializer.is_valid():
-        #     serializer.save()
-        #     return Response(serializer.data, status=201)
-        # return Response(serializer.errors, status=400)
+        child = get_object_or_404(Children, pk=pk)
+        serializer = DocumentsSerializer(data=request.data)
+        serializer.initial_data['child_id'] = child.id
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
 
 
 
