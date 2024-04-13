@@ -16,7 +16,7 @@ interface NotesBlockProps {
 function NotesSection(props: NotesBlockProps) {
 
     const [showNoteForm, setShowNoteForm] = useState(false);
-
+    const [isWrapped, setIsWrapped] = useState(false);
     const fetcher: (url: string) => Promise<NoteModel[]> = async (url) => {
 
         const response = await fetch(url, {
@@ -67,9 +67,20 @@ function NotesSection(props: NotesBlockProps) {
 
             {data.length !== 0 ?
                 <div className='flex flex-col gap-5'>
-                    {data.map((note) => <Note toggleReload={mutate} key={note.id} note={note}/>)}
+                    <button
+                        className="bg-blue-500 text-white font-semibold py-2 px-4 rounded"
+                        onClick={() => setIsWrapped(!isWrapped)}
+                    > {isWrapped ? 'Rozwiń notatki' : 'Zwiń notatki'}
+                    </button>
+                    <div className={`flex flex-col gap-5 overflow-hidden ${
+                            isWrapped ? 'max-h-0 absolute' : 'max-h-full'
+                        }`}>
+                        {data.map((note) => <Note toggleReload={mutate} key={note.id} note={note}/>)}
+                    </div>
 
-                </div> :
+                    {}
+                </div>
+                :
                 <span className='mx-auto'>Póki co nie ma notatek</span>}
         </div>
     );
