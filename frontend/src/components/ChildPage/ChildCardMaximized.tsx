@@ -1,6 +1,6 @@
 import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
-import ChildInfoContainer from "./ChildInfoContainer.tsx";
+import InfoContainer from "./InfoContainer.tsx";
 import {Link, useNavigate} from "react-router-dom";
 import useSWR from "swr";
 import {BASE_API_URL} from "../../api/contst.ts";
@@ -75,19 +75,19 @@ function ChildCardMaximized(props: ChildCardProps) {
                             {/*</div>*/}
                             <div
                                 className='flex flex-col gap-7 sm:grid sm:grid-cols-1 xl:gap-4 xl:gap-y-7 xl:grid-cols-2 2xl:grid-cols-3'>
-                                <ChildInfoContainer note='Płeć'
-                                                    text={child.gender === 'Female' ? 'Kobieta' : 'Mężczyzna'}/>
-                                <ChildInfoContainer note='Data urodzenia' text={child.birth_date}/>
-                                <ChildInfoContainer note='Miejsce urodzeina' text={child.birthplace}/>
+                                <InfoContainer note='Płeć'
+                                               text={child.gender === 'Female' ? 'Kobieta' : 'Mężczyzna'}/>
+                                <InfoContainer note='Data urodzenia' text={child.birth_date}/>
+                                <InfoContainer note='Miejsce urodzeina' text={child.birthplace}/>
                             </div>
                             <div className='flex flex-col gap-7'>
-                                <ChildInfoContainer note='Adres zamieszkania' text={child.residential_address}/>
-                                <ChildInfoContainer note='Adres zamieldowania' text={child.registered_address}/>
+                                <InfoContainer note='Adres zamieszkania' text={child.residential_address}/>
+                                <InfoContainer note='Adres zamieldowania' text={child.registered_address}/>
                             </div>
                             <div className='flex flex-col sm:flex-row gap-7'>
-                                <ChildInfoContainer note='Data przyjęcia' text={child.admission_date}/>
+                                <InfoContainer note='Data przyjęcia' text={child.admission_date}/>
                                 {child.leaving_date &&
-                                    <ChildInfoContainer note='Data opuszczenia' text={child.leaving_date}/>}
+                                    <InfoContainer note='Data opuszczenia' text={child.leaving_date}/>}
                             </div>
                         </div>
                     </div>
