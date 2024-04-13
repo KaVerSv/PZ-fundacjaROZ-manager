@@ -3,7 +3,7 @@ import {BASE_API_URL} from "../../../api/contst.ts";
 import {useEffect, useState} from "react";
 import FormInput from "../../common/FormInput.tsx";
 import {NoteModel} from "../../../models/NoteModel.ts";
-import {Mode} from "./Mode.ts";
+import {Mode} from "../Mode.ts";
 
 interface Props {
     toggleReload: () => void;

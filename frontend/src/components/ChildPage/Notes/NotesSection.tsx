@@ -6,7 +6,7 @@ import {BASE_API_URL} from "../../../api/contst.ts";
 import {useState} from "react";
 import NoteForm from "./NoteForm.tsx";
 import Note from "./Note.tsx";
-import {Mode} from "./Mode.ts";
+import {Mode} from "../Mode.ts";
 
 interface NotesBlockProps {
     childId: string

@@ -4,7 +4,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {BASE_API_URL} from "../../../api/contst.ts";
 import {useState} from "react";
 import NoteForm from "./NoteForm.tsx";
-import {Mode} from "./Mode.ts";
+import {Mode} from "../Mode.ts";
 
 interface NoteProps {
     note: NoteModel;
