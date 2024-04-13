@@ -16,7 +16,7 @@ interface NotesBlockProps {
 function NotesSection(props: NotesBlockProps) {
 
     const [showNoteForm, setShowNoteForm] = useState(false);
-    const [isWrapped, setIsWrapped] = useState(false);
+    const [isWrapped, setIsWrapped] = useState(true);
     const fetcher: (url: string) => Promise<NoteModel[]> = async (url) => {
 
         const response = await fetch(url, {
@@ -44,7 +44,7 @@ function NotesSection(props: NotesBlockProps) {
 
     return (
         <div
-            className='flex flex-col gap-1.5 w-[90%] sm:w-72 border-main_red border-4 rounded-2xl m-2 p-3'>
+            className='flex flex-col gap-1.5 w-[90%] sm:w-96 border-main_red border-4 rounded-2xl m-2 p-3'>
             <div className='flex flex-row justify-between'>
                 <span className='font-bold text-lg'>Notatki</span>
                 <div className='text-main_red hover:text-red-600 cursor-pointer' onClick={() => {
