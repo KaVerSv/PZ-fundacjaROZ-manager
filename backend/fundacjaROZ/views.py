@@ -161,8 +161,6 @@ class ChildrenAPIView(ModelViewSet):
                 with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
                     for chunk in photo.chunks():
                         destination.write(chunk)
-            if serializer.leaving_date == "":
-                serializer.leaving_date = None
             serializer.save(photo_path = filename)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
