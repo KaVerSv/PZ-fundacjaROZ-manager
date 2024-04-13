@@ -41,6 +41,11 @@ class UsersSerializer(ModelSerializer):
         model = User
         fields = ('user_id','first_name','surname','email')
 
+class DocumentsSerializer(ModelSerializer):
+    class Meta:
+        model = Documents
+        fields = ('id','name','date','file_name', 'child_id')
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
 
