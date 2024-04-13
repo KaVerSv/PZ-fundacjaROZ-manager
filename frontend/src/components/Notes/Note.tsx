@@ -30,8 +30,8 @@ function Note(props: NoteProps) {
         }
     }
     return (
-        <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': '' } rounded-xl`}>
-            <div className='flex justify-between' style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
+        <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': 'pt-3' } rounded-xl`}>
+            <div className='flex justify-between relative' style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
                 {!editMode && <span className='font-bold w-[80%]'>{props.note.title}</span>}
                 {!editMode ?
                     <div className='flex gap-2 justify-end'>
@@ -45,15 +45,16 @@ function Note(props: NoteProps) {
                         </div>
                     </div>
                     :
-                    <div className='flex gap-2 justify-end p-3'>
+                    <div className='flex gap-2 justify-end p-3 absolute -top-4 w-full'>
+                        <span className='font-bold w-[80%]'>Edytuj notatkę</span>
                         <div className='text-main_grey hover:text-gray-900 cursor-pointer'
-                             onClick={()=>setEditMode(false)}>
-                            <FontAwesomeIcon icon={faReplyAll} />
+                             onClick={() => setEditMode(false)}>
+                            <FontAwesomeIcon icon={faReplyAll}/>
                         </div>
                     </div>
                 }
-                {editMode &&<>
-                    <NoteForm toggleReload={props.toggleReload}
+                {editMode && <>
+                <NoteForm toggleReload={props.toggleReload}
                               toggleShowForm={() => {
                                   setEditMode(false)
                               }}
