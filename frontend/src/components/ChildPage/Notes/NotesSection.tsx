@@ -1,8 +1,8 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faFileCirclePlus} from "@fortawesome/free-solid-svg-icons";
-import {NoteModel} from "../../models/NoteModel.ts";
+import {NoteModel} from "../../../models/NoteModel.ts";
 import useSWR from "swr";
-import {BASE_API_URL} from "../../api/contst.ts";
+import {BASE_API_URL} from "../../../api/contst.ts";
 import {useState} from "react";
 import NoteForm from "./NoteForm.tsx";
 import Note from "./Note.tsx";
@@ -44,7 +44,7 @@ function NotesSection(props: NotesBlockProps) {
 
     return (
         <div
-            className='flex flex-col gap-1.5 w-[90%] sm:w-72 border-main_red border-4 rounded-2xl m-2 p-3 sm:mb-auto'>
+            className='flex flex-col gap-1.5 w-[90%] sm:w-72 border-main_red border-4 rounded-2xl m-2 p-3'>
             <div className='flex flex-row justify-between'>
                 <span className='font-bold text-lg'>Notatki</span>
                 <div className='text-main_red hover:text-red-600 cursor-pointer' onClick={() => {

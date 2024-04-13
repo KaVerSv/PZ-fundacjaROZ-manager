@@ -1,8 +1,8 @@
 import {SubmitHandler, useForm} from "react-hook-form";
-import {BASE_API_URL} from "../../api/contst.ts";
+import {BASE_API_URL} from "../../../api/contst.ts";
 import {useEffect, useState} from "react";
-import FormInput from "../common/FormInput.tsx";
-import {NoteModel} from "../../models/NoteModel.ts";
+import FormInput from "../../common/FormInput.tsx";
+import {NoteModel} from "../../../models/NoteModel.ts";
 import {Mode} from "./Mode.ts";
 
 interface Props {
