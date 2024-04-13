@@ -45,7 +45,7 @@ function Note(props: NoteProps) {
                         </div>
                     </div>
                     :
-                    <div className='flex gap-2 justify-end p-3 absolute -top-4 w-full'>
+                    <div className='flex gap-2 justify-end p-3 absolute -left-3 -top-4 w-full'>
                         <span className='font-bold w-[80%]'>Edytuj notatkę</span>
                         <div className='text-main_grey hover:text-gray-900 cursor-pointer'
                              onClick={() => setEditMode(false)}>
