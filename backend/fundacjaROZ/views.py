@@ -161,6 +161,8 @@ class ChildrenAPIView(ModelViewSet):
                 with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
                     for chunk in photo.chunks():
                         destination.write(chunk)
+            if serializer.leaving_date == "":
+                serializer.leaving_date = None
             serializer.save(photo_path = filename)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
@@ -170,8 +172,9 @@ class ChildrenAPIView(ModelViewSet):
         serializer = self.get_serializer(child, data=request.data)
         
         if serializer.is_valid():
+            old_photo_path = child.photo_path
             if 'photo' in request.FILES:
-                old_photo_path = child.photo_path
+                
                 new_photo = request.FILES['photo']
 
                 if old_photo_path:
@@ -188,6 +191,8 @@ class ChildrenAPIView(ModelViewSet):
                     for chunk in new_photo.chunks():
                         destination.write(chunk)
                 child.photo_path = filename
+            else:
+                child.photo_path = old_photo_path
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -295,6 +300,15 @@ class ChildrenNotesDetailsAPIView(APIView):
         except Notes.DoesNotExist:
             return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)      
         return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
+    
+    def put(self, request, pk, note_id):
+        child = get_object_or_404(Children, pk=pk)
+        note = get_object_or_404(Notes, pk=note_id, child_id=child.id)
+        serializer = NotesSerializer(note, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
             
             
 
@@ -355,17 +369,17 @@ class ChildrenRelativesDetailsAPIView(APIView):
             return Response({'success': 'Krewny został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)
         else:
             return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-        
+    
     def put(self, request, pk=None, relative_id=None):
         child = get_object_or_404(Children, pk=pk)
         relative = get_object_or_404(Relatives, pk=relative_id)
 
         if relative:
-            if relative not in child.relatives.all():
+            if relative in child.relatives.all():
                 child.relatives.add(relative)
-                return Response({'success': 'Krewny został pomyślnie dodany'}, status=status.HTTP_204_NO_CONTENT)
+                return Response({'success': 'Krewny został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
             else:
-                return Response({'error': 'Krewny jest już przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
