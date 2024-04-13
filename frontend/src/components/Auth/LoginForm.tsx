@@ -24,7 +24,7 @@ function LoginForm() {
 
     const onSubmit: SubmitHandler<FormData> = async (formData) => {
         try {
-            const response = await fetch(BASE_API_URL + 'api/user/login/', {
+            const response = await fetch(BASE_API_URL + '/login/', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
