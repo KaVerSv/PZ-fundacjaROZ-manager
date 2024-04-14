@@ -160,7 +160,7 @@ class ChildrenAPIView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         child = self.get_object()
         old_photo_path = child.photo_path
-        serializer = self.get_serializer(child, data=request.data)
+        serializer = ChildrenSerializer1(child, data=request.data)
 
         if serializer.is_valid():
             serializer.save(photo_path = old_photo_path)
