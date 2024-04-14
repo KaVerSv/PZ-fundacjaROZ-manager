@@ -81,7 +81,7 @@ function RelativesSection(props: NotesBlockProps) {
                     {}
                 </div>
                 :
-                <span className='mx-auto'>Póki co nie ma notatek</span>}
+                <span className='mx-auto'>Póki co nie ma rodziców</span>}
         </div>
     );
 }
