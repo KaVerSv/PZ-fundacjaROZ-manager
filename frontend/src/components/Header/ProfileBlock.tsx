@@ -1,6 +1,6 @@
 import {useEffect, useState} from "react";
 import {BASE_API_URL} from "../../api/contst.ts";
-import {jwtDecode} from "jwt-decode";
+import { jwtDecode } from "jwt-decode";
 import {faArrowRightFromBracket} from "@fortawesome/free-solid-svg-icons";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {useNavigate} from "react-router-dom";
@@ -12,13 +12,13 @@ interface User {
 }
 
 function ProfileBlock() {
-    const [user, setUser] = useState({});
+    const [user, setUser] = useState({email: '', first_name: '', surname:''});
     const navigate = useNavigate();
 
     useEffect(() => {
         const fetchData = async () => {
             try {
-                const response = await fetch(`${BASE_API_URL}/users/${jwtDecode(localStorage.getItem("token"))?.user_id}`, {
+                const response = await fetch(`${BASE_API_URL}/users/${jwtDecode<{user_id: string}>(localStorage.getItem("token"))?.user_id}`, {
                     headers: {
                         'Authorization': `Bearer ${localStorage.getItem("token")}`
                     }
