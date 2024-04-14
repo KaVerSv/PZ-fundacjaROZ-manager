@@ -76,7 +76,7 @@ function ChildCardMaximized(props: ChildCardProps) {
                             <div
                                 className='flex flex-col gap-7 sm:grid sm:grid-cols-1 xl:gap-4 xl:gap-y-7 xl:grid-cols-2 2xl:grid-cols-3'>
                                 <InfoContainer note='Płeć'
-                                               text={child.gender === 'Female' ? 'Kobieta' : 'Mężczyzna'}/>
+                                               text={child.gender === 'female' ? 'Kobieta' : 'Mężczyzna'}/>
                                 <InfoContainer note='Data urodzenia' text={child.birth_date}/>
                                 <InfoContainer note='Miejsce urodzeina' text={child.birthplace}/>
                             </div>
