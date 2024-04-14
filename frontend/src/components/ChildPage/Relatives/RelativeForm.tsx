@@ -40,17 +40,19 @@ function RelativeForm(props: Props) {
         setFocus('first_name');
     }, []);
 
-    const onSubmit: SubmitHandler<RelativeModel> = async (noteFormData) => {
+    const onSubmit: SubmitHandler<RelativeModel> = async (relativeFormData) => {
         setLoading(true);
+        console.log(relativeFormData);
         try {
-            const response = await fetch(`${BASE_API_URL}/children/${props.childId}/relatives/${props.relative ? props.relative.id + '/' : ''}`, {
+            const response = await fetch(Mode.edit ? `${BASE_API_URL}children/${props.childId}/relatives/` :  `${BASE_API_URL}relatives/${props.relative.id}/`, {
                 method: props.mode === Mode.edit ? 'PUT' : 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("token")}`,
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify(noteFormData),
+                body: JSON.stringify(relativeFormData),
             });
+            console.log(response);
             if (!response.ok) {
                 throw new Error(`API request failed with status ${response.status}`);
             } else {
@@ -69,18 +71,15 @@ function RelativeForm(props: Props) {
     return (
         <form onSubmit={handleSubmit(onSubmit)}
               className={`${props.mode === Mode.create ? 'bg-amber-500' : ''} w-full bg-opacity-30 rounded-2xl py-1 flex flex-col pt-2`}>
-            <FormInput name={"first_name"} type={"text"} label={"Imie"}
+            <FormInput name={"first_name"} type={"text"} label={"Imię"}
                        register={register}
                        error={errors.first_name}
                        rules={{
                            required: 'Pole wymagane'
                        }}/>
-            <FormInput name={"second_name"} type={"text"} label={"Drugie imie"}
+            <FormInput name={"second_name"} type={"text"} label={"Drugie Imię"}
                        register={register}
-                       error={errors.second_name}
-                       rules={{
-                           required: 'Pole wymagane'
-                       }}/>
+                       error={errors.second_name}/>
             <FormInput name={"surname"} type={"text"} label={"Nazwisko"}
                        register={register}
                        error={errors.surname}
