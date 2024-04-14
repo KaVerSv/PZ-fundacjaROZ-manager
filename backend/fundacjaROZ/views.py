@@ -153,21 +153,7 @@ class ChildrenAPIView(ModelViewSet):
             pesel = serializer.validated_data.get('pesel')
             if Children.objects.filter(pesel=pesel).exists():
                 return Response({'error': 'Dziecko o podanym PESEL już istnieje.'}, status=status.HTTP_400_BAD_REQUEST)
-            
-            filename = ""
-
-            if 'photo' in request.FILES:
-                photo = request.FILES['photo']
-                filename = photo.name                
-                if os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
-                    name, extension = os.path.splitext(filename)
-                    timestamp = int(time.time() * 1000)
-                    filename = f"{name}_{timestamp}{extension}"
-
-                with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
-                    for chunk in photo.chunks():
-                        destination.write(chunk)
-            serializer.save(photo_path = filename)
+            serializer.save(photo_path = "")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
@@ -177,8 +163,7 @@ class ChildrenAPIView(ModelViewSet):
         serializer = self.get_serializer(child, data=request.data)
 
         if serializer.is_valid():
-            child.photo_path = old_photo_path
-            serializer.save()
+            serializer.save(photo_path = old_photo_path)
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
