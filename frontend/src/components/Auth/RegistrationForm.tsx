@@ -72,7 +72,7 @@ function RegistrationForm() {
                                        }
                                    }}
                                    labelColor='text-main_white'></FormInput>
-                        <FormInput name={'first_name'} type={'text'} label={'Imie'} register={register}
+                        <FormInput name={'first_name'} type={'text'} label={'Imię'} register={register}
                                    error={errors.first_name}
                                    rules={{
                                        required: 'Pole wymagane'

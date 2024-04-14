@@ -140,9 +140,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                             </div>
                             <div className='flex flex-col sm:w-[90%] md:w-auto'>
                                 <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
-                                    <FormInput name={'first_name'} type={'text'} label={'Imie'} register={register}
+                                    <FormInput name={'first_name'} type={'text'} label={'Imię'} register={register}
                                                rules={{required: 'Pole wymagane'}} error={errors.first_name}/>
-                                    <FormInput name={"second_name"} type={"text"} label={"Drugie Imie"}
+                                    <FormInput name={"second_name"} type={"text"} label={"Drugie Imię"}
                                                register={register}
                                                rules={{}} error={errors.second_name}/>
                                     <FormInput name={"surname"} type={"text"} label={"Nazwisko"} register={register}
