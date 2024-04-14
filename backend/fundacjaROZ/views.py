@@ -143,13 +143,19 @@ class ChildrenAPIView(ModelViewSet):
         except Children.DoesNotExist:
             return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
-    def create(self, request, *args, **kwargs):        
-        serializer = ChildrenSerializer1(data=request.data)
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        if data['leaving_date'] == "":
+            data['leaving_date'] = None
+
+        serializer = ChildrenSerializer1(data = data)
         if serializer.is_valid():
             pesel = serializer.validated_data.get('pesel')
             if Children.objects.filter(pesel=pesel).exists():
                 return Response({'error': 'Dziecko o podanym PESEL już istnieje.'}, status=status.HTTP_400_BAD_REQUEST)
             
+            filename = ""
+
             if 'photo' in request.FILES:
                 photo = request.FILES['photo']
                 filename = photo.name                
