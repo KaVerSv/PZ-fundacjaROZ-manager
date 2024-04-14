@@ -175,7 +175,7 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
         old_photo_path = child.photo_path
         serializer = self.get_serializer(child, data=request.data)
-        
+
         if serializer.is_valid():
             child.photo_path = old_photo_path
             serializer.save()
@@ -207,7 +207,7 @@ class ChildrenPhotoAPIView(APIView):
             file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
             if os.path.exists(file_path):
                 os.remove(file_path)
-            child.photo_path = None
+            child.photo_path = ""
             child.save()
             return Response(status=status.HTTP_204_NO_CONTENT)
         else:

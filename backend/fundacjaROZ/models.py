@@ -45,7 +45,7 @@ def validate_admission_date(admission_date):
     
 class Relatives(models.Model):
     first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
+    second_name = models.CharField(max_length=50, blank=True)
     surname = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
     residential_address = models.CharField(max_length=200)

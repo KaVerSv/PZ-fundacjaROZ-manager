@@ -18,7 +18,7 @@ class ChildrenSerializer1(ModelSerializer):
                   'birth_date','birthplace','residential_address','registered_address',
                   'admission_date','leaving_date','photo_path'
                   )
-        
+    
 class RelativesSerializer(ModelSerializer):
     class Meta:
         model = Relatives
