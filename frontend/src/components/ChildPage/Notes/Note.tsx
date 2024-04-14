@@ -30,7 +30,7 @@ function Note(props: NoteProps) {
         }
     }
     return (
-        <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': 'pt-3' } rounded-xl`}>
+        <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': 'pt-8' } rounded-xl`}>
             <div className='flex justify-between relative' style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
                 {!editMode && <span className='font-bold w-[80%]'>{props.note.title}</span>}
                 {!editMode ?
@@ -45,7 +45,7 @@ function Note(props: NoteProps) {
                         </div>
                     </div>
                     :
-                    <div className='flex gap-2 justify-end p-3 absolute -top-4 w-full'>
+                    <div className='flex gap-2 justify-end p-3 absolute -top-7 w-full'>
                         <span className='font-bold w-[89%]'>Edytuj notatkę</span>
                         <div className='text-main_grey hover:text-gray-900 cursor-pointer'
                              onClick={() => setEditMode(false)}>
