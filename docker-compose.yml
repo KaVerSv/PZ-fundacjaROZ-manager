@@ -16,10 +16,18 @@ services:
       - ./data/db:/var/lib/postgresql/data/
 
   frontend:
-      image: zakharsytoi/roz_frontend:latest
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
 
-      ports:
-        - '8080:8080'
+    ports:
+      - '8080:8080'
+
+    volumes:
+      - ./frontend:/app/frontend
+
+    depends_on:
+      - backend
 
   backend: 
     build: 
