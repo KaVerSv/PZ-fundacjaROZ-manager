@@ -43,8 +43,9 @@ function RelativeForm(props: Props) {
     const onSubmit: SubmitHandler<RelativeModel> = async (relativeFormData) => {
         setLoading(true);
         console.log(relativeFormData);
+        console.log(props.mode)
         try {
-            const response = await fetch(Mode.edit ? `${BASE_API_URL}children/${props.childId}/relatives/` :  `${BASE_API_URL}relatives/${props.relative.id}/`, {
+            const response = await fetch( `${BASE_API_URL}${props.mode === Mode.edit ? `relatives/${props.relative.id}/` :  `children/${props.childId}/relatives/`}`   , {
                 method: props.mode === Mode.edit ? 'PUT' : 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("token")}`,
