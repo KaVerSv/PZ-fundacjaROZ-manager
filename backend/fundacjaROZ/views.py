@@ -173,30 +173,11 @@ class ChildrenAPIView(ModelViewSet):
 
     def update(self, request, *args, **kwargs):
         child = self.get_object()
+        old_photo_path = child.photo_path
         serializer = self.get_serializer(child, data=request.data)
         
         if serializer.is_valid():
-            old_photo_path = child.photo_path
-            if 'photo' in request.FILES:
-                
-                new_photo = request.FILES['photo']
-
-                if old_photo_path:
-                    if settings.MEDIA_ROOT.exists(old_photo_path):
-                        settings.MEDIA_ROOT.delete(old_photo_path)
-
-                filename = new_photo.name                
-                if os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
-                    name, extension = os.path.splitext(filename)
-                    timestamp = int(time.time() * 1000)
-                    filename = f"{name}_{timestamp}{extension}"
-
-                with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
-                    for chunk in new_photo.chunks():
-                        destination.write(chunk)
-                child.photo_path = filename
-            else:
-                child.photo_path = old_photo_path
+            child.photo_path = old_photo_path
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
