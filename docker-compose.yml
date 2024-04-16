@@ -16,7 +16,7 @@ services:
       - ./data/db:/var/lib/postgresql/data/
 
   frontend:
-      image: zakharsytoi/roz_frontend:latest
+      image: zakharsytoi/roz_frontend:0.3
 
       ports:
         - '8080:8080'
