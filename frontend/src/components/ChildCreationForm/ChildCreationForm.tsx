@@ -37,7 +37,8 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                     // @ts-expect-error
                     setValue(key, jsonData[key]);
                 });
-                setValue('gender', jsonData.gender === 'Female' ? GenderEnum.female : GenderEnum.male)
+                console.log(jsonData.gender);
+                setValue('gender', jsonData.gender === 'female' ? GenderEnum.female : GenderEnum.male)
                 const url = await fetchImage(`${BASE_API_URL}/children/${parseInt(props.childId)}/photo`);
                 setPreview(url);
             } catch (error) {
@@ -62,7 +63,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
         setLoading(true);
         setValue('leaving_date', formData.leaving_date === "" ? null : formData.leaving_date)
         try {
-            let response = await fetch(`${BASE_API_URL}/children/${props.editMode ? parseInt(props.childId) + '/' : ''}`, {
+            let response = await fetch(`${BASE_API_URL}children/${props.editMode ? parseInt(props.childId) + '/' : ''}`, {
                 method: props.editMode ? 'PUT' : 'POST',
                 headers: {
                     'Authorization': `Bearer ${localStorage.getItem("token")}`,

@@ -16,9 +16,9 @@ services:
       - ./data/db:/var/lib/postgresql/data/
 
   frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
+      build:
+        context: ./frontend
+        dockerfile: Dockerfile
 
     ports:
       - '8080:8080'
