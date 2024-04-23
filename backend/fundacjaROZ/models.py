@@ -50,27 +50,40 @@ class Relatives(models.Model):
     phone_number = models.CharField(max_length=15)
     residential_address = models.CharField(max_length=200)
     e_mail = models.CharField(max_length=100, validators=[validate_email])
+    legal_status = models.TextField(default='')
+
+class Schools(models.Model):
+    name = models.CharField(max_length=50)
+    address = models.TextField()
 
 class Children(models.Model):
-    pesel = models.CharField(unique=True, max_length=11)#, validators=[validate_pesel]
+    pesel = models.CharField(unique=True, max_length=11)
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50, blank=True)
     surname = models.CharField(max_length=100)
-    gender = models.CharField(max_length=10)
     birth_date = models.DateField()
     birthplace = models.CharField(max_length=100)
     residential_address = models.CharField(max_length=200)
     registered_address = models.CharField(max_length=200)
-    admission_date = models.DateField()#validators=[validate_admission_date])
-    leaving_date = models.DateField(blank=True, null=True)#, validators=[validate_leaving_date])
-    photo_path = models.CharField(null=True, max_length = 100)
-    relatives = models.ManyToManyField(Relatives)
+    admission_date = models.DateField()
+    leaving_date = models.DateField(blank=True, null=True)
+    photo_path = models.CharField(null=True, max_length=100)
+    relatives = models.ManyToManyField(Relatives, through='FamilyRelationship')
+    schools = models.ManyToManyField(Schools, through='Enrollment')
 
-    def clean(self):
-        super().clean()
-        validate_pesel(self.pesel, self.birth_date)
-        if self.leaving_date:
-            validate_leaving_date(self.admission_date, self.leaving_date)
+class Enrollment(models.Model):
+    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    school = models.ForeignKey(Schools, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)  
+
+class FamilyRelationship(models.Model):    
+    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    relative = models.ForeignKey(Relatives, on_delete=models.CASCADE)
+    relation = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = ['child', 'relative']
 
 class Notes(models.Model):
     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
@@ -78,10 +91,12 @@ class Notes(models.Model):
     contents = models.TextField()
 
 class Documents(models.Model):
-    name = models.CharField(max_length = 50)
+    signature = models.CharField(max_length = 100, default='')
+    specification = models.CharField(max_length = 200, default='')
     date = models.DateField()
     file_name = models.CharField(max_length=100)
     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
+    relative_id = models.ForeignKey(Relatives, on_delete=models.SET_NULL, null=True)
 
 class CustomUserManager(BaseUserManager):
 	def create_user(self, email, password=None):

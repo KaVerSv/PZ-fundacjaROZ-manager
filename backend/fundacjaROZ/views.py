@@ -289,12 +289,13 @@ class ChildrenNotesDetailsAPIView(APIView):
 
 
 
+
 class ChildrenRelativesAPIView(APIView):
     def get(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
         relatives = child.relatives.all()
-        serializer = RelativesSerializer(relatives, many=True)
-        return Response(serializer.data)
+        serializer = RelativesSerializer(relatives, many=True, context={'child_id': child.id})
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
@@ -538,20 +539,33 @@ class ChildrenDocumentsDetailsAPIView(APIView):
         child = get_object_or_404(Children, pk=pk)
         document = Documents.objects.filter(id=document_id)
         if document.child_id == child:
-            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
+            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.file_name)
             return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
         else:
             return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)  
-    
-    def delete(self, request, pk=None, document_id=None):    
+        
+    def put(self, request, pk, document_id):
         child = get_object_or_404(Children, pk=pk)
-        try:
-            document = Documents.objects.get(id=document_id)
-            if document.child_id == child:
-                file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
-                if os.path.exists(file_path):
-                    os.remove(file_path)
-                document.delete()
-        except document.DoesNotExist:
-            return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)      
-        return Response({'success': 'Document został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)
+        document = Documents.objects.filter(id=document_id)
+        if document.child_id == child and document.file_name:
+            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
+        if 'file' in request.FILES:
+            file = request.FILES['file']
+
+            filename = file.name                
+            if os.path.exists(os.path.join(settings.DOCUMENTS_ROOT, filename)):
+                name, extension = os.path.splitext(filename)
+                timestamp = int(time.time() * 1000)
+                filename = f"{name}_{timestamp}{extension}"
+
+            with open(os.path.join(settings.DOCUMENTS_ROOT, filename), 'wb') as destination:
+                for chunk in file.chunks():
+                    destination.write(chunk)
+            document.filename = filename
+            document.save()
+            return Response({'message': 'Plik dokumentu został zaktualizowany'}, status=status.HTTP_200_OK)
+        else:
+            return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)

@@ -6,7 +6,7 @@ from django.contrib.auth import get_user_model
 class ChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('id', 'pesel','first_name','second_name','surname', 'gender',
+        fields = ('id', 'pesel','first_name','second_name','surname',
                   'birth_date','birthplace','residential_address','registered_address',
                   'admission_date','leaving_date','photo_path', 'relatives'
                   )
@@ -14,18 +14,23 @@ class ChildrenSerializer(ModelSerializer):
 class ChildrenSerializer1(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('id', 'pesel','first_name','second_name','surname', 'gender',
+        fields = ('id', 'pesel','first_name','second_name','surname',
                   'birth_date','birthplace','residential_address','registered_address',
                   'admission_date','leaving_date','photo_path'
                   )
     
-class RelativesSerializer(ModelSerializer):
+class RelativesSerializer(serializers.ModelSerializer):
+    relation = serializers.SerializerMethodField()
+
     class Meta:
         model = Relatives
-        fields = ('id','first_name','second_name','surname',
-                  'phone_number', 'residential_address','e_mail'
-                  )
-        
+        fields = ['first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'relation']
+
+    def get_relation(self, obj):
+        child_id = self.context.get('child_id')
+        relation = FamilyRelationship.objects.filter(child_id=child_id, relative=obj).first()
+        return relation.relation if relation else None
+          
 class ChildrenSerializer2(ModelSerializer):
     class Meta:
         model = Children
