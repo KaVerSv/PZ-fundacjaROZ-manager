@@ -43,6 +43,11 @@ class DocumentsSerializer(ModelSerializer):
         model = Documents
         fields = ('id','name','date','file_name', 'child_id')
 
+class SchoolsSerializer(ModelSerializer):
+    class Meta:
+        model = Schools
+        fields = ('id', 'name', 'address')
+
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
 

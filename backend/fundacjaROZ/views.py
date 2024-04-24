@@ -625,6 +625,64 @@ class ChildrenDocumentsAPIView(APIView):
 
 
 
+class SchoolsAPIView(ModelViewSet):
+    queryset = Schools.objects.all()
+    serializer_class = SchoolsSerializer
+
+    http_method_names = ['get', 'post', 'put', 'delete']
+    
+    def delete(self, request, pk=None):
+        school = self.get_object()
+        school.delete()
+        return Response({'message': 'School deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
+
+    def list(self, request):    
+        try:
+            queryset = self.filter_queryset(self.get_queryset())
+            schools = queryset.all()
+
+            serializer = self.get_serializer(schools, many=True)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Schools.DoesNotExist:
+            return Response({"error": "Schools not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    def retrieve(self, request, pk=None):        
+        try:
+            school = self.get_object()
+            
+            serializer = self.get_serializer(school)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Children.DoesNotExist:
+            return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
+ 
+    def create(self, request, *args, **kwargs):
+        data = request.data
+
+        serializer = SchoolsSerializer(data = data)
+        if serializer.is_valid():
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+
+    def update(self, request, *args, **kwargs):
+        school = self.get_object()
+        serializer = SchoolsSerializer(school, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
 class ChildrenDocumentsDetailsAPIView(APIView):
     def get(self, pk=None, document_id=None):
         child = get_object_or_404(Children, pk=pk)
