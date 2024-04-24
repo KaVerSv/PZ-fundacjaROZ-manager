@@ -23,7 +23,7 @@ const InputWrapper = ({children, labelFor, labelNote, shift, alwaysShowLabel, er
             <LabelForInput labelFor={labelFor} labelNote={labelNote} isDirty={alwaysShowLabel || !!inputValue} shift={!!shift? shift : [0,0]} labelColor={labelColor}/>
             {children}
             {error && <div
-                className={`text-red-600 absolute bottom-11 self-end`}>
+                className={`text-red-600 absolute text-sm -top-5 self-end`}>
                 <span>{error.message}</span>
             </div>}
         </div>

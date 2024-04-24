@@ -1,8 +1,12 @@
 import HeightWrapper from "../components/wrappers/HeightWrapper.tsx";
 import RegistrationForm from "../components/Auth/RegistrationForm.tsx";
+import {useEffect} from "react";
 
 
 function Registration() {
+    useEffect(() => {
+        document.title = "Utwórz konto";
+    }, []);
     return (
         <HeightWrapper>
             <div>

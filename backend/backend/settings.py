@@ -18,11 +18,19 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/media/')
 
+DOCUMENTS_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/documents/')
+
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = 'django-insecure-&o*y(slzh!mvh*%+z1dl3jvtdx+*xigc^lo9fsjox16ex7jo5w'
+
+
+JWT_CONFIG = {
+    'TOKEN_LIFETIME_HOURS': 24,  # Ustaw tutaj odpowiedni czas życia tokena w godzinach
+    # Inne ustawienia JWT, jeśli potrzebne
+}
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -50,10 +58,27 @@ ROOT_URLCONF = 'backend.urls'
 
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'fundacjaROZ.authentication.JWTAuthentication',
+    ]
 }
 
 CORS_ALLOWED_ORIGINS=['http://localhost:8080']
 
+CORS_ALLOW_CREDENTIALS: True
+
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+)
 
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',

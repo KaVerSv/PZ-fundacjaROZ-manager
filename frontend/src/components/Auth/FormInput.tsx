@@ -1,5 +1,6 @@
 import {FieldError, RegisterOptions, UseFormRegister} from "react-hook-form";
-import InputWrapper from "./InputWrapper.tsx";
+import InputWrapper from "../ChildCreationForm/InputWrapper.tsx";
+
 
 interface FormProps {
     name: string;

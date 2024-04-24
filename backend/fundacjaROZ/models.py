@@ -8,6 +8,7 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import Group
+from django.utils.translation import gettext_lazy as _
 
 def validate_email(value):
     email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
@@ -44,37 +45,59 @@ def validate_admission_date(admission_date):
     
 class Relatives(models.Model):
     first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
+    second_name = models.CharField(max_length=50, blank=True)
     surname = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
     residential_address = models.CharField(max_length=200)
     e_mail = models.CharField(max_length=100, validators=[validate_email])
+    legal_status = models.TextField(default='')
+    alive = models.BooleanField(default = True)
+
+class Schools(models.Model):
+    name = models.CharField(max_length=50)
+    address = models.TextField()
 
 class Children(models.Model):
-    pesel = models.CharField(unique=True, max_length=11)#, validators=[validate_pesel]
+    pesel = models.CharField(unique=True, max_length=11)
     first_name = models.CharField(max_length=50)
-    second_name = models.CharField(max_length=50)
+    second_name = models.CharField(max_length=50, blank=True)
     surname = models.CharField(max_length=100)
-    gender = models.CharField(max_length=10)
     birth_date = models.DateField()
     birthplace = models.CharField(max_length=100)
     residential_address = models.CharField(max_length=200)
     registered_address = models.CharField(max_length=200)
-    admission_date = models.DateField(validators=[validate_admission_date])
-    leaving_date = models.DateField(blank=True, null=True)#, validators=[validate_leaving_date])
-    photo_path = models.CharField(null=True, max_length = 100)
-    relatives = models.ManyToManyField(Relatives)
+    admission_date = models.DateField()
+    leaving_date = models.DateField(blank=True, null=True)
+    photo_path = models.CharField(null=True, max_length=100)
+    relatives = models.ManyToManyField(Relatives, through='FamilyRelationship')
+    schools = models.ManyToManyField(Schools, through='Enrollment')
 
-    def clean(self):
-        super().clean()
-        validate_pesel(self.pesel, self.birth_date)
-        if self.leaving_date:
-            validate_leaving_date(self.admission_date, self.leaving_date)
+class Enrollment(models.Model):
+    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    school = models.ForeignKey(Schools, on_delete=models.CASCADE)
+    start_date = models.DateField()
+    end_date = models.DateField(null=True, blank=True)  
+
+class FamilyRelationship(models.Model):    
+    child = models.ForeignKey(Children, on_delete=models.CASCADE)
+    relative = models.ForeignKey(Relatives, on_delete=models.CASCADE)
+    relation = models.CharField(max_length=100)
+
+    class Meta:
+        unique_together = ['child', 'relative']
 
 class Notes(models.Model):
     child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
     title = models.CharField(max_length=50)
     contents = models.TextField()
+
+class Documents(models.Model):
+    signature = models.CharField(max_length = 100, default='')
+    specification = models.CharField(max_length = 200, default='')
+    date = models.DateField()
+    file_name = models.CharField(max_length=100)
+    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
+    relative_id = models.ForeignKey(Relatives, on_delete=models.SET_NULL, null=True)
 
 class CustomUserManager(BaseUserManager):
 	def create_user(self, email, password=None):
@@ -102,8 +125,10 @@ class CustomUserManager(BaseUserManager):
 		user.is_staff = True
 		user.save()
 		return user
+     
 
-
+#
+#classy z polami sie powtarzajacymi
 class User(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)
     first_name = models.CharField(max_length=50)
@@ -122,11 +147,5 @@ class User(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return self.email
-
-# class Documents(models.Model):
-#     name = models.CharField(max_length = 50)
-#     doc_type = models.CharField(max_length = 20)
-#     date = models.DateField()
-#     path = models.CharField(max_length=100)
-#     child_pesel = models.ForeignKey(Children, on_delete=models.CASCADE)
     
+

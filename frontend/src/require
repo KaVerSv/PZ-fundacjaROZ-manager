@@ -1,0 +1,45 @@
+Dobra potrzebuje następne REST endpointy:
+
+1) /children  : GET POST PUT DELETE (all (by id))
+        interface FormData {
+            pesel: string;
+            firstName: string;
+            secondName: string;
+            surname: string;
+            birthDate: string;
+            birthplace: string;
+            residentialAddress: string;
+            registeredAddress: string;
+            admissionDate: string;
+            leavingDate: string;
+            photoPath: string;
+            gender: GenderEnum;
+        }
+        ( enum GenderEnum {
+             notDefined = "not", //nie może byc przeslaned
+             female = "female",
+             male = "male"
+         } )
+
+2) /children/current GET  // do pobrania listy obecnych
+        [ //lista
+        ChildModelMinimized{
+           childName: string,
+           childSurname: string
+           childPhotoPath: string
+       }
+       ]
+3) /children/arch GET     // do pobrania listy archiwalnych
+         [  //lista
+         ChildModelMinimized{
+                    childName: string,
+                    childSurname: string
+                    childPhotoPath: string
+                }
+         ]
+
+4) /children/[id]/photo GET POST PUT DELETE (All by id)
+    {
+        image: FormData / Blob   //nie jestem pewien co do typu pry post ale get musi zwracac image.
+    }
+    

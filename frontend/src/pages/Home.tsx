@@ -4,8 +4,12 @@ import HeightWrapper from "../components/wrappers/HeightWrapper.tsx";
 import ChildrenBlock from "../components/ChildrenBlock/ChildrenBlock.tsx";
 import CurrentBlockHeader from "../components/ChildrenBlock/childBlockHeaders/CurrentBlockHeader.tsx";
 import ArchiveBlockHeader from "../components/ChildrenBlock/childBlockHeaders/ArchiveBlockHeader.tsx";
+import {useEffect} from "react";
 
 const Home = () => {
+    useEffect(() => {
+        document.title = "Strona głowna";
+    }, []);
     return (
         <HeightWrapper>
             <Top headerHeight={500}>

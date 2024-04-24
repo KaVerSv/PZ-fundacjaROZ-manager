@@ -1,7 +1,7 @@
 export interface ChildModelMinimized{
     id: string;
-    childName: string;
-    childLastName: string;
-    childSurname: string;
-    childPhotoLink: string;
+    first_name: string;
+    second_name: string;
+    surname: string;
+    photo_path: string;
 }

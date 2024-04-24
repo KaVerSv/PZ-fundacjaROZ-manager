@@ -1,7 +1,11 @@
 import LoginForm from "../components/Auth/LoginForm.tsx";
 import HeightWrapper from "../components/wrappers/HeightWrapper.tsx";
+import {useEffect} from "react";
 
 function Login() {
+    useEffect(() => {
+        document.title = "Zaloguj się";
+    }, []);
     return (
         <HeightWrapper>
             <div>
