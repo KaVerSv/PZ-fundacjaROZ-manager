@@ -7,5 +7,5 @@ class FundacjarozConfig(AppConfig):
     default_auto_field = 'django.db.models.BigAutoField'
     name = 'fundacjaROZ'
 
-    def ready(self):
-        post_migrate.connect(add_example_data, sender=self)
+    # def ready(self):
+    #     post_migrate.connect(add_example_data, sender=self)

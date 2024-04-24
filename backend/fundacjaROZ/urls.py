@@ -13,6 +13,9 @@ urlpatterns = [
  	path('children/<int:pk>/relatives/', ChildrenRelativesAPIView.as_view()),
     path('children/<int:pk>/relatives/<int:relative_id>/', ChildrenRelativesDetailsAPIView.as_view()),
     
+	path('children/<int:pk>/schools/', ChildrenSchoolsAPIView.as_view()),
+    path('children/<int:pk>/schools/<int:school_id>/', ChildrenSchoolsDetailsAPIView.as_view()),
+    
     path('children/<int:pk>/notes/', ChildrenNotesAPIView.as_view()),
     path('children/<int:pk>/notes/<int:note_id>/', ChildrenNotesDetailsAPIView().as_view()),
     

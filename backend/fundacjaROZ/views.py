@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
 import os
-from django.http import FileResponse, HttpResponse
+from django.http import FileResponse
 from .models import *
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
@@ -294,12 +294,12 @@ class ChildrenRelativesAPIView(APIView):
     def get(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
         relatives = child.relatives.all()
-        serializer = RelativesSerializer(relatives, many=True, context={'child_id': child.id})
+        serializer = ChildrenRelativesSerializer(relatives, many=True, context={'child_id': child.id})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
-        serializer = RelativesSerializer(data=request.data)
+        serializer = ChildrenRelativesSerializer(data=request.data)
             
         if serializer.is_valid():
             relative_data = serializer.validated_data 
@@ -354,7 +354,7 @@ class ChildrenRelativesDetailsAPIView(APIView):
         relative = get_object_or_404(Relatives, pk=relative_id)
 
         if relative:
-            if relative in child.relatives.all():
+            if relative not in child.relatives.all():
                 child.relatives.add(relative)
                 
                 relation = self.request.data.get('relation')
@@ -381,7 +381,74 @@ class ChildrenRelativesDetailsAPIView(APIView):
 
 
 class ChildrenSchoolsAPIView(APIView):
-    pass 
+    def get(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        schools = child.schools.all()
+        serializer = ChildrenSchoolsSerializer(schools, many=True, context={'child_id': child.id})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def post(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        serializer = ChildrenSchoolsSerializer(data=request.data)
+            
+        if serializer.is_valid():
+            school_data = serializer.validated_data 
+
+            try:
+                school = Schools.objects.get(
+                    name=school_data['name'],
+                    address=school_data['address'],
+                )
+            except Schools.DoesNotExist:
+                school = serializer.save()
+
+            child.schools.add()
+
+            start_date = self.request.data.get('start_date')
+            end_date = self.request.data.get('end_date')
+
+            Enrollment.objects.update_or_create(
+                child=child,
+                school=school,
+                defaults={'start_date': start_date, 'end_date': end_date}
+            )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+class ChildrenSchoolsDetailsAPIView(APIView):
+    def delete(self, request, pk=None, school_id=None):
+        child = get_object_or_404(Children, pk=pk)
+        school = get_object_or_404(Schools, pk=school_id)
+
+        if school in child.schools.all():
+            child.schools.remove(school)
+            return Response({'success': 'Szkoła została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, pk=None, school_id=None):
+        child = get_object_or_404(Children, pk=pk)
+        school = get_object_or_404(Schools, pk=school_id)
+
+        if school:
+            if school not in child.schools.all():
+                child.schools.add(school)
+                
+                start_date = self.request.data.get('start_date')
+                end_date = self.request.data.get('end_date')
+
+                Enrollment.objects.update_or_create(
+                    child=child,
+                    school=school,
+                    defaults={'start_date': start_date, 'end_date': end_date}
+                )
+
+                return Response({'success': 'Szkoła została pomyślnie zaktualizowana'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'Szkoła nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
