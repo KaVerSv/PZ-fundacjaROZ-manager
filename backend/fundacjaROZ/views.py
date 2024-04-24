@@ -354,7 +354,7 @@ class ChildrenRelativesDetailsAPIView(APIView):
         relative = get_object_or_404(Relatives, pk=relative_id)
 
         if relative:
-            if relative not in child.relatives.all():
+            if relative not in child.relatives.all():   
                 child.relatives.add(relative)
                 
                 relation = self.request.data.get('relation')
@@ -372,6 +372,54 @@ class ChildrenRelativesDetailsAPIView(APIView):
             return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
 
+
+
+
+class RelativeChildrensAPIView(APIView):
+    def get(self, request, pk):
+        relative = get_object_or_404(Relatives, pk=pk)
+        childrens = Children.objects.filter(familyrelationship__relative=relative)
+        serializer = ChildrensSerializer(childrens, many=True, context={'relative_id': relative.id})
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+
+
+
+
+class RelativeChildrensDetailsAPIView(APIView):
+    def delete(self, request, pk=None, child_id=None):
+        child = get_object_or_404(Children, pk=child_id)
+        relative = get_object_or_404(Relatives, pk=pk)
+        
+        if relative in child.relatives.all():
+            child.relatives.remove(relative)
+            return Response({'success': 'Dziecka został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)
+        else:
+            return Response({'error': 'Dziecko nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, pk=None, child_id=None):
+        child = get_object_or_404(Children, pk=child_id)
+        relative = get_object_or_404(Relatives, pk=pk)
+
+        if relative:
+            if relative not in child.relatives.all():
+                child.relatives.add(relative)
+                
+                relation = self.request.data.get('relation')
+
+                FamilyRelationship.objects.update_or_create(
+                    child=child,
+                    relative=relative,
+                    defaults={'relation': relation}
+                )
+
+                return Response({'success': 'Krewny został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+        else:
+            return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
@@ -655,41 +703,6 @@ class UsersViewAPI(ModelViewSet):
 
 
 
-class ChildrenDocumentsAPIView(APIView):  
-    def get(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        documents = Documents.objects.filter(child_id=child)
-        serializer = DocumentsSerializer(documents, many=True)
-        data = serializer.data
-        for document_data in data:
-            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}"
-        return Response(serializer.data, status=status.HTTP_200_OK)
-
-    def post(self, request, pk):
-        serializer = DocumentsSerializer(data=request.data)
-        if serializer.is_valid():            
-            if 'file' in request.FILES:
-                file = request.FILES['file']
-                filename = file.name                
-                if os.path.exists(os.path.join(settings.DOCUMENTS_ROOT, filename)):
-                    name, extension = os.path.splitext(filename)
-                    timestamp = int(time.time() * 1000)
-                    filename = f"{name}_{timestamp}{extension}"
-
-                with open(os.path.join(settings.DOCUMENTS_ROOT, filename), 'wb') as destination:
-                    for chunk in file.chunks():
-                        destination.write(chunk)
-            serializer.save(filename = filename)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-
-
-
-
-
-
-
 
 
 class SchoolsAPIView(ModelViewSet):
@@ -746,6 +759,34 @@ class SchoolsAPIView(ModelViewSet):
 
 
 
+
+class ChildrenDocumentsAPIView(APIView):  
+    def get(self, request, pk):
+        child = get_object_or_404(Children, pk=pk)
+        documents = Documents.objects.filter(child_id=child)
+        serializer = DocumentsSerializer(documents, many=True)
+        data = serializer.data
+        for document_data in data:
+            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}"
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    def post(self, request, pk):
+        serializer = DocumentsSerializer(data=request.data)
+        if serializer.is_valid():            
+            if 'file' in request.FILES:
+                file = request.FILES['file']
+                filename = file.name                
+                if os.path.exists(os.path.join(settings.DOCUMENTS_ROOT, filename)):
+                    name, extension = os.path.splitext(filename)
+                    timestamp = int(time.time() * 1000)
+                    filename = f"{name}_{timestamp}{extension}"
+
+                with open(os.path.join(settings.DOCUMENTS_ROOT, filename), 'wb') as destination:
+                    for chunk in file.chunks():
+                        destination.write(chunk)
+            serializer.save(filename = filename)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
 
 
