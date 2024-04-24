@@ -12,18 +12,26 @@ class ChildrenSerializer(ModelSerializer):
                   )
     
 class RelativesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Relatives
+        fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status']
+
+
+class ChildrenRelativesSerializer(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField()
 
     class Meta:
         model = Relatives
-        fields = ['first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'relation']
+        # fields = ['first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'relation']
+        fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'relation']
 
     def get_relation(self, obj):
         child_id = self.context.get('child_id')
         relation = FamilyRelationship.objects.filter(child_id=child_id, relative=obj).first()
         return relation.relation if relation else None
     
-class ChildrensSerializer(serializers.ModelSerializer):
+    
+class RelativeChildrensSerializer(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField()
 
     class Meta:
@@ -38,7 +46,24 @@ class ChildrensSerializer(serializers.ModelSerializer):
         return relation.relation if relation else None
     
           
-          
+class ChildrenSchoolsSerializer(serializers.ModelSerializer):
+    start_date = serializers.SerializerMethodField()
+    end_date = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Schools
+        fields = ['name', 'address', 'start_date', 'end_date']
+
+    def get_start_date(self, obj):
+        child_id = self.context.get('child_id')
+        start_date = Enrollment.objects.filter(child_id=child_id, school=obj).first()
+        return start_date.start_date if start_date else None
+
+    def get_end_date(self, obj):
+        child_id = self.context.get('child_id')
+        end_date = Enrollment.objects.filter(child_id=child_id, school=obj).first()
+        return end_date.end_date if end_date else None
+    
 class ShortChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children

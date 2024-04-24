@@ -1,5 +1,12 @@
 from django.urls import path
-from .views import *
+# from .views import *
+from .views_collection.children_view import CurrentChildrenAPIView,ArchivalChildrenAPIView
+from .views_collection.documents_view import ChildrenDocumentsAPIView,ChildrenDocumentsDetailsAPIView
+from .views_collection.notes_view import ChildrenNotesAPIView,ChildrenNotesDetailsAPIView
+from .views_collection.photos_view import ChildrenPhotoAPIView
+from .views_collection.relatives_view import RelativeChildrensAPIView,RelativeChildrensDetailsAPIView,ChildrenRelativesAPIView,ChildrenRelativesDetailsAPIView
+from .views_collection.schools_view import ChildrenSchoolsAPIView,ChildrenSchoolsDetailsAPIView
+from .views_collection.user_view import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI
 
 
 urlpatterns = [
@@ -15,6 +22,9 @@ urlpatterns = [
     
     path('relatives/<int:pk>/children/', RelativeChildrensAPIView.as_view()),
     path('relatives/<int:pk>/children/<int:child_id>/', RelativeChildrensDetailsAPIView.as_view()),
+    
+    path('children/<int:pk>/schools/', ChildrenSchoolsAPIView.as_view()),
+    path('children/<int:pk>/schools/<int:school_id>/', ChildrenSchoolsDetailsAPIView.as_view()),
     
     path('children/<int:pk>/notes/', ChildrenNotesAPIView.as_view()),
     path('children/<int:pk>/notes/<int:note_id>/', ChildrenNotesDetailsAPIView().as_view()),

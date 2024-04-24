@@ -365,11 +365,11 @@ class ChildrenRelativesDetailsAPIView(APIView):
                     defaults={'relation': relation}
                 )
 
-                return Response({'success': 'Krewny został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
+                return Response({'success': 'dziecko został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
             else:
-                return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+                return Response({'error': 'dziecko nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+            return Response({'error': 'dziecko nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
 
 
 
