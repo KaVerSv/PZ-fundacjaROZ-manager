@@ -51,6 +51,7 @@ class Relatives(models.Model):
     residential_address = models.CharField(max_length=200)
     e_mail = models.CharField(max_length=100, validators=[validate_email])
     legal_status = models.TextField(default='')
+    alive = models.BooleanField(default = True)
 
 class Schools(models.Model):
     name = models.CharField(max_length=50)

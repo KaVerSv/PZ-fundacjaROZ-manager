@@ -148,7 +148,7 @@ class ChildrenAPIView(ModelViewSet):
         if data['leaving_date'] == "":
             data['leaving_date'] = None
 
-        serializer = ChildrenSerializer1(data = data)
+        serializer = ChildrenSerializer(data = data)
         if serializer.is_valid():
             pesel = serializer.validated_data.get('pesel')
             if Children.objects.filter(pesel=pesel).exists():
@@ -160,7 +160,7 @@ class ChildrenAPIView(ModelViewSet):
     def update(self, request, *args, **kwargs):
         child = self.get_object()
         old_photo_path = child.photo_path
-        serializer = ChildrenSerializer1(child, data=request.data)
+        serializer = ChildrenSerializer(child, data=request.data)
 
         if serializer.is_valid():
             serializer.save(photo_path = old_photo_path)
@@ -318,8 +318,16 @@ class ChildrenRelativesAPIView(APIView):
 
             child.relatives.add(relative)
 
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
+            relation = self.request.data.get('relation')
+
+            FamilyRelationship.objects.update_or_create(
+                child=child,
+                relative=relative,
+                defaults={'relation': relation}
+            )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 
@@ -348,6 +356,15 @@ class ChildrenRelativesDetailsAPIView(APIView):
         if relative:
             if relative in child.relatives.all():
                 child.relatives.add(relative)
+                
+                relation = self.request.data.get('relation')
+
+                FamilyRelationship.objects.update_or_create(
+                    child=child,
+                    relative=relative,
+                    defaults={'relation': relation}
+                )
+
                 return Response({'success': 'Krewny został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
             else:
                 return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
@@ -363,9 +380,46 @@ class ChildrenRelativesDetailsAPIView(APIView):
 
 
 
+class ChildrenSchoolsAPIView(APIView):
+    pass 
+
+
+
+
+
+
+
+
+
+
 class CurrentChildrenAPIView(ListAPIView):
-    queryset = Children.objects.filter(leaving_date__isnull=True)
-    serializer_class = ChildrenSerializer2
+    serializer_class = ShortChildrenSerializer
+
+    def get_queryset(self):
+        queryset = Children.objects.filter(leaving_date__isnull=True)
+        name = self.request.query_params.get('name', None)
+        ordering = self.request.query_params.get('ordering', 'birth_date')
+        search_orphans = self.request.query_params.get('search', None)
+
+        if name:
+            queryset = queryset.filter(
+                relatives__in=Relatives.objects.filter(first_name__icontains=name.split()[0], surname__icontains=name.split()[1]) |
+                               Relatives.objects.filter(first_name__icontains=name.split()[1], surname__icontains=name.split()[0])
+            )
+
+        queryset = queryset.order_by(ordering)
+
+        if search_orphans == "biological orphans":
+            orphan_child_ids = []
+            for child in queryset:
+                mothers = Relatives.objects.filter(child=child, relation="Matka", alive=False)
+                fathers = Relatives.objects.filter(child=child, relation="Ojciec", alive=False)
+                if mothers.exists() and fathers.exists():
+                    orphan_child_ids.append(child.id)
+
+            queryset = queryset.filter(id__in=orphan_child_ids)
+
+        return queryset
 
     def list(self, request, *args, **kwargs):
         children = self.get_queryset()
@@ -385,8 +439,33 @@ class CurrentChildrenAPIView(ListAPIView):
 
 
 class ArchivalChildrenAPIView(ListAPIView):
-    queryset = Children.objects.exclude(leaving_date__isnull=True)
-    serializer_class = ChildrenSerializer2
+    serializer_class = ShortChildrenSerializer
+
+    def get_queryset(self):
+        queryset = Children.objects.exclude(leaving_date__isnull=True)
+        name = self.request.query_params.get('name', None)
+        ordering = self.request.query_params.get('ordering', 'birth_date')
+        search_orphans = self.request.query_params.get('search', None)
+
+        if name:
+            queryset = queryset.filter(
+                relatives__in=Relatives.objects.filter(first_name__icontains=name.split()[0], surname__icontains=name.split()[1]) |
+                               Relatives.objects.filter(first_name__icontains=name.split()[1], surname__icontains=name.split()[0])
+            )
+
+        queryset = queryset.order_by(ordering)
+
+        if search_orphans == "biological orphans":
+            orphan_child_ids = []
+            for child in queryset:
+                mothers = Relatives.objects.filter(child=child, relation="Matka", alive=False)
+                fathers = Relatives.objects.filter(child=child, relation="Ojciec", alive=False)
+                if mothers.exists() and fathers.exists():
+                    orphan_child_ids.append(child.id)
+
+            queryset = queryset.filter(id__in=orphan_child_ids)
+
+        return queryset
 
     def list(self, request):
         children = self.get_queryset()
@@ -440,6 +519,18 @@ class RelativesAPIView(ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+
+
+
+
+
+
+
+
+class RelativesChildrenAPIView(APIView):
+    pass
 
 
 

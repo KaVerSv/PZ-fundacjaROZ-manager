@@ -8,14 +8,6 @@ class ChildrenSerializer(ModelSerializer):
         model = Children
         fields = ('id', 'pesel','first_name','second_name','surname',
                   'birth_date','birthplace','residential_address','registered_address',
-                  'admission_date','leaving_date','photo_path', 'relatives'
-                  )
-        
-class ChildrenSerializer1(ModelSerializer):
-    class Meta:
-        model = Children
-        fields = ('id', 'pesel','first_name','second_name','surname',
-                  'birth_date','birthplace','residential_address','registered_address',
                   'admission_date','leaving_date','photo_path'
                   )
     
@@ -31,7 +23,7 @@ class RelativesSerializer(serializers.ModelSerializer):
         relation = FamilyRelationship.objects.filter(child_id=child_id, relative=obj).first()
         return relation.relation if relation else None
           
-class ChildrenSerializer2(ModelSerializer):
+class ShortChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children
         fields = ('id','pesel','first_name','surname','photo_path')
