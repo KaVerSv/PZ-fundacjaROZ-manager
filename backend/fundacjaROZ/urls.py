@@ -1,4 +1,6 @@
 from django.urls import path
+
+from .views import ChildrenDocumentsDetailsFileAPIView
 # from .views import *
 from .views_collection.children_view import CurrentChildrenAPIView,ArchivalChildrenAPIView
 from .views_collection.documents_view import ChildrenDocumentsAPIView,ChildrenDocumentsDetailsAPIView
@@ -35,7 +37,6 @@ urlpatterns = [
 	path('children/<int:pk>/documents/',  ChildrenDocumentsAPIView.as_view()),
     path('children/<int:pk>/documents/<int:document_id>/',  ChildrenDocumentsDetailsAPIView.as_view()),
     path('children/<int:pk>/documents/<int:document_id>/file',  ChildrenDocumentsDetailsFileAPIView().as_view()),
-    
     
 	path('children/<int:pk>/photo/', ChildrenPhotoAPIView.as_view()),
 ]

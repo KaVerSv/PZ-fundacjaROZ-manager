@@ -381,7 +381,7 @@ class RelativeChildrensAPIView(APIView):
         children = Children.objects.filter(familyrelationship__relative=relative)
         for child in children:
                 child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
-        serializer = ChildrensSerializer(children, many=True, context={'relative_id': relative.id})
+        serializer = ChildrenSerializer(children, many=True, context={'relative_id': relative.id})
         return Response(serializer.data, status=status.HTTP_200_OK)
     
 
