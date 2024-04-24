@@ -3,9 +3,9 @@
 from django.utils import timezone
 from datetime import timedelta
 
-def add_example_data(**kwargs):
-    from .models import Relatives, Children, Notes, User
 
+def add_example_data(**kwargs):
+    from .models import Relatives, Children, Notes, User, Enrollment, Schools
     relatives_data = [
         {
             'first_name': 'John',
@@ -419,3 +419,124 @@ def add_example_data(**kwargs):
     children[18].relatives.add(relatives[4])
     children[19].relatives.add(relatives[5])
 
+    schools_data = [
+        {
+            'name': 'School A',
+            'address': '123 Oak St, City'
+        },
+        {
+            'name': 'School B',
+            'address': '456 Elm St, Town'
+        },
+        {
+            'name': 'School C',
+            'address': '789 Pine St, Village'
+        }
+    ]
+
+    schools = Schools.objects.bulk_create(Schools(**data) for data in schools_data)
+
+    enrollment_data = [
+        {
+            'child': children[0],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[1],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[2],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[3],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[4],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[5],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[6],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[7],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[8],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[9],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[10],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[11],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[12],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[13],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[14],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[15],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[16],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[17],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[18],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[19],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+    ]
+
+    Enrollment.objects.bulk_create(Enrollment(**data) for data in enrollment_data)
