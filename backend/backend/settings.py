@@ -11,27 +11,30 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/media/')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&ayp0mt^*z#px54zefnj#5+s_s7e4_7%!@@=m(kz$=^5c91kp!'
+SECRET_KEY = 'django-insecure-&o*y(slzh!mvh*%+z1dl3jvtdx+*xigc^lo9fsjox16ex7jo5w'
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
 ALLOWED_HOSTS = []
 
+## custom user model
+AUTH_USER_MODEL = 'fundacjaROZ.User'
 
 # Application definition
 
 INSTALLED_APPS = [
-    # 'fundacjaROZ.apps.FundacjarozConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -44,8 +47,9 @@ INSTALLED_APPS = [
     'drf_spectacular',
 ]
 
+ROOT_URLCONF = 'backend.urls'
+
 REST_FRAMEWORK = {
-    # other DRF settings here
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
@@ -62,10 +66,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-# ['http://localhost:8080']
-
-ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {

@@ -1,22 +1,83 @@
 from rest_framework.serializers import ModelSerializer
-from .models import Children, Relatives
+from .models import *
+from rest_framework import serializers
+from django.contrib.auth import get_user_model
 
 class ChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('id','pesel','first_name','second_name','surname',
+        fields = ('id', 'pesel','first_name','second_name','surname', 'gender',
                   'birth_date','birthplace','residential_address','registered_address',
-                  'admission_date','leaving_date','photo_path'
+                  'admission_date','leaving_date','photo_path', 'relatives'
                   )
         
 class RelativesSerializer(ModelSerializer):
     class Meta:
         model = Relatives
-        fields = ('first_name','second_name','surname',
+        fields = ('id','first_name','second_name','surname',
                   'phone_number', 'residential_address','e_mail'
                   )
-
+        
 class ChildrenSerializer2(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('pesel','first_name','surname','photo_path')
+        fields = ('id','pesel','first_name','surname','photo_path')
+
+class NotesSerializer(ModelSerializer):
+    class Meta:
+        model = Notes
+        fields = ('id','child_id', 'title', 'contents')
+
+
+# class UserSerializer(ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('id', 'first_name', 'surname', 'e_mail', 'password')
+
+
+class UserRegistrationSerializer(serializers.ModelSerializer):
+    password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
+
+    class Meta:
+        model = get_user_model()
+        fields = ['email', 'first_name', 'surname', 'password']
+
+    def create(self, validated_data):
+        user_password = validated_data.get('password', None)
+        email = validated_data.get('email')
+        first_name = validated_data.get('first_name')
+        surname = validated_data.get('surname')
+
+        # Tworzenie nowej instancji modelu z przekazaniem wszystkich danych
+        db_instance = self.Meta.model(
+            email=email,
+            first_name=first_name,
+            surname=surname
+        )
+        db_instance.set_password(user_password)
+        db_instance.save()
+        return db_instance
+
+
+
+
+class UserLoginSerializer(serializers.Serializer):
+    email = serializers.CharField(max_length=100)
+    password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
+    token = serializers.CharField(max_length=255, read_only=True)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

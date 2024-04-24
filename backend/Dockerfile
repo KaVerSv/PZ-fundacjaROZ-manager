@@ -11,7 +11,8 @@ COPY requirements.txt /app/backend/
 RUN apk add --virtual .build-deps --no-cache postgresql-dev gcc python3-dev musl-dev && \
         pip install --no-cache-dir -r requirements.txt && \
         apk --purge del .build-deps && \
-        pip install drf-spectacular
+        pip install drf-spectacular && \
+        pip install djangorestframework-simplejwt
 
 COPY . /app/backend/
 
