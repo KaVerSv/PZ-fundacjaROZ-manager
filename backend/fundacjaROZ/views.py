@@ -646,18 +646,6 @@ class RelativesAPIView(ModelViewSet):
 
 
 
-class RelativesChildrenAPIView(APIView):
-    pass
-
-
-
-
-
-
-
-
-
-
 class UsersViewAPI(ModelViewSet): 
     queryset = User.objects.all()
     serializer_class = UserRegistrationSerializer
@@ -769,7 +757,7 @@ class ChildrenDocumentsAPIView(APIView):
         serializer = DocumentsSerializer(documents, many=True)
         data = serializer.data
         for document_data in data:
-            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}"
+            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}/file/"
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
@@ -790,10 +778,39 @@ class ChildrenDocumentsAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
 
-
-
-
 class ChildrenDocumentsDetailsAPIView(APIView):
+    def get(self, request, pk, document_id):
+        child = get_object_or_404(Children, pk=pk)
+        document = Documents.objects.filter(child_id=child, id = document_id)
+        serializer = DocumentsSerializer(document)
+        data = serializer.data
+        for document_data in data:
+            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}/file/"
+        return Response(serializer.data, status=status.HTTP_200_OK)
+    
+    def delete(self, request, pk, document_id):
+        child = get_object_or_404(Children, pk=pk)
+        document = Documents.objects.filter(child_id=child, id = document_id)
+        if document and document.file_name:
+            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+            document.delete()
+        return Response({'message': 'Dokument usunięty'}, status=status.HTTP_200_OK)
+    
+    def update(self, request, pk, document_id):
+        child = get_object_or_404(Children, pk=pk)
+        document = Documents.objects.filter(child_id=child, id = document_id)
+        old_file_name = document.file_name
+        serializer = DocumentsSerializer(document, data=request.data)
+
+        if serializer.is_valid():
+            serializer.save(file_name = old_file_name)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+class ChildrenDocumentsDetailsFileAPIView(APIView):
     def get(self, pk=None, document_id=None):
         child = get_object_or_404(Children, pk=pk)
         document = Documents.objects.filter(id=document_id)
@@ -827,4 +844,4 @@ class ChildrenDocumentsDetailsAPIView(APIView):
             document.save()
             return Response({'message': 'Plik dokumentu został zaktualizowany'}, status=status.HTTP_200_OK)
         else:
-            return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Nie przesłano pliku'}, status=status.HTTP_400_BAD_REQUEST)
