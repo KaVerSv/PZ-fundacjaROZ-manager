@@ -15,7 +15,8 @@ class RelativesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Relatives
         fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status']
-    
+
+
 class ChildrenRelativesSerializer(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField()
 
@@ -46,8 +47,7 @@ class ChildrenSchoolsSerializer(serializers.ModelSerializer):
         end_date = Enrollment.objects.filter(child_id=child_id, school=obj).first()
         return end_date.end_date if end_date else None
     
-    
-class ChildrensSerializer(serializers.ModelSerializer):
+class RelativeChildrensSerializer(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField()
 
     class Meta:
@@ -60,7 +60,8 @@ class ChildrensSerializer(serializers.ModelSerializer):
         relative_id = self.context.get('relative_id')
         relation = FamilyRelationship.objects.filter(child=obj, relative_id=relative_id).first()
         return relation.relation if relation else None
-          
+   
+    
 class ShortChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children
