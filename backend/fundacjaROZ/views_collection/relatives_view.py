@@ -1,14 +1,10 @@
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..models import *
+from ..models import Relatives, Children, FamilyRelationship
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
-from ..serializers import *
-
-
-
-
+from ..serializers import RelativesSerializer, ChildrenSerializer, ChildrenRelativesSerializer
 
 class RelativesAPIView(ModelViewSet):
     queryset = Relatives.objects.all()
@@ -45,24 +41,15 @@ class RelativesAPIView(ModelViewSet):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-#---------------------------- relatives/<int:pk>/children/ -----------------------------------------
-
+    
 class RelativeChildrensAPIView(APIView):
     def get(self, request, pk):
-        
         relative = get_object_or_404(Relatives, pk=pk)
         children = Children.objects.filter(familyrelationship__relative=relative)
-        
         for child in children:
-            child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
-            
-        serializer = RelativeChildrensSerializer(children, many=True, context={'relative_id': relative.id})
+                child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
+        serializer = ChildrenSerializer(children, many=True, context={'relative_id': relative.id})
         return Response(serializer.data, status=status.HTTP_200_OK)
-    
-#------------------------------ relatives/<int:pk>/children/<int:child_id>/  --------------------------------------------
 
 class RelativeChildrensDetailsAPIView(APIView):
     def delete(self, request, pk=None, child_id=None):
@@ -96,11 +83,6 @@ class RelativeChildrensDetailsAPIView(APIView):
                 return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-# ------------------------------ children/<int:pk>/relatives/ ----------------------------------
 
 class ChildrenRelativesAPIView(APIView):
     def get(self, request, pk):
@@ -141,9 +123,6 @@ class ChildrenRelativesAPIView(APIView):
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-# ------------------------------ children/<int:pk>/relatives/<int:relative_id>/--------------------------------------
-
 class ChildrenRelativesDetailsAPIView(APIView):
     def delete(self, request, pk=None, relative_id=None):
         child = get_object_or_404(Children, pk=pk)
@@ -160,7 +139,7 @@ class ChildrenRelativesDetailsAPIView(APIView):
         relative = get_object_or_404(Relatives, pk=relative_id)
 
         if relative:
-            if relative not in child.relatives.all():
+            if relative not in child.relatives.all():   
                 child.relatives.add(relative)
                 
                 relation = self.request.data.get('relation')
@@ -176,5 +155,4 @@ class ChildrenRelativesDetailsAPIView(APIView):
                 return Response({'error': 'dziecko nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'dziecko nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
-
 

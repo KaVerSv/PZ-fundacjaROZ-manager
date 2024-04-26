@@ -1,14 +1,11 @@
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
 import os
-from ..models import *
+from ..models import Children, FamilyRelationship
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from django.conf import settings
-from ..serializers import *
-
-
-
+from ..serializers import ChildrenSerializer, ShortChildrenSerializer
 
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
@@ -78,38 +75,42 @@ class ChildrenAPIView(ModelViewSet):
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
-
-
-
-
-
-
 class CurrentChildrenAPIView(ListAPIView):
     serializer_class = ShortChildrenSerializer
 
     def get_queryset(self):
         queryset = Children.objects.filter(leaving_date__isnull=True)
-        name = self.request.query_params.get('name', None)
+        first_name = self.request.query_params.get('first_name', None)
+        surname = self.request.query_params.get('surname', None)
         ordering = self.request.query_params.get('ordering', 'birth_date')
         search_orphans = self.request.query_params.get('search', None)
-
-        if name:
+        
+        if first_name and surname:
             queryset = queryset.filter(
-                relatives__in=Relatives.objects.filter(first_name__icontains=name.split()[0], surname__icontains=name.split()[1]) |
-                               Relatives.objects.filter(first_name__icontains=name.split()[1], surname__icontains=name.split()[0])
+                first_name__icontains=first_name, surname__icontains=surname
+            )
+        elif first_name:
+            queryset = queryset.filter(
+                first_name__icontains=first_name
+            )
+        elif surname:
+            queryset = queryset.filter(
+                surname__icontains=surname
             )
 
         queryset = queryset.order_by(ordering)
 
-        if search_orphans == "biological orphans":
+        if search_orphans == "biological_orphans":
             orphan_child_ids = []
             for child in queryset:
-                mothers = Relatives.objects.filter(child=child, relation="Matka", alive=False)
-                fathers = Relatives.objects.filter(child=child, relation="Ojciec", alive=False)
-                if mothers.exists() and fathers.exists():
+                family_relationships = FamilyRelationship.objects.filter(child=child)
+                mothers_exist = family_relationships.filter(relation="Matka", relative__alive=False).exists()
+                fathers_exist = family_relationships.filter(relation="Ojciec", relative__alive=False).exists()
+                if mothers_exist and fathers_exist:
                     orphan_child_ids.append(child.id)
 
-            queryset = queryset.filter(id__in=orphan_child_ids)
+        queryset = queryset.filter(id__in=orphan_child_ids)
+
 
         return queryset
 
@@ -121,33 +122,41 @@ class CurrentChildrenAPIView(ListAPIView):
             child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
         return Response(data, status=status.HTTP_200_OK)
 
-
 class ArchivalChildrenAPIView(ListAPIView):
     serializer_class = ShortChildrenSerializer
 
     def get_queryset(self):
         queryset = Children.objects.exclude(leaving_date__isnull=True)
-        name = self.request.query_params.get('name', None)
+        first_name = self.request.query_params.get('first_name', None)
+        surname = self.request.query_params.get('surname', None)
         ordering = self.request.query_params.get('ordering', 'birth_date')
         search_orphans = self.request.query_params.get('search', None)
 
-        if name:
+        if first_name and surname:
             queryset = queryset.filter(
-                relatives__in=Relatives.objects.filter(first_name__icontains=name.split()[0], surname__icontains=name.split()[1]) |
-                               Relatives.objects.filter(first_name__icontains=name.split()[1], surname__icontains=name.split()[0])
+                first_name__icontains=first_name, surname__icontains=surname
+            )
+        elif first_name:
+            queryset = queryset.filter(
+                first_name__icontains=first_name
+            )
+        elif surname:
+            queryset = queryset.filter(
+                surname__icontains=surname
             )
 
         queryset = queryset.order_by(ordering)
 
-        if search_orphans == "biological orphans":
+        if search_orphans == "biological_orphans":
             orphan_child_ids = []
             for child in queryset:
-                mothers = Relatives.objects.filter(child=child, relation="Matka", alive=False)
-                fathers = Relatives.objects.filter(child=child, relation="Ojciec", alive=False)
-                if mothers.exists() and fathers.exists():
+                family_relationships = FamilyRelationship.objects.filter(child=child)
+                mothers_exist = family_relationships.filter(relation="Matka", relative__alive=False).exists()
+                fathers_exist = family_relationships.filter(relation="Ojciec", relative__alive=False).exists()
+                if mothers_exist and fathers_exist:
                     orphan_child_ids.append(child.id)
 
-            queryset = queryset.filter(id__in=orphan_child_ids)
+        queryset = queryset.filter(id__in=orphan_child_ids)
 
         return queryset
 
@@ -158,11 +167,3 @@ class ArchivalChildrenAPIView(ListAPIView):
         for child_data in data:
             child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
         return Response(data, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
-

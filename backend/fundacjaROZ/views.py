@@ -1,10 +1,6 @@
-import time
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
-from rest_framework.generics import ListAPIView
 from rest_framework.views import APIView
-import os
-from django.http import FileResponse
 from .models import *
 from rest_framework.viewsets import ModelViewSet
 from rest_framework.permissions import AllowAny
@@ -27,15 +23,6 @@ class UserRegistrationAPIView(APIView):
                 access_token = JWTAuthentication.create_jwt(new_user)
                 return Response(data={'token': access_token}, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
 
 class UserLoginAPIView(APIView):
 	serializer_class = UserLoginSerializer
@@ -64,15 +51,6 @@ class UserLoginAPIView(APIView):
 			'message': 'Something went wrong.'
 		})
 
-
-
-
-
-
-
-
-
-
 class UserViewAPI(APIView):
     def get(self, request):
         user, payload = JWTAuthentication.authenticate(self, request)
@@ -89,562 +67,6 @@ class UserViewAPI(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    
-
-
-
-
-
-
-
-
-class ChildrenAPIView(ModelViewSet):
-    queryset = Children.objects.all()
-    serializer_class = ChildrenSerializer
-
-    http_method_names = ['get', 'post', 'put', 'delete']
-    
-    def delete(self, request, pk=None):
-        child = self.get_object()
-
-        if child.photo_path:
-            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-
-        child.delete()
-        return Response({'message': 'Child and associated photo deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
-
-    def list(self, request):    
-        try:
-            queryset = self.filter_queryset(self.get_queryset())
-            children = queryset.all()
-
-            for child in children:
-                child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
-
-            serializer = self.get_serializer(children, many=True)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except Children.DoesNotExist:
-            return Response({"error": "Children not found"}, status=status.HTTP_404_NOT_FOUND)
-
-    def retrieve(self, request, pk=None):        
-        try:
-            child = self.get_object()
-            
-            photo_url = f"http://localhost:8000/children/{child.id}/photo"
-            child.photo_path = photo_url
-            
-            serializer = self.get_serializer(child)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-
-        except Children.DoesNotExist:
-            return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
- 
-    def create(self, request, *args, **kwargs):
-        data = request.data
-        if data['leaving_date'] == "":
-            data['leaving_date'] = None
-
-        serializer = ChildrenSerializer(data = data)
-        if serializer.is_valid():
-            pesel = serializer.validated_data.get('pesel')
-            if Children.objects.filter(pesel=pesel).exists():
-                return Response({'error': 'Dziecko o podanym PESEL już istnieje.'}, status=status.HTTP_400_BAD_REQUEST)
-            serializer.save(photo_path = "")
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-    def update(self, request, *args, **kwargs):
-        child = self.get_object()
-        old_photo_path = child.photo_path
-        serializer = ChildrenSerializer(child, data=request.data)
-
-        if serializer.is_valid():
-            serializer.save(photo_path = old_photo_path)
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
-
-
-
-
-
-
-
-
-class ChildrenPhotoAPIView(APIView):
-    def get(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        photo = child.photo_path
-        if photo == "":
-            photo = 'default.png'
-        
-        file_path = os.path.join(settings.MEDIA_ROOT, photo)
-        return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
-        
-    def delete(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        if child.photo_path:
-            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            child.photo_path = ""
-            child.save()
-            return Response(status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response({'message': 'Brak zdjęcia do usunięcia.'}, status=status.HTTP_404_NOT_FOUND)
-        
-    def put(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        if child.photo_path:
-            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-
-        if 'photo' in request.FILES:
-            photo = request.FILES['photo']
-
-            filename = photo.name                
-            if os.path.exists(os.path.join(settings.MEDIA_ROOT, filename)):
-                name, extension = os.path.splitext(filename)
-                timestamp = int(time.time() * 1000)
-                filename = f"{name}_{timestamp}{extension}"
-            
-            if hasattr(photo, 'content_type') and photo.content_type in ['image/jpeg', 'image/png']:
-                with open(os.path.join(settings.MEDIA_ROOT, filename), 'wb') as destination:
-                    for chunk in photo.chunks():
-                        destination.write(chunk)
-                child.photo_path = filename
-                child.save()
-                return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
-            else:
-                return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-        else:
-            return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
-
-class ChildrenNotesAPIView(APIView):
-    def get(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        notes = Notes.objects.filter(child_id=child)
-        serializer = NotesSerializer(notes, many=True)
-        return Response(serializer.data)
-    
-    def post(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        serializer = NotesSerializer(data=request.data)
-        serializer.initial_data['child_id'] = child.id
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
-
-
-
-
-
-
-
-
-
-class ChildrenNotesDetailsAPIView(APIView):
-    def delete(self, request, pk=None, note_id=None):
-        child = get_object_or_404(Children, pk=pk)
-        try:
-            note = Notes.objects.get(id=note_id)
-            if note.child_id == child:
-                note.delete()
-        except Notes.DoesNotExist:
-            return Response({'error': 'Notatka nie istnieje'}, status=status.HTTP_404_NOT_FOUND)      
-        return Response({'success': 'Notatka została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
-    
-    def put(self, request, pk, note_id):
-        child = get_object_or_404(Children, pk=pk)
-        note = get_object_or_404(Notes, pk=note_id, child_id=child.id)
-        serializer = NotesSerializer(note, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-            
-            
-
-    
-            
-
-
-
-
-
-
-class ChildrenRelativesAPIView(APIView):
-    def get(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        relatives = child.relatives.all()
-        serializer = ChildrenRelativesSerializer(relatives, many=True, context={'child_id': child.id})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def post(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        serializer = ChildrenRelativesSerializer(data=request.data)
-            
-        if serializer.is_valid():
-            relative_data = serializer.validated_data 
-
-            try:
-                relative = Relatives.objects.get(
-                    first_name=relative_data['first_name'],
-                    second_name=relative_data['second_name'],
-                    surname=relative_data['surname'],
-                    phone_number=relative_data['phone_number'],
-                    residential_address=relative_data['residential_address'],
-                    e_mail=relative_data['e_mail']
-                )
-            except Relatives.DoesNotExist:
-                relative = serializer.save()
-
-            child.relatives.add(relative)
-
-            relation = self.request.data.get('relation')
-
-            FamilyRelationship.objects.update_or_create(
-                child=child,
-                relative=relative,
-                defaults={'relation': relation}
-            )
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
-
-class ChildrenRelativesDetailsAPIView(APIView):
-    def delete(self, request, pk=None, relative_id=None):
-        child = get_object_or_404(Children, pk=pk)
-        relative = get_object_or_404(Relatives, pk=relative_id)
-
-        if relative in child.relatives.all():
-            child.relatives.remove(relative)
-            return Response({'success': 'Krewny został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def put(self, request, pk=None, relative_id=None):
-        child = get_object_or_404(Children, pk=pk)
-        relative = get_object_or_404(Relatives, pk=relative_id)
-
-        if relative:
-            if relative not in child.relatives.all():   
-                child.relatives.add(relative)
-                
-                relation = self.request.data.get('relation')
-
-                FamilyRelationship.objects.update_or_create(
-                    child=child,
-                    relative=relative,
-                    defaults={'relation': relation}
-                )
-
-                return Response({'success': 'dziecko został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({'error': 'dziecko nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({'error': 'dziecko nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-class RelativeChildrensAPIView(APIView):
-    def get(self, request, pk):
-        relative = get_object_or_404(Relatives, pk=pk)
-        children = Children.objects.filter(familyrelationship__relative=relative)
-        for child in children:
-                child.photo_path = f"http://localhost:8000/children/{child.id}/photo"
-        serializer = ChildrenSerializer(children, many=True, context={'relative_id': relative.id})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-
-
-
-
-
-
-class RelativeChildrensDetailsAPIView(APIView):
-    def delete(self, request, pk=None, child_id=None):
-        child = get_object_or_404(Children, pk=child_id)
-        relative = get_object_or_404(Relatives, pk=pk)
-        
-        if relative in child.relatives.all():
-            child.relatives.remove(relative)
-            return Response({'success': 'Dziecka został pomyślnie usunięty'}, status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response({'error': 'Dziecko nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def put(self, request, pk=None, child_id=None):
-        child = get_object_or_404(Children, pk=child_id)
-        relative = get_object_or_404(Relatives, pk=pk)
-
-        if relative:
-            if relative not in child.relatives.all():
-                child.relatives.add(relative)
-                
-                relation = self.request.data.get('relation')
-
-                FamilyRelationship.objects.update_or_create(
-                    child=child,
-                    relative=relative,
-                    defaults={'relation': relation}
-                )
-
-                return Response({'success': 'Krewny został pomyślnie zaktualizowany'}, status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({'error': 'Krewny nie jest przypisany do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({'error': 'Krewny nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-
-
-
-class ChildrenSchoolsAPIView(APIView):
-    def get(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        schools = child.schools.all()
-        serializer = ChildrenSchoolsSerializer(schools, many=True, context={'child_id': child.id})
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def post(self, request, pk):
-        child = get_object_or_404(Children, pk=pk)
-        serializer = ChildrenSchoolsSerializer(data=request.data)
-            
-        if serializer.is_valid():
-            school_data = serializer.validated_data 
-
-            try:
-                school = Schools.objects.get(
-                    name=school_data['name'],
-                    address=school_data['address'],
-                )
-            except Schools.DoesNotExist:
-                school = serializer.save()
-
-            child.schools.add()
-
-            start_date = self.request.data.get('start_date')
-            end_date = self.request.data.get('end_date')
-
-            Enrollment.objects.update_or_create(
-                child=child,
-                school=school,
-                defaults={'start_date': start_date, 'end_date': end_date}
-            )
-
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-class ChildrenSchoolsDetailsAPIView(APIView):
-    def delete(self, request, pk=None, school_id=None):
-        child = get_object_or_404(Children, pk=pk)
-        school = get_object_or_404(Schools, pk=school_id)
-
-        if school in child.schools.all():
-            child.schools.remove(school)
-            return Response({'success': 'Szkoła została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
-        else:
-            return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-    
-    def put(self, request, pk=None, school_id=None):
-        child = get_object_or_404(Children, pk=pk)
-        school = get_object_or_404(Schools, pk=school_id)
-
-        if school:
-            if school not in child.schools.all():
-                child.schools.add(school)
-                
-                start_date = self.request.data.get('start_date')
-                end_date = self.request.data.get('end_date')
-
-                Enrollment.objects.update_or_create(
-                    child=child,
-                    school=school,
-                    defaults={'start_date': start_date, 'end_date': end_date}
-                )
-
-                return Response({'success': 'Szkoła została pomyślnie zaktualizowana'}, status=status.HTTP_204_NO_CONTENT)
-            else:
-                return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
-        else:
-            return Response({'error': 'Szkoła nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
-
-
-
-
-
-
-
-
-
-
-class CurrentChildrenAPIView(ListAPIView):
-    serializer_class = ShortChildrenSerializer
-
-    def get_queryset(self):
-        queryset = Children.objects.filter(leaving_date__isnull=True)
-        name = self.request.query_params.get('name', None)
-        ordering = self.request.query_params.get('ordering', 'birth_date')
-        search_orphans = self.request.query_params.get('search', None)
-
-        if name:
-            queryset = queryset.filter(
-                relatives__in=Relatives.objects.filter(first_name__icontains=name.split()[0], surname__icontains=name.split()[1]) |
-                               Relatives.objects.filter(first_name__icontains=name.split()[1], surname__icontains=name.split()[0])
-            )
-
-        queryset = queryset.order_by(ordering)
-
-        if search_orphans == "biological orphans":
-            orphan_child_ids = []
-            for child in queryset:
-                mothers = Relatives.objects.filter(child=child, relation="Matka", alive=False)
-                fathers = Relatives.objects.filter(child=child, relation="Ojciec", alive=False)
-                if mothers.exists() and fathers.exists():
-                    orphan_child_ids.append(child.id)
-
-            queryset = queryset.filter(id__in=orphan_child_ids)
-
-        return queryset
-
-    def list(self, request, *args, **kwargs):
-        children = self.get_queryset()
-        serializer = self.get_serializer(children, many=True)
-        data = serializer.data
-        for child_data in data:
-            child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
-        return Response(data, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
-
-
-
-class ArchivalChildrenAPIView(ListAPIView):
-    serializer_class = ShortChildrenSerializer
-
-    def get_queryset(self):
-        queryset = Children.objects.exclude(leaving_date__isnull=True)
-        name = self.request.query_params.get('name', None)
-        ordering = self.request.query_params.get('ordering', 'birth_date')
-        search_orphans = self.request.query_params.get('search', None)
-
-        if name:
-            queryset = queryset.filter(
-                relatives__in=Relatives.objects.filter(first_name__icontains=name.split()[0], surname__icontains=name.split()[1]) |
-                               Relatives.objects.filter(first_name__icontains=name.split()[1], surname__icontains=name.split()[0])
-            )
-
-        queryset = queryset.order_by(ordering)
-
-        if search_orphans == "biological orphans":
-            orphan_child_ids = []
-            for child in queryset:
-                mothers = Relatives.objects.filter(child=child, relation="Matka", alive=False)
-                fathers = Relatives.objects.filter(child=child, relation="Ojciec", alive=False)
-                if mothers.exists() and fathers.exists():
-                    orphan_child_ids.append(child.id)
-
-            queryset = queryset.filter(id__in=orphan_child_ids)
-
-        return queryset
-
-    def list(self, request):
-        children = self.get_queryset()
-        serializer = self.get_serializer(children, many=True)
-        data = serializer.data
-        for child_data in data:
-            child_data['photo_path'] = f"http://localhost:8000/children/{child_data['id']}/photo"
-        return Response(data, status=status.HTTP_200_OK)
-
-
-
-
-
-
-
-
-
-
-class RelativesAPIView(ModelViewSet):
-    queryset = Relatives.objects.all()
-    serializer_class = RelativesSerializer
-     
-    http_method_names = ['get', 'post', 'delete', 'put']
-    
-    def destroy(self, request, pk):
-        relative = get_object_or_404(Relatives, pk=pk)
-        relative.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
-    
-    def create(self, request):
-        serializer = RelativesSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def list(self, request):   
-        relatives = Relatives.objects.all()
-        serializer = RelativesSerializer(relatives, many=True)
-        return Response(serializer.data)
-    
-    def retrieve(self, request, pk):    
-        relative = get_object_or_404(Relatives, pk=pk)
-        serializer = RelativesSerializer(relative)
-        return Response(serializer.data)
-    
-    def update(self, request, pk):
-        relative = get_object_or_404(Relatives, pk=pk)
-        serializer = RelativesSerializer(relative, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-
-
 
 class UsersViewAPI(ModelViewSet): 
     queryset = User.objects.all()
@@ -724,124 +146,90 @@ class SchoolsAPIView(ModelViewSet):
             serializer = self.get_serializer(school)
             return Response(serializer.data, status=status.HTTP_200_OK)
 
-        except Children.DoesNotExist:
+        except Schools.DoesNotExist:
             return Response({"error": "Child not found"}, status=status.HTTP_404_NOT_FOUND)
  
-    def create(self, request, *args, **kwargs):
-        data = request.data
-
-        serializer = SchoolsSerializer(data = data)
-        if serializer.is_valid():
+    def create(self, request):
+        serializer = SchoolsSerializer(data=request.data)
+        if serializer.is_valid():   
+            serializer.save()
             return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def update(self, request, *args, **kwargs):
         school = self.get_object()
         serializer = SchoolsSerializer(school, data=request.data)
-
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
-
-
-
-class ChildrenDocumentsAPIView(APIView):  
+    
+class ChildrenSchoolsAPIView(APIView):
     def get(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
-        documents = Documents.objects.filter(child_id=child)
-        serializer = DocumentsSerializer(documents, many=True)
-        data = serializer.data
-        for document_data in data:
-            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}/file/"
+        schools = child.schools.all()
+        serializer = ChildrenSchoolsSerializer(schools, many=True, context={'child_id': child.id})
         return Response(serializer.data, status=status.HTTP_200_OK)
-
+    
     def post(self, request, pk):
-        serializer = DocumentsSerializer(data=request.data)
-        if serializer.is_valid():            
-            if 'file' in request.FILES:
-                file = request.FILES['file']
-                filename = file.name                
-                if os.path.exists(os.path.join(settings.DOCUMENTS_ROOT, filename)):
-                    name, extension = os.path.splitext(filename)
-                    timestamp = int(time.time() * 1000)
-                    filename = f"{name}_{timestamp}{extension}"
-
-                with open(os.path.join(settings.DOCUMENTS_ROOT, filename), 'wb') as destination:
-                    for chunk in file.chunks():
-                        destination.write(chunk)
-            serializer.save(filename = filename)
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)  
-
-class ChildrenDocumentsDetailsAPIView(APIView):
-    def get(self, request, pk, document_id):
         child = get_object_or_404(Children, pk=pk)
-        document = Documents.objects.filter(child_id=child, id = document_id)
-        serializer = DocumentsSerializer(document)
-        data = serializer.data
-        for document_data in data:
-            document_data['filename'] = f"http://localhost:8000/children/{child['id']}/document/{document_data['id']}/file/"
-        return Response(serializer.data, status=status.HTTP_200_OK)
-    
-    def delete(self, request, pk, document_id):
-        child = get_object_or_404(Children, pk=pk)
-        document = Documents.objects.filter(child_id=child, id = document_id)
-        if document and document.file_name:
-            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
-            if os.path.exists(file_path):
-                os.remove(file_path)
-            document.delete()
-        return Response({'message': 'Dokument usunięty'}, status=status.HTTP_200_OK)
-    
-    def update(self, request, pk, document_id):
-        child = get_object_or_404(Children, pk=pk)
-        document = Documents.objects.filter(child_id=child, id = document_id)
-        old_file_name = document.file_name
-        serializer = DocumentsSerializer(document, data=request.data)
-
+        serializer = ChildrenSchoolsSerializer(data=request.data)
+            
         if serializer.is_valid():
-            serializer.save(file_name = old_file_name)
-            return Response(serializer.data, status=status.HTTP_200_OK)
+            school_data = serializer.validated_data 
+
+            try:
+                school = Schools.objects.get(
+                    name=school_data['name'],
+                    address=school_data['address'],
+                )
+            except Schools.DoesNotExist:
+                school = serializer.save()
+
+            child.schools.add()
+
+            start_date = self.request.data.get('start_date')
+            end_date = self.request.data.get('end_date')
+
+            Enrollment.objects.update_or_create(
+                child=child,
+                school=school,
+                defaults={'start_date': start_date, 'end_date': end_date}
+            )
+
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-class ChildrenDocumentsDetailsFileAPIView(APIView):
-    def get(self, pk=None, document_id=None):
+    
+class ChildrenSchoolsDetailsAPIView(APIView):
+    def delete(self, request, pk=None, school_id=None):
         child = get_object_or_404(Children, pk=pk)
-        document = Documents.objects.filter(id=document_id)
-        if document.child_id == child:
-            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.file_name)
-            return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
+        school = get_object_or_404(Schools, pk=school_id)
+
+        if school in child.schools.all():
+            child.schools.remove(school)
+            return Response({'success': 'Szkoła została pomyślnie usunięta'}, status=status.HTTP_204_NO_CONTENT)
         else:
-            return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)  
-        
-    def put(self, request, pk, document_id):
+            return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
+    
+    def put(self, request, pk=None, school_id=None):
         child = get_object_or_404(Children, pk=pk)
-        document = Documents.objects.filter(id=document_id)
-        if document.child_id == child and document.file_name:
-            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.filename)
-            if os.path.exists(file_path):
-                os.remove(file_path)
+        school = get_object_or_404(Schools, pk=school_id)
 
-        if 'file' in request.FILES:
-            file = request.FILES['file']
+        if school:
+            if school not in child.schools.all():
+                child.schools.add(school)
+                
+                start_date = self.request.data.get('start_date')
+                end_date = self.request.data.get('end_date')
 
-            filename = file.name                
-            if os.path.exists(os.path.join(settings.DOCUMENTS_ROOT, filename)):
-                name, extension = os.path.splitext(filename)
-                timestamp = int(time.time() * 1000)
-                filename = f"{name}_{timestamp}{extension}"
+                Enrollment.objects.update_or_create(
+                    child=child,
+                    school=school,
+                    defaults={'start_date': start_date, 'end_date': end_date}
+                )
 
-            with open(os.path.join(settings.DOCUMENTS_ROOT, filename), 'wb') as destination:
-                for chunk in file.chunks():
-                    destination.write(chunk)
-            document.filename = filename
-            document.save()
-            return Response({'message': 'Plik dokumentu został zaktualizowany'}, status=status.HTTP_200_OK)
+                return Response({'success': 'Szkoła została pomyślnie zaktualizowana'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
         else:
-            return Response({'error': 'Nie przesłano pliku'}, status=status.HTTP_400_BAD_REQUEST)
+            return Response({'error': 'Szkoła nie istnieje'}, status=status.HTTP_404_NOT_FOUND)

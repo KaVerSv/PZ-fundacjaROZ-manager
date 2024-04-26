@@ -1,14 +1,9 @@
-import time
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..models import *
+from ..models import Notes, Children
 from rest_framework import status
-from ..serializers import *
-
-
-
-
+from ..serializers import NotesSerializer
 
 class ChildrenNotesAPIView(APIView):
     def get(self, request, pk):
@@ -25,15 +20,6 @@ class ChildrenNotesAPIView(APIView):
             serializer.save()
             return Response(serializer.data, status=201)
         return Response(serializer.errors, status=400)
-
-
-
-
-
-
-
-
-
 
 class ChildrenNotesDetailsAPIView(APIView):
     def delete(self, request, pk=None, note_id=None):
@@ -54,8 +40,3 @@ class ChildrenNotesDetailsAPIView(APIView):
             serializer.save()
             return Response(serializer.data)
         return Response(serializer.errors, status=400)
-            
-            
-
-    
-            

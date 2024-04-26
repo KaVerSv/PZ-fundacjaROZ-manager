@@ -1,5 +1,5 @@
 from rest_framework.serializers import ModelSerializer
-from .models import *
+from .models import Children, Relatives, FamilyRelationship, Enrollment, Schools, Notes, User, Documents
 from rest_framework import serializers
 from django.contrib.auth import get_user_model
 
@@ -14,7 +14,7 @@ class ChildrenSerializer(ModelSerializer):
 class RelativesSerializer(serializers.ModelSerializer):
     class Meta:
         model = Relatives
-        fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status']
+        fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'alive']
 
 
 class ChildrenRelativesSerializer(serializers.ModelSerializer):
@@ -22,7 +22,7 @@ class ChildrenRelativesSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Relatives
-        fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'relation']
+        fields = ['id', 'first_name', 'second_name', 'surname', 'phone_number', 'residential_address', 'e_mail', 'legal_status', 'alive', 'relation']
 
     def get_relation(self, obj):
         child_id = self.context.get('child_id')
@@ -35,7 +35,7 @@ class ChildrenSchoolsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schools
-        fields = ['name', 'address', 'start_date', 'end_date']
+        fields = ['id', 'name', 'address', 'start_date', 'end_date']
 
     def get_start_date(self, obj):
         child_id = self.context.get('child_id')
@@ -80,7 +80,7 @@ class UsersSerializer(ModelSerializer):
 class DocumentsSerializer(ModelSerializer):
     class Meta:
         model = Documents
-        fields = ('id','name','date','file_name', 'child_id')
+        fields = ('id','signature','specification','date','file_name', 'child_id', 'relative_id')
 
 class SchoolsSerializer(ModelSerializer):
     class Meta:

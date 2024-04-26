@@ -4,14 +4,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 import os
 from django.http import FileResponse
-from ..models import *
+from ..models import Children
 from rest_framework import status
 from django.conf import settings
-from ..serializers import *
-
-
-
-
 
 class ChildrenPhotoAPIView(APIView):
     def get(self, request, pk):
@@ -62,7 +57,6 @@ class ChildrenPhotoAPIView(APIView):
                 return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
             return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-
 
 
 

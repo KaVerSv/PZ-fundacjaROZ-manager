@@ -42,7 +42,11 @@ def validate_leaving_date(admission_date, leaving_date):
 def validate_admission_date(admission_date):
     if admission_date > datetime.date.today():
         raise ValidationError("Wrong admission date!!!")
-    
+
+class Schools(models.Model):
+    name = models.CharField(max_length=50)
+    address = models.CharField(max_length=200)
+
 class Relatives(models.Model):
     first_name = models.CharField(max_length=50)
     second_name = models.CharField(max_length=50, blank=True)
@@ -52,10 +56,6 @@ class Relatives(models.Model):
     e_mail = models.CharField(max_length=100, validators=[validate_email])
     legal_status = models.TextField(default='')
     alive = models.BooleanField(default = True)
-
-class Schools(models.Model):
-    name = models.CharField(max_length=50)
-    address = models.TextField()
 
 class Children(models.Model):
     pesel = models.CharField(unique=True, max_length=11)
@@ -95,8 +95,8 @@ class Documents(models.Model):
     signature = models.CharField(max_length = 100, default='')
     specification = models.CharField(max_length = 200, default='')
     date = models.DateField()
-    file_name = models.CharField(max_length=100)
-    child_id = models.ForeignKey(Children, on_delete=models.CASCADE)
+    file_name = models.CharField(max_length=100, blank=True)
+    child_id = models.ForeignKey(Children, on_delete=models.SET_NULL, null=True)
     relative_id = models.ForeignKey(Relatives, on_delete=models.SET_NULL, null=True)
 
 class CustomUserManager(BaseUserManager):

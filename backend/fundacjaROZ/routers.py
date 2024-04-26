@@ -1,11 +1,9 @@
-from django.urls import path
 from rest_framework.routers import DefaultRouter
 
-# from .views import *
 from .views_collection.children_view import ChildrenAPIView
 from .views_collection.relatives_view import RelativesAPIView
 from .views_collection.schools_view import SchoolsAPIView
-from .views_collection.user_view import UsersViewAPI
+from .views import UsersViewAPI
 
 
 
