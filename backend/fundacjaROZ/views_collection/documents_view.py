@@ -15,7 +15,7 @@ class DocumentsAPIView(APIView):
         serializer = DocumentsSerializer(documents, many=True)
         data = serializer.data
         for document_data in data:
-            document_data['file_name'] = f"http://localhost:8000/document/{document_data['id']}/file/"
+            document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
@@ -32,7 +32,7 @@ class ChildrenDocumentsAPIView(APIView):
         serializer = DocumentsSerializer(documents, many=True)
         data = serializer.data
         for document_data in data:
-            document_data['file_name'] = f"http://localhost:8000/document/{document_data['id']}/file/"
+            document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
@@ -50,7 +50,7 @@ class RelativesDocumentsAPIView(APIView):
         serializer = DocumentsSerializer(documents, many=True)
         data = serializer.data
         for document_data in data:
-            document_data['file_name'] = f"http://localhost:8000/document/{document_data['id']}/file/"
+            document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
@@ -66,7 +66,7 @@ class DocumentsDetailsAPIView(APIView):
         document = get_object_or_404(Documents, pk=pk)
         serializer = DocumentsSerializer(document)
         data = serializer.data
-        data['file_name'] = f"http://localhost:8000/document/{pk}/file/"
+        data['file_name'] = f"http://localhost:8000/documents/{pk}/file/"
         return Response(data, status=status.HTTP_200_OK)
     
     def delete(self, request, pk):

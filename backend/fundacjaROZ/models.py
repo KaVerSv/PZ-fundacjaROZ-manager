@@ -8,7 +8,6 @@ from django.contrib.auth.base_user import BaseUserManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.contrib.auth.models import Permission
 from django.contrib.auth.models import Group
-from django.utils.translation import gettext_lazy as _
 
 def validate_email(value):
     email_regex = re.compile(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
