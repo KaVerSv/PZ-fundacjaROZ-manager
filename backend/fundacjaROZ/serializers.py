@@ -39,13 +39,37 @@ class ChildrenSchoolsSerializer(serializers.ModelSerializer):
 
     def get_start_date(self, obj):
         child_id = self.context.get('child_id')
-        start_date = Enrollment.objects.filter(child_id=child_id, school=obj).first()
-        return start_date.start_date if start_date else None
-    
+        print(obj)
+        if isinstance(obj, Schools):
+            school=obj
+        else:
+            school_name = obj.get('name') 
+            school_address = obj.get('address') 
+
+            school = Schools.objects.filter(name=school_name, address=school_address).first()
+
+        if school:
+            start_date = Enrollment.objects.filter(child_id=child_id, school=school).first()
+            return start_date.start_date if start_date else None
+        else:
+            return None  
+        
     def get_end_date(self, obj):
         child_id = self.context.get('child_id')
-        end_date = Enrollment.objects.filter(child_id=child_id, school=obj).first()
-        return end_date.end_date if end_date else None
+        if isinstance(obj, Schools):
+            school=obj
+        else:
+            school_name = obj.get('name') 
+            school_address = obj.get('address') 
+
+            school = Schools.objects.filter(name=school_name, address=school_address).first()
+
+        if school:
+            end_date = Enrollment.objects.filter(child_id=child_id, school=school).first()
+            return end_date.end_date if end_date else None
+        else:
+            return None  
+
     
 class RelativeChildrensSerializer(serializers.ModelSerializer):
     relation = serializers.SerializerMethodField()

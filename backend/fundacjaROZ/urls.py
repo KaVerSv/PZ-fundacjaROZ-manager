@@ -5,7 +5,7 @@ from .views_collection.notes_view import ChildrenNotesAPIView,ChildrenNotesDetai
 from .views_collection.photos_view import ChildrenPhotoAPIView
 from .views_collection.relatives_view import RelativeChildrensAPIView,RelativeChildrensDetailsAPIView,ChildrenRelativesAPIView,ChildrenRelativesDetailsAPIView
 from .views_collection.documents_view import ChildrenDocumentsAPIView, DocumentsAPIView,DocumentsDetailsAPIView, DocumentsDetailsFileAPIView, RelativesDocumentsAPIView
-from .views import ChildrenSchoolsAPIView,ChildrenSchoolsDetailsAPIView
+from .views_collection.schools_view import ChildrenSchoolsAPIView,ChildrenSchoolsDetailsAPIView
 from .views import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI
 
 
@@ -28,8 +28,8 @@ urlpatterns = [
     path('relatives/<int:pk>/children/', RelativeChildrensAPIView.as_view()),
     path('relatives/<int:pk>/children/<int:child_id>/', RelativeChildrensDetailsAPIView.as_view()),
     
-    path('children/<int:pk>/schools/', ChildrenSchoolsAPIView.as_view()),
-    path('children/<int:pk>/schools/<int:school_id>/', ChildrenSchoolsDetailsAPIView.as_view()),
+    # path('children/<int:pk>/schools/', ChildrenSchoolsAPIView.as_view()),
+    # path('children/<int:pk>/schools/<int:school_id>/', ChildrenSchoolsDetailsAPIView.as_view()),
     
     path('children/<int:pk>/notes/', ChildrenNotesAPIView.as_view()),
     path('children/<int:pk>/notes/<int:note_id>/', ChildrenNotesDetailsAPIView().as_view()),
