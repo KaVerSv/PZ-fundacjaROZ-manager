@@ -109,8 +109,7 @@ class CurrentChildrenAPIView(ListAPIView):
                 if mothers_exist and fathers_exist:
                     orphan_child_ids.append(child.id)
 
-        queryset = queryset.filter(id__in=orphan_child_ids)
-
+            queryset = queryset.filter(id__in=orphan_child_ids)
 
         return queryset
 
@@ -156,7 +155,7 @@ class ArchivalChildrenAPIView(ListAPIView):
                 if mothers_exist and fathers_exist:
                     orphan_child_ids.append(child.id)
 
-        queryset = queryset.filter(id__in=orphan_child_ids)
+            queryset = queryset.filter(id__in=orphan_child_ids)
 
         return queryset
 
