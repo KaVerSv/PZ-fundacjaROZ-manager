@@ -32,7 +32,7 @@ function Relative(props: NoteProps) {
         }
     }
     return (
-        <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': 'pt-8' } rounded-xl`}>
+        <div className={`${props.relative.alive? 'bg-orange-500' : 'bg-main_grey'} bg-opacity-60 ${!editMode?'p-3': 'pt-8' } rounded-xl`}>
             <div className='flex justify-between relative' style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
                 {!editMode && <span className='font-bold w-[89%]'>{props.relative.first_name} {props.relative.second_name} {props.relative.surname}</span>}
                 {!editMode ?
@@ -72,7 +72,8 @@ function Relative(props: NoteProps) {
                 <InfoContainer note={'Email'} text={props.relative.e_mail}/>
                 <InfoContainer note={'Adres zamieszkania'} text={props.relative.residential_address}/>
                 <InfoContainer note={'Telefon'} text={props.relative.phone_number}/>
-
+                <InfoContainer note={'Status prawny'} text={props.relative.legal_status}/>
+                <InfoContainer note={'Żyje'} text={props.relative.alive? 'Tak' : 'Nie'}/>
             </div>}
         </div>
     );

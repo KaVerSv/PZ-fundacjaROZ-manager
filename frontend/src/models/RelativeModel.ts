@@ -6,4 +6,6 @@ export interface RelativeModel {
     phone_number: string;
     residential_address: string;
     e_mail: string;
+    legal_status: string,
+    alive: boolean | string;
 }

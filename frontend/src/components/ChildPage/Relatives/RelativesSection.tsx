@@ -50,7 +50,7 @@ function RelativesSection(props: NotesBlockProps) {
                 <div className='text-main_red hover:text-red-600 cursor-pointer' onClick={() => {
                     setShowRelativesFrom(!showRelativesFrom)
                 }}>
-                    <FontAwesomeIcon icon={faUserPlus} />
+                    <FontAwesomeIcon icon={faUserPlus}/>
                 </div>
             </div>
             <div className='w-full flex justify-center'>
@@ -61,8 +61,8 @@ function RelativesSection(props: NotesBlockProps) {
                     mutate()
                 }}
                               toggleShowForm={() => {
-                              setShowRelativesFrom(false);
-                          }} mode={Mode.create} childId={props.childId}/>
+                                  setShowRelativesFrom(false);
+                              }} mode={Mode.create} childId={props.childId}/>
             </div>}
 
             {data.length !== 0 ?
@@ -73,12 +73,16 @@ function RelativesSection(props: NotesBlockProps) {
                     > {isWrapped ? 'Rozwiń rodziców' : 'Zwiń rodziców'}
                     </button>
                     <div className={`flex flex-col gap-5 overflow-hidden ${
-                            isWrapped ? 'max-h-0 absolute' : 'max-h-full'
-                        }`}>
-                        {data.map((relative) => <Relative toggleReload={mutate} child_id={props.childId} key={relative.id} relative={relative}/>)}
+                        isWrapped ? 'max-h-0 absolute' : 'max-h-full'
+                    }`}>
+                        {data
+                            .sort((a, b) => {
+                                if (!a.alive) return 1;
+                                return a.first_name.localeCompare(b.first_name)
+                            })
+                            .map((relative) => <Relative toggleReload={mutate} child_id={props.childId}
+                                                         key={relative.id} relative={relative}/>)}
                     </div>
-
-                    {}
                 </div>
                 :
                 <span className='mx-auto'>Póki co nie ma rodziców</span>}

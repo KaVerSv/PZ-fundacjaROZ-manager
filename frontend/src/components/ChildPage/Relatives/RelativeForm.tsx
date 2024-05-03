@@ -4,6 +4,7 @@ import {useEffect, useState} from "react";
 import FormInput from "../../common/FormInput.tsx";
 import {Mode} from "../Mode.ts";
 import {RelativeModel} from "../../../models/RelativeModel.ts";
+import InputWrapper from "../../ChildCreationForm/InputWrapper.tsx";
 
 interface Props {
     toggleReload: () => void;
@@ -23,6 +24,8 @@ function RelativeForm(props: Props) {
         handleSubmit,
         formState: {errors, isValid},
         setFocus,
+        setValue,
+        getValues
     } = useForm<RelativeModel>({
         mode: "onChange",
         defaultValues: {
@@ -33,6 +36,8 @@ function RelativeForm(props: Props) {
             phone_number: props.relative?.phone_number,
             residential_address: props.relative?.residential_address,
             e_mail: props.relative?.e_mail,
+            legal_status: props.relative?.legal_status,
+            alive: props.relative?.alive
         }
     },);
 
@@ -42,8 +47,7 @@ function RelativeForm(props: Props) {
 
     const onSubmit: SubmitHandler<RelativeModel> = async (relativeFormData) => {
         setLoading(true);
-        console.log(relativeFormData);
-        console.log(props.mode)
+        setValue('alive', getValues('alive') === 'true')
         try {
             const response = await fetch( `${BASE_API_URL}${props.mode === Mode.edit ? `relatives/${props.relative.id}/` :  `children/${props.childId}/relatives/`}`   , {
                 method: props.mode === Mode.edit ? 'PUT' : 'POST',
@@ -53,7 +57,6 @@ function RelativeForm(props: Props) {
                 },
                 body: JSON.stringify(relativeFormData),
             });
-            console.log(response);
             if (!response.ok) {
                 throw new Error(`API request failed with status ${response.status}`);
             } else {
@@ -105,6 +108,30 @@ function RelativeForm(props: Props) {
                        rules={{
                            required: 'Pole wymagane'
                        }}/>
+            <FormInput name={"legal_status"} type={"text"} label={"Status Prawny"}
+                       register={register}
+                       error={errors.legal_status}
+                       rules={{
+                           required: 'Pole wymagane'
+                       }}/>
+            <InputWrapper labelFor="alive" labelNote="Żyje" alwaysShowLabel={true} error={errors.alive}>
+                <select
+                    className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    id="alive" {...register('alive', {
+                    required: true,
+                })}>
+                    <option selected={true} value={'true'}>Tak</option>
+                    <option value={'false'}>Nie</option>
+                </select>
+                <div
+                    className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
+                    <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
+                         viewBox="0 0 20 20">
+                        <path
+                            d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
+                    </svg>
+                </div>
+            </InputWrapper>
             <div className='w-full text-right'>
                 {error && <div className='flex justify-center'>
                     <span className='text-sm text-red-800'>Coś poszło nie tak.<br/>Sprobuj ponownie</span>
