@@ -189,7 +189,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
                             {error && <div className='flex justify-center'>
                                 <span className='text-sm text-red-800'>Coś poszło nie tak.<br/>Sprobuj ponownie</span>
                             </div>}
@@ -199,6 +199,13 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                                 disabled={loading}>
                                 {props.editMode ? 'Zapisz zmiany' : 'Dodaj dziecko'}
                             </button>
+                            {props.editMode && <button
+                                onClick={() => navigate(`/children/${props.childId}`)}
+                                className='mt-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded disabled:opacity-30'
+                                type="button"
+                                disabled={loading}>
+                                Odrzuć zmiany
+                            </button>}
                         </div>
                     </div>
 
