@@ -12,7 +12,7 @@ const Home = () => {
     }, []);
     return (
         <HeightWrapper>
-            <Top headerHeight={500}>
+            <Top headerHeight={300}>
                 <Header/>
             </Top>
             <ChildrenBlock header={<CurrentBlockHeader/>}/>

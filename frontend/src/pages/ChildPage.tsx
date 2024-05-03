@@ -11,7 +11,7 @@ function ChildPage() {
     if (!id) id = '0';
     return (
         <HeightWrapper>
-            <Top headerHeight={350}>
+            <Top headerHeight={100}>
                 <Header/>
             </Top>
             <div className='flex flex-col sm:flex-row justify-center'>
