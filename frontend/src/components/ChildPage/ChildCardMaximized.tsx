@@ -70,13 +70,8 @@ function ChildCardMaximized(props: ChildCardProps) {
                                 {child.second_name && <span className='text-2xl font-bold'>{child.second_name}</span>}
                                 <span className='text-2xl font-bold'>{child.surname}</span>
                             </div>
-                            {/*<div>*/}
-
-                            {/*</div>*/}
                             <div
-                                className='flex flex-col gap-7 sm:grid sm:grid-cols-1 xl:gap-4 xl:gap-y-7 xl:grid-cols-2 2xl:grid-cols-3'>
-                                <InfoContainer note='Płeć'
-                                               text={child.gender === 'female' ? 'Kobieta' : 'Mężczyzna'}/>
+                                className='flex flex-col gap-7 sm:grid sm:grid-cols-1 xl:gap-4 xl:gap-y-7 xl:grid-cols-2 2xl:grid-cols-2'>
                                 <InfoContainer note='Data urodzenia' text={child.birth_date}/>
                                 <InfoContainer note='Miejsce urodzeina' text={child.birthplace}/>
                             </div>
