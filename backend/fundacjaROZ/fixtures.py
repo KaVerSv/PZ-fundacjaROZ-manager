@@ -419,15 +419,21 @@ def add_example_data(**kwargs):
     schools_data = [
         {
             'name': 'School A',
-            'address': '123 Oak St, City'
+            'address': '123 Oak St, City',
+            'phone_number': '123456789',
+            'e_mail': 'john.doe@example.com',
         },
         {
             'name': 'School B',
-            'address': '456 Elm St, Town'
+            'address': '456 Elm St, Town',
+            'phone_number': '123456789',
+            'e_mail': 'john.doe@example.com',
         },
         {
             'name': 'School C',
-            'address': '789 Pine St, Village'
+            'address': '789 Pine St, Village',
+            'phone_number': '123456789',
+            'e_mail': 'john.doe@example.com',
         }
     ]
 

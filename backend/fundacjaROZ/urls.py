@@ -4,7 +4,7 @@ from .views_collection.children_view import CurrentChildrenAPIView,ArchivalChild
 from .views_collection.notes_view import ChildrenNotesAPIView,ChildrenNotesDetailsAPIView
 from .views_collection.photos_view import ChildrenPhotoAPIView
 from .views_collection.relatives_view import RelativeChildrensAPIView,RelativeChildrensDetailsAPIView,ChildrenRelativesAPIView,ChildrenRelativesDetailsAPIView
-from .views_collection.documents_view import ChildrenDocumentsAPIView, DocumentsAPIView,DocumentsDetailsAPIView, DocumentsDetailsFileAPIView, RelativesDocumentsAPIView
+from .views_collection.documents_view import ChildrenDetailsDocumentsAPIView,DocumentsAPIView,DocumentsDetailsAPIView, DocumentsDetailsFileAPIView, RelativesDetailsDocumentsAPIView
 from .views_collection.schools_view import ChildrenSchoolsAPIView,ChildrenSchoolsDetailsAPIView
 from .views import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI
 
@@ -34,8 +34,8 @@ urlpatterns = [
     path('children/<int:pk>/notes/', ChildrenNotesAPIView.as_view()),
     path('children/<int:pk>/notes/<int:note_id>/', ChildrenNotesDetailsAPIView().as_view()),
     
-	path('children/<int:pk>/documents/',  ChildrenDocumentsAPIView.as_view()),
-    path('relatives/<int:pk>/documents/',  RelativesDocumentsAPIView.as_view()),
+	path('children/<int:pk>/documents/',  ChildrenDetailsDocumentsAPIView.as_view()),
+    path('relatives/<int:pk>/documents/',  RelativesDetailsDocumentsAPIView.as_view()),
 
     path('documents/',  DocumentsAPIView.as_view()),
     path('documents/<int:pk>/',  DocumentsDetailsAPIView.as_view()),
