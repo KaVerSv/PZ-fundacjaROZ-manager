@@ -35,7 +35,7 @@ class ChildrenSchoolsSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Schools
-        fields = ['id', 'name', 'address', 'start_date', 'end_date']
+        fields = ['id', 'name', 'address', 'start_date', 'end_date', 'phone_number','e_mail']
 
     def get_start_date(self, obj):
         child_id = self.context.get('child_id')
@@ -89,7 +89,7 @@ class RelativeChildrensSerializer(serializers.ModelSerializer):
 class ShortChildrenSerializer(ModelSerializer):
     class Meta:
         model = Children
-        fields = ('id','pesel','first_name','surname','photo_path')
+        fields = ('id','pesel','first_name','surname','photo_path','birth_date','admission_date','leaving_date')
 
 class NotesSerializer(ModelSerializer):
     class Meta:
@@ -109,7 +109,7 @@ class DocumentsSerializer(ModelSerializer):
 class SchoolsSerializer(ModelSerializer):
     class Meta:
         model = Schools
-        fields = ('id', 'name', 'address')
+        fields = ('id', 'name', 'address','phone_number','e_mail')
 
 class UserRegistrationSerializer(serializers.ModelSerializer):
     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
