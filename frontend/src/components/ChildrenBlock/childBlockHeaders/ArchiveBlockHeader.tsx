@@ -8,6 +8,7 @@ function ArchiveBlockHeader(props: {onSortingMethodChange : (sortingMethod: stri
                 <div className='flex items-center justify-between'>
                     <span className='text-main_white'>Archiwalni wychowankowie</span>
                     <SortingTypeChoice isArch={true} onSortingMethodChange={props.onSortingMethodChange}/>
+                    <div className="w-64"></div>
                 </div>
             </WidthWrapper>
         </div>
