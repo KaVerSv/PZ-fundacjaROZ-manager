@@ -5,6 +5,7 @@ import ChildCardMaximized from "../components/ChildPage/ChildCardMaximized.tsx";
 import {useParams} from "react-router-dom";
 import NotesSection from "../components/ChildPage/Notes/NotesSection.tsx";
 import RelativesSection from "../components/ChildPage/Relatives/RelativesSection.tsx";
+import SchoolsSection from "../components/ChildPage/Schools/SchoolsSection.tsx";
 
 function ChildPage() {
     let {id} = useParams();
@@ -17,6 +18,7 @@ function ChildPage() {
             <div className='flex flex-col sm:flex-row justify-center'>
                 <ChildCardMaximized childId={id}/>
                 <div className='flex flex-col justify-center' style={{alignItems: "center"}}>
+                    <SchoolsSection childId={id}/>
                     <NotesSection childId={id}/>
                     <RelativesSection childId={id}/>
                 </div>
