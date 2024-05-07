@@ -92,6 +92,12 @@ function NoteForm(props: Props) {
                     <span className='text-sm text-red-800'>Coś poszło nie tak.<br/>Sprobuj ponownie</span>
                 </div>}
                 <button
+                    className="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey mr-2 mb-1"
+                    type="button"
+                    onClick={props.toggleShowForm}>
+                    Odrzuć zmiany
+                </button>
+                <button
                     disabled={!isValid || loading}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey mr-2 mb-1"
                     type="submit">
