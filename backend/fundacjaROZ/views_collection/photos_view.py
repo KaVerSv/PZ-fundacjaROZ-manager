@@ -2,22 +2,64 @@ import time
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-import os
-from django.http import FileResponse
+from django.http import HttpResponse
 from ..models import Children
 from rest_framework import status
 from django.conf import settings
 
+from googleapiclient import discovery
+from httplib2 import Http
+from oauth2client import file, client, tools
+import os
+
+from django.http import HttpResponse
+from rest_framework import status
+from googleapiclient.errors import HttpError
+
 class ChildrenPhotoAPIView(APIView):
+    # def get(self, request, pk):
+    #     child = get_object_or_404(Children, pk=pk)
+    #     photo = child.photo_path
+    #     if photo == "":
+    #         photo = 'default.png'
+        
+    #     file_path = os.path.join(settings.MEDIA_ROOT, photo)
+    #     return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
     def get(self, request, pk):
+        SCOPES = 'https://www.googleapis.com/auth/drive'
+        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
+        store = file.Storage(file_path_store)
+        creds = store.get()
+        if not creds or creds.invalid:
+            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
+            flow = client.flow_from_clientsecrets(file_path, SCOPES)
+            creds = tools.run_flow(flow, store)
+        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+
         child = get_object_or_404(Children, pk=pk)
         photo = child.photo_path
-        if photo == "":
+
+        if not photo:
             photo = 'default.png'
+
+        query = f"name='{photo}'"
+        try:
+            response = DRIVE.files().list(q=query, fields='files(id)').execute()
+            files = response.get('files', [])
+            if not files:
+                return HttpResponse("Plik nie został znaleziony.")
+            
+            file_id = files[0]['id']
+            request = DRIVE.files().get_media(fileId=file_id)
+            
+            file_content = request.execute()
+            
+            return HttpResponse(file_content, content_type='image/png')
         
-        file_path = os.path.join(settings.MEDIA_ROOT, photo)
-        return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
-        
+        except HttpError as e:
+            return HttpResponse(f"Wystąpił błąd podczas pobierania pliku {e}")
+
+
     def delete(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
         if child.photo_path:
@@ -57,7 +99,3 @@ class ChildrenPhotoAPIView(APIView):
                 return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
             return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
