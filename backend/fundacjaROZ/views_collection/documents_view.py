@@ -5,9 +5,16 @@ from rest_framework.views import APIView
 import os
 from ..serializers import DocumentsSerializer
 from ..models import Documents, Children, Relatives
-from rest_framework import status
 from django.conf import settings
-from django.http import FileResponse
+
+from googleapiclient import discovery
+from httplib2 import Http
+from oauth2client import file, client, tools
+import os
+
+from django.http import FileResponse, HttpResponse
+from rest_framework import status
+from googleapiclient.errors import HttpError
 
 class DocumentsAPIView(APIView):  
     def get(self, request):
@@ -137,11 +144,53 @@ class DocumentsDetailsAPIView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class DocumentsDetailsFileAPIView(APIView):
+class DocumentsDetailsFileAPIView(APIView): 
+    # def get(self, request, pk=None):
+    #     document = get_object_or_404(Documents, pk=pk)
+    #     if document:
+    #         file_path = os.path.join(settings.DOCUMENTS_ROOT, document.file_name)
+    #         return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
+    #     else:
+    #         return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+               
     def get(self, request, pk=None):
+        SCOPES = 'https://www.googleapis.com/auth/drive'
+        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
+        store = file.Storage(file_path_store)
+        creds = store.get()
+        if not creds or creds.invalid:
+            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
+            flow = client.flow_from_clientsecrets(file_path, SCOPES)
+            creds = tools.run_flow(flow, store)
+        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+
         document = get_object_or_404(Documents, pk=pk)
         if document:
-            file_path = os.path.join(settings.DOCUMENTS_ROOT, document.file_name)
-            return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
+            query = f"name='{document.file_name}'"
+            try:
+                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                files = response.get('files', [])
+                if not files:
+                    return HttpResponse("Plik nie został znaleziony.")
+                
+                file_id = files[0]['id']
+                request = DRIVE.files().get_media(fileId=file_id)
+                
+                file_content = request.execute()
+                
+                file_extension = document.file_name.split('.')[-1].lower()  # Pobierz rozszerzenie pliku
+                content_type = 'image/png'  # Domyślny typ treści
+                
+                if file_extension == 'pdf':
+                    content_type = 'application/pdf'
+                elif file_extension == 'png':
+                    content_type = 'image/png'
+                elif file_extension == 'jpg' or file_extension == 'jpeg':
+                    content_type = 'image/jpeg'
+                
+                return HttpResponse(file_content, content_type=content_type)
+            
+            except HttpError as e:
+                return HttpResponse(f"Wystąpił błąd podczas pobierania pliku {e}")
         else:
             return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)

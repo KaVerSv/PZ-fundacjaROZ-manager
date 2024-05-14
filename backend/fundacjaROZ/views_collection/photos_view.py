@@ -17,14 +17,6 @@ from rest_framework import status
 from googleapiclient.errors import HttpError
 
 class ChildrenPhotoAPIView(APIView):
-    # def get(self, request, pk):
-    #     child = get_object_or_404(Children, pk=pk)
-    #     photo = child.photo_path
-    #     if photo == "":
-    #         photo = 'default.png'
-        
-    #     file_path = os.path.join(settings.MEDIA_ROOT, photo)
-    #     return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
     def get(self, request, pk):
         SCOPES = 'https://www.googleapis.com/auth/drive'
         file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
