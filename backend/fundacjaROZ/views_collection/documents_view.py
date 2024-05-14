@@ -144,15 +144,7 @@ class DocumentsDetailsAPIView(APIView):
                 return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class DocumentsDetailsFileAPIView(APIView): 
-    # def get(self, request, pk=None):
-    #     document = get_object_or_404(Documents, pk=pk)
-    #     if document:
-    #         file_path = os.path.join(settings.DOCUMENTS_ROOT, document.file_name)
-    #         return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
-    #     else:
-    #         return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
-               
+class DocumentsDetailsFileAPIView(APIView):             
     def get(self, request, pk=None):
         SCOPES = 'https://www.googleapis.com/auth/drive'
         file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
@@ -178,8 +170,8 @@ class DocumentsDetailsFileAPIView(APIView):
                 
                 file_content = request.execute()
                 
-                file_extension = document.file_name.split('.')[-1].lower()  # Pobierz rozszerzenie pliku
-                content_type = 'image/png'  # Domyślny typ treści
+                file_extension = document.file_name.split('.')[-1].lower()
+                content_type = 'image/png'
                 
                 if file_extension == 'pdf':
                     content_type = 'application/pdf'
