@@ -29,9 +29,10 @@ services:
     depends_on:
       - backend
 
-  backend: 
+  backend:
     depends_on:
-      - db
+      db:
+        condition: service_started
 
     build: 
       context: ./backend
