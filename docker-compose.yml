@@ -30,6 +30,9 @@ services:
       - backend
 
   backend: 
+    depends_on:
+      - db
+
     build: 
       context: ./backend
       dockerfile: Dockerfile
@@ -44,6 +47,3 @@ services:
 
     volumes:
       - ./backend:/app/backend
-
-    depends_on:
-      - db
