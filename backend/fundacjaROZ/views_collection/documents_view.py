@@ -17,8 +17,12 @@ from rest_framework import status
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 import tempfile
+from .google_connection import google_connect
 
-class DocumentsAPIView(APIView):  
+class DocumentsAPIView(APIView):
+    google_connection = google_connect()
+    DRIVE = google_connection.get_drive()
+    
     def get(self, request):
         documents = Documents.objects.all()
         serializer = DocumentsSerializer(documents, many=True)
@@ -28,15 +32,7 @@ class DocumentsAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-        SCOPES = 'https://www.googleapis.com/auth/drive'
-        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        store = file.Storage(file_path_store)
-        creds = store.get()
-        if not creds or creds.invalid:
-            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            creds = tools.run_flow(flow, store)
-        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+
         
         serializer = DocumentsSerializer(data=request.data)
         if serializer.is_valid():
@@ -44,7 +40,7 @@ class DocumentsAPIView(APIView):
             if file_:
                 filename = file_.name
                 query = f"name='{filename}'"
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     base_name, extension = os.path.splitext(filename)
@@ -59,7 +55,7 @@ class DocumentsAPIView(APIView):
                     temp_file.write(file_.read())
                     media = MediaFileUpload(temp_file.name, mimetype='application/octet-stream', resumable=True)
                 try:
-                    response = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    response = self.DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                     serializer.save(file_name=filename)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 except HttpError as e:
@@ -68,7 +64,10 @@ class DocumentsAPIView(APIView):
                 return Response({'error': 'Nie przekazano pliku'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class ChildrenDetailsDocumentsAPIView(APIView):  
+class ChildrenDetailsDocumentsAPIView(APIView): 
+    google_connection = google_connect()
+    DRIVE = google_connection.get_drive()
+     
     def get(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
         documents = Documents.objects.filter(child_id=child)
@@ -79,15 +78,7 @@ class ChildrenDetailsDocumentsAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request, pk):
-        SCOPES = 'https://www.googleapis.com/auth/drive'
-        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        store = file.Storage(file_path_store)
-        creds = store.get()
-        if not creds or creds.invalid:
-            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            creds = tools.run_flow(flow, store)
-        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+
         
         child = get_object_or_404(Children, pk=pk)
         serializer = DocumentsSerializer(data=request.data)
@@ -96,7 +87,7 @@ class ChildrenDetailsDocumentsAPIView(APIView):
             if file_:
                 filename = file_.name
                 query = f"name='{filename}'"
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     base_name, extension = os.path.splitext(filename)
@@ -111,7 +102,7 @@ class ChildrenDetailsDocumentsAPIView(APIView):
                     temp_file.write(file_.read())
                     media = MediaFileUpload(temp_file.name, mimetype='application/octet-stream', resumable=True)
                 try:
-                    response = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    response = self.DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                     serializer.save(file_name=filename, child_id = child)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 except HttpError as e:
@@ -121,6 +112,8 @@ class ChildrenDetailsDocumentsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class RelativesDetailsDocumentsAPIView(APIView):  
+    google_connection = google_connect()
+    DRIVE = google_connection.get_drive()
     def get(self, request, pk):
         relative = get_object_or_404(Relatives, pk=pk)
         documents = Documents.objects.filter(relative_id = relative)
@@ -131,15 +124,7 @@ class RelativesDetailsDocumentsAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
-        SCOPES = 'https://www.googleapis.com/auth/drive'
-        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        store = file.Storage(file_path_store)
-        creds = store.get()
-        if not creds or creds.invalid:
-            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            creds = tools.run_flow(flow, store)
-        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+       
         
         relative = get_object_or_404(Relatives, pk=pk)
         serializer = DocumentsSerializer(data=request.data)
@@ -148,7 +133,7 @@ class RelativesDetailsDocumentsAPIView(APIView):
             if file_:
                 filename = file_.name
                 query = f"name='{filename}'"
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     base_name, extension = os.path.splitext(filename)
@@ -163,7 +148,7 @@ class RelativesDetailsDocumentsAPIView(APIView):
                     temp_file.write(file_.read())
                     media = MediaFileUpload(temp_file.name, mimetype='application/octet-stream', resumable=True)
                 try:
-                    response = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    response = self.DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                     serializer.save(file_name=filename, relative_id = relative)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 except HttpError as e:
@@ -173,6 +158,9 @@ class RelativesDetailsDocumentsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DocumentsDetailsAPIView(APIView):
+    google_connection = google_connect()
+    DRIVE = google_connection.get_drive()
+    
     def get(self, request, pk):
         document = get_object_or_404(Documents, pk=pk)
         serializer = DocumentsSerializer(document)
@@ -181,25 +169,17 @@ class DocumentsDetailsAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
     
     def delete(self, request, pk):
-        SCOPES = 'https://www.googleapis.com/auth/drive'
-        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        store = file.Storage(file_path_store)
-        creds = store.get()
-        if not creds or creds.invalid:
-            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            creds = tools.run_flow(flow, store)
-        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+       
 
         document = get_object_or_404(Documents, pk=pk)
         if document and document.file_name:
             query = f"name='{document.file_name}'"
             try:
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     file_id = files[0]['id']
-                    DRIVE.files().delete(fileId=file_id).execute()
+                    self.DRIVE.files().delete(fileId=file_id).execute()
                     document.delete()
                     return Response({'message': 'Dokument usunięty'}, status=status.HTTP_200_OK)
                 else:
@@ -259,41 +239,43 @@ class DocumentsDetailsAPIView(APIView):
                     return Response({'error': 'Nie przekazano pliku'}, status=status.HTTP_400_BAD_REQUEST)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-class DocumentsDetailsFileAPIView(APIView):             
+class DocumentsDetailsFileAPIView(APIView):
+    google_connection = google_connect()
+    DRIVE = google_connection.get_drive()
+             
     def get(self, request, pk=None):
-        SCOPES = 'https://www.googleapis.com/auth/drive'
-        file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        store = file.Storage(file_path_store)
-        creds = store.get()
-        if not creds or creds.invalid:
-            file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            creds = tools.run_flow(flow, store)
-        DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+       
 
         document = get_object_or_404(Documents, pk=pk)
         if document:
             query = f"name='{document.file_name}'"
             try:
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if not files:
                     return HttpResponse("Plik nie został znaleziony.")
                 
                 file_id = files[0]['id']
-                request = DRIVE.files().get_media(fileId=file_id)
-                
+                request = self.DRIVE.files().get_media(fileId=file_id)
                 file_content = request.execute()
-                
+
                 file_extension = document.file_name.split('.')[-1].lower()
-                content_type = 'image/png'
                 
+                content_type = 'image/png'
+
                 if file_extension == 'pdf':
                     content_type = 'application/pdf'
                 elif file_extension == 'png':
                     content_type = 'image/png'
-                elif file_extension == 'jpg' or file_extension == 'jpeg':
+                elif file_extension in ['jpg', 'jpeg']:
                     content_type = 'image/jpeg'
+                elif file_extension == 'txt':
+                    content_type = 'text/plain'
+                elif file_extension == 'doc':
+                    content_type = 'application/msword'
+                elif file_extension == 'docx':
+                    content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+                
                 
                 return HttpResponse(file_content, content_type=content_type)
             
