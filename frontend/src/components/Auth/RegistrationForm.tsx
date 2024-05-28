@@ -19,7 +19,7 @@ function RegistrationForm() {
     const location = useLocation()
     const [error, setError] = useState(false);
     const {register, handleSubmit, formState: {errors, isValid}, getValues} = useForm<FormData>({
-        mode: 'onChange'
+        mode: 'onBlur'
     });
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
