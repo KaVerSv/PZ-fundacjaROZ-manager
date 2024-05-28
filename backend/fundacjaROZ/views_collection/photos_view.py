@@ -1,3 +1,4 @@
+import ssl
 import tempfile
 import time
 from django.shortcuts import get_object_or_404
@@ -16,45 +17,50 @@ from rest_framework import status
 from googleapiclient.errors import HttpError
 from googleapiclient.http import MediaFileUpload
 from .google_connection import google_connect
+from googleapiclient.errors import HttpError
+import time
+
+
+def execute_with_retry(request, max_retries=5, backoff_factor=2):
+    for attempt in range(max_retries):
+        try:
+            return request.execute()
+        except (HttpError, ssl.SSLError) as e:
+            if attempt < max_retries - 1:
+                time.sleep(backoff_factor ** attempt) 
+                print(backoff_factor ** attempt)
+            else:
+                raise e
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(backoff_factor ** attempt)  
+            else:
+                raise e
+
 
 class ChildrenPhotoAPIView(APIView):
     google_connection = google_connect()
     DRIVE = google_connection.get_drive()
-        
-
-
-
 
     def get(self, request, pk):
-        # SCOPES = 'https://www.googleapis.com/auth/drive'
-        # file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        # store = file.Storage(file_path_store)
-        # creds = store.get()
-        # if not creds or creds.invalid:
-        #     file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-        #     flow = client.flow_from_clientsecrets(file_path, SCOPES)
-        #     creds = tools.run_flow(flow, store)
-        # DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
-
         child = get_object_or_404(Children, pk=pk)
-        photo = child.photo_path
-
-        if not photo:
-            photo = 'default.png'
-
+        photo = child.photo_path or 'default.png'
         query = f"name='{photo}'"
+        
         try:
-            response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
+
+            response = execute_with_retry(self.DRIVE.files().list(q=query, fields='files(id)'))
+
             files = response.get('files', [])
             if not files:
                 return HttpResponse("Plik nie został znaleziony.")
-
+            
             file_id = files[0]['id']
-            request = self.DRIVE.files().get_media(fileId=file_id)
-            file_content = request.execute()
+            file_content = execute_with_retry(self.DRIVE.files().get_media(fileId=file_id))
             return HttpResponse(file_content, content_type='image/png')
         
         except HttpError as e:
+            print("Error")
             return HttpResponse(f"Wystąpił błąd podczas pobierania pliku {e}")
 
     def delete(self, request, pk):

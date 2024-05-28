@@ -8,7 +8,6 @@ class google_connect():
     
     def __init__(self):
         SCOPES = 'https://www.googleapis.com/auth/drive'
-        
         file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
         store = file.Storage(file_path_store)
         creds = store.get()
