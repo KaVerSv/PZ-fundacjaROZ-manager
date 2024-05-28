@@ -37,6 +37,9 @@ function ChildCardMaximized(props: ChildCardProps) {
     if (error) return <div>failed to load</div>
     if (isLoading) return <div>loading...</div>
 
+    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+    // @ts-expect-error
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const handleDeleteChild = async () => {
         try {
             const response = await fetch(BASE_API_URL + `/children/${parseInt(props.childId)}/`,{
@@ -89,18 +92,11 @@ function ChildCardMaximized(props: ChildCardProps) {
                     <div className='flex justify-center flex-col sm:flex-row gap-2 sm:gap-16 items-center'>
                         <Link to={`/children-edit/${child.id}`}>
                             <button
-                                className='mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded w-28'
+                                className='mt-3 bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 border border-blue-700 rounded w-52'
                                 type="submit">
                                 Edutuj
                             </button>
                         </Link>
-
-                        <button
-                            className='mt-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-blue-700 rounded w-28'
-                            type="button"
-                            onClick={handleDeleteChild}>
-                            Usuń
-                        </button>
                     </div>
                 </div>
             </WidthWrapper>
