@@ -18,6 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/media/')
 
+GOOGLE_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/views_collection/')
+
 DOCUMENTS_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/documents/')
 
 # Quick-start development settings - unsuitable for production
@@ -59,9 +61,9 @@ ROOT_URLCONF = 'backend.urls'
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'fundacjaROZ.authentication.JWTAuthentication',
     ]

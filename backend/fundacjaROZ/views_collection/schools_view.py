@@ -126,3 +126,10 @@ class ChildrenSchoolsDetailsAPIView(APIView):
                 return Response({'error': 'Szkoła nie jest przypisana do tego dziecka'}, status=status.HTTP_404_NOT_FOUND)
         else:
             return Response({'error': 'Szkoła nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
+        
+
+
+
+
+
+

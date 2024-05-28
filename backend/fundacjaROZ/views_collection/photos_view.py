@@ -17,7 +17,8 @@ class ChildrenPhotoAPIView(APIView):
         
         file_path = os.path.join(settings.MEDIA_ROOT, photo)
         return FileResponse(open(file_path, 'rb'), status=status.HTTP_200_OK)
-        
+
+
     def delete(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
         if child.photo_path:
@@ -57,7 +58,3 @@ class ChildrenPhotoAPIView(APIView):
                 return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
             return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)
-
-
-
-
