@@ -138,13 +138,17 @@ function DocumentForm(props: Props) {
                        onChange={handleChange}/> Dokument jest powiązany z rodzicem
             </label>
             {isChecked &&
-                <InputWrapper labelFor="relative_id" labelNote="Rodzic" alwaysShowLabel={true} error={errors.relative_id}>
+                <InputWrapper labelFor="relative_id" labelNote="Rodzic" alwaysShowLabel={true}
+                              error={errors.relative_id}>
                     <select
                         className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                        id="alive" {...register('relative_id', {
-                        required: isChecked,
-                    })}>
-                        <option selected={true} disabled={true}>Wybierz rodzica</option>
+                        id="alive"
+                        defaultValue={"-1"}
+                        {...register('relative_id', {
+                                required: isChecked,
+                            }
+                        )}>
+                        <option value={"-1"}>Wybierz rodzica</option>
                         {data
                             .map((relative) => <option key={relative.id}
                                                        value={relative.id}>{relative.first_name} {relative.surname}</option>)}
