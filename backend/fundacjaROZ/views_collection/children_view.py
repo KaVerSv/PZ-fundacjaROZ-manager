@@ -7,13 +7,6 @@ from rest_framework import status
 from django.conf import settings
 from ..serializers import ChildrenSerializer, ShortChildrenSerializer
 
-from googleapiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
-import os
-
-from googleapiclient.errors import HttpError
-
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
     serializer_class = ChildrenSerializer
@@ -24,25 +17,9 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
 
         if child.photo_path:
-            SCOPES = 'https://www.googleapis.com/auth/drive'
-            file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-            store = file.Storage(file_path_store)
-            creds = store.get()
-            if not creds or creds.invalid:
-                file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-                flow = client.flow_from_clientsecrets(file_path, SCOPES)
-                creds = tools.run_flow(flow, store)
-            DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
-
-            query = f"name='{child.photo_path}'"
-            try:
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
-                files = response.get('files', [])
-                if files:
-                    file_id = files[0]['id']
-                    DRIVE.files().delete(fileId=file_id).execute()
-            except HttpError as e:
-                return Response({'error': f'Wystąpił błąd podczas usuwania zdjecia: {e}'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR) 
+            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
 
         child.delete()
         return Response({'message': 'Child and associated photo deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
