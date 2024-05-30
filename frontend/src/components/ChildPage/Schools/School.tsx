@@ -62,7 +62,7 @@ function School(props: NoteProps) {
                               }}
                             mode={Mode.edit}
                             childId={props.child_id}
-                            relative={props.relative}
+                            school={props.school}
                     />
                 </>
 
