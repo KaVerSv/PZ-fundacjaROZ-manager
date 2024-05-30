@@ -77,8 +77,8 @@ function RelativesSection(props: NotesBlockProps) {
                     }`}>
                         {data
                             .sort((a, b) => {
-                                if (!a.alive) return 1;
-                                return a.first_name.localeCompare(b.first_name)
+                                if(a.alive === false) return 1;
+                                else return a.first_name.localeCompare(b.first_name)
                             })
                             .map((relative) => <Relative toggleReload={mutate} child_id={props.childId}
                                                          key={relative.id} relative={relative}/>)}
