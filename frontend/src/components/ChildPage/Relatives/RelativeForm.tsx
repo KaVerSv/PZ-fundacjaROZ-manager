@@ -118,7 +118,6 @@ function RelativeForm(props: Props) {
                 <select
                     className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                     id="alive" {...register('alive', {
-                    required: true,
                 })}>
                     <option selected={true} value={'true'}>Tak</option>
                     <option value={'false'}>Nie</option>
