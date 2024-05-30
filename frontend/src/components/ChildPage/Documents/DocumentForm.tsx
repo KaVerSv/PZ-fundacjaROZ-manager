@@ -24,7 +24,7 @@ function DocumentForm(props: Props) {
 
     const handleChange = () => {
         setIsChecked(!isChecked);
-        setValue('relative_id', undefined);
+        setValue('relative_id', -1);
     };
     const fetcher: (url: string) => Promise<RelativeModel[]> = async (url) => {
 
@@ -50,8 +50,7 @@ function DocumentForm(props: Props) {
         handleSubmit,
         formState: {errors, isValid},
         setFocus,
-        setValue,
-        getValues
+        setValue
     } = useForm<DocumentModel>({
         mode: "onChange",
         defaultValues: {
@@ -72,12 +71,12 @@ function DocumentForm(props: Props) {
     const onSubmit: SubmitHandler<DocumentModel> = async (documentFormData) => {
         try {
             const formData = new FormData();
-            formData.append('file', documentFormData.file);
+            if(props.mode === Mode.create) formData.append('file', documentFormData.file[0]);
             formData.append('date', documentFormData.date);
             formData.append('signature', documentFormData.signature);
             formData.append('specification', documentFormData.specification);
             formData.append('child_id', documentFormData.child_id.toString());
-            if (documentFormData.relative_id) formData.append('relative_id', documentFormData.relative_id.toString());
+            if (documentFormData.relative_id != -1) formData.append('relative_id', documentFormData.relative_id.toString());
 
             console.log(formData)
             const response = await fetch(`${BASE_API_URL}${props.mode === Mode.edit ? `documents/${props.document.id}/` : `documents/`}`, {
@@ -102,12 +101,6 @@ function DocumentForm(props: Props) {
         }
     }
 
-    const handleUploadedFile = (event) => {
-        const file = event.target.files[0];
-
-        setValue('file', file);
-    };
-
     return (
         <form onSubmit={handleSubmit(onSubmit)}
               className={`${props.mode === Mode.create ? 'bg-amber-500' : ''} w-auto bg-opacity-30 rounded-2xl py-1 flex flex-col pt-2`}>
@@ -124,14 +117,19 @@ function DocumentForm(props: Props) {
                            required: 'Pole wymagane'
                        }}/>
             <label className="block mx-auto">
+                {props.mode === Mode.create &&
+                    < input type="file" {...register('file', {
+                            required: true,
+                        }
+                    )} className="block w-full text-sm text-slate-500
+                    file:mr-4 file:py-2 file:px-4
+                    file:rounded-full file:border-0
+                    file:text-sm file:font-semibold
+                    file:bg-violet-50 file:text-blue-500
+                    hover:file:bg-violet-100
+                    "/>
+                }
 
-                <input type="file" onChange={handleUploadedFile} className="block w-full text-sm text-slate-500
-      file:mr-4 file:py-2 file:px-4
-      file:rounded-full file:border-0
-      file:text-sm file:font-semibold
-      file:bg-violet-50 file:text-blue-500
-      hover:file:bg-violet-100
-    "/>
             </label>
             <label className="ml-5">
                 <input type="checkbox" className="accent-main_red" checked={isChecked}
@@ -143,12 +141,16 @@ function DocumentForm(props: Props) {
                     <select
                         className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
                         id="alive"
-                        defaultValue={"-1"}
+                        defaultValue={-1}
                         {...register('relative_id', {
                                 required: isChecked,
+                                validate: (value) => {
+                                    if (value === -1) return "incorrect value";
+                                    return true;
+                                }
                             }
                         )}>
-                        <option value={"-1"}>Wybierz rodzica</option>
+                        <option value={-1} disabled={true}>Wybierz rodzica</option>
                         {data
                             .map((relative) => <option key={relative.id}
                                                        value={relative.id}>{relative.first_name} {relative.surname}</option>)}
@@ -174,10 +176,10 @@ function DocumentForm(props: Props) {
                     Odrzuć zmiany
                 </button>
                 <button
-                    disabled={!isValid || loading || !getValues('file')}
+                    disabled={!isValid || loading}
                     className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-3 mx-auto rounded focus:outline-none focus:shadow-outline disabled:bg-main_grey mr-2 mb-1"
                     type="submit">
-                    {props.mode === Mode.create ? 'Dodaj rodzica' : 'Zapisz zmiany'}
+                    {props.mode === Mode.create ? 'Dodaj dokument' : 'Zapisz zmiany'}
                 </button>
             </div>
 
