@@ -6,6 +6,8 @@ import InfoContainer from "../InfoContainer.tsx";
 import DocumentForm from "./DocumentForm.tsx";
 import {Mode} from "../Mode.ts";
 import {DocumentModel} from "../../../models/DocumentModel.ts";
+import {RelativeModel} from "../../../models/RelativeModel.ts";
+import useSWR from "swr";
 
 interface DocumentProps {
     document: DocumentModel;
@@ -31,6 +33,27 @@ function Document(props: DocumentProps) {
             console.error('Error deleting:', error);
         }
     }
+
+    const fetcher: (url: string) => Promise<RelativeModel> = async (url) => {
+
+        const response = await fetch(url, {
+            method: 'GET',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                'Content-Type': 'application/json',
+            },
+        });
+
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+        return response.json();
+    };
+    const {
+        data
+    } = useSWR<RelativeModel>(`${BASE_API_URL}relatives/${props.document.relative_id}`, fetcher, {refreshInterval: 0});
+
+
     return (
         <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': 'pt-8' } rounded-xl`}>
             <div className='flex justify-end relative' style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
@@ -67,10 +90,16 @@ function Document(props: DocumentProps) {
 
                 }
             </div>
-            {!editMode && <div className='grid grid-cols-1 sm:grid-cols-2 gap-y-6 gap-x-2 relative mt-6'>
-                <InfoContainer note={'Sygnatura'} text={props.document.signature}/>
-                <InfoContainer note={'Specyfikacja'} text={props.document.specification}/>
-                <InfoContainer note={'Data'} text={props.document.date}/>
+            {!editMode && <div className="flex flex-col items-center gap-2 pt-3">
+                <div className="grid w-full grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-2 gap-y-6">
+                    <InfoContainer note={'Sygnatura'} text={props.document.signature}/>
+                    <InfoContainer note={'Specyfikacja'} text={props.document.specification}/>
+                    <InfoContainer note={'Data'} text={props.document.date}/>
+                </div>
+                {data &&
+                <div className='w-full mt-4'>
+                    <InfoContainer note={'Rodzic powiązany'} text={`${data.first_name}${data.second_name ? ' ' + data.second_name + ' ' : ' '}${data.surname}`}/>
+                </div>}
                 <button
                     className="bg-blue-500 text-white font-semibold py-2 px-4 rounded"
                     onClick={()=>{
