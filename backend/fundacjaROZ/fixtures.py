@@ -1,11 +1,12 @@
 # fixtures.py
 
+from random import choice
 from django.utils import timezone
 from datetime import timedelta
 
-def add_example_data(**kwargs):
-    from .models import Relatives, Children, Notes, User
 
+def add_example_data(**kwargs):
+    from .models import Relatives, Children, Notes, User, Enrollment, Schools,FamilyRelationship
     relatives_data = [
         {
             'first_name': 'John',
@@ -13,7 +14,8 @@ def add_example_data(**kwargs):
             'surname': 'Smith',
             'phone_number': '123456789',
             'residential_address': '123 Main St, City',
-            'e_mail': 'john.doe@example.com'
+            'e_mail': 'john.doe@example.com',
+            'alive': True
         },
         {
             'first_name': 'Jan',
@@ -21,7 +23,8 @@ def add_example_data(**kwargs):
             'surname': 'Nowak',
             'phone_number': '987654321',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'jan.nowak@example.com'
+            'e_mail': 'jan.nowak@example.com',
+            'alive': False
         },
         {
             'first_name': 'Jan',
@@ -29,7 +32,8 @@ def add_example_data(**kwargs):
             'surname': 'Drugi',
             'phone_number': '987654333',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'jan.drugi@example.com'
+            'e_mail': 'jan.drugi@example.com',
+            'alive': True
         },
         {
             'first_name': 'Franek',
@@ -37,7 +41,8 @@ def add_example_data(**kwargs):
             'surname': 'Dolas',
             'phone_number': '999654321',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'franek.dolas@example.com'
+            'e_mail': 'franek.dolas@example.com',
+            'alive': False
         },
         {
             'first_name': 'Piotr',
@@ -45,7 +50,8 @@ def add_example_data(**kwargs):
             'surname': 'Więcek',
             'phone_number': '987333333',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'piotr.wiecek@example.com'
+            'e_mail': 'piotr.wiecek@example.com',
+            'alive': True
         },
         {
             'first_name': 'Marek',
@@ -53,7 +59,8 @@ def add_example_data(**kwargs):
             'surname': 'Aureliusz',
             'phone_number': '333654321',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'marek.aureliusz@example.com'
+            'e_mail': 'marek.aureliusz@example.com',
+            'alive': False
         },
         {
             'first_name': 'Walenty',
@@ -61,7 +68,8 @@ def add_example_data(**kwargs):
             'surname': 'Kwicoł',
             'phone_number': '987333321',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'walenty.kwicoł@example.com'
+            'e_mail': 'walenty.kwicoł@example.com',
+            'alive': False
         },
 
         {
@@ -70,7 +78,8 @@ def add_example_data(**kwargs):
             'surname': 'Pyzdra',
             'phone_number': '333333321',
             'residential_address': '456 Elm St, Town',
-            'e_mail': 'jadrus.pyzdra@example.com'
+            'e_mail': 'jadrus.pyzdra@example.com',
+            'alive': False
         },
     ]
 
@@ -80,7 +89,6 @@ def add_example_data(**kwargs):
             'first_name': 'Alice',
             'second_name': 'Jane',
             'surname': 'Doe',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*13),
             'birthplace': 'City Hospital',
             'residential_address': '456 Elm St, Town',
@@ -94,7 +102,6 @@ def add_example_data(**kwargs):
             'first_name': 'Emily',
             'second_name': 'Grace',
             'surname': 'Brown',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*14),
             'birthplace': 'Town Clinic',
             'residential_address': '123 Oak St, City',
@@ -108,7 +115,6 @@ def add_example_data(**kwargs):
             'first_name': 'Michael',
             'second_name': 'John',
             'surname': 'Smith',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*12),
             'birthplace': 'City Hospital',
             'residential_address': '789 Pine St, Town',
@@ -122,7 +128,6 @@ def add_example_data(**kwargs):
             'first_name': 'Olivia',
             'second_name': 'Sophia',
             'surname': 'Johnson',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*11),
             'birthplace': 'Town Clinic',
             'residential_address': '456 Oak St, City',
@@ -136,7 +141,6 @@ def add_example_data(**kwargs):
             'first_name': 'James',
             'second_name': '',
             'surname': 'Williams',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*10),
             'birthplace': 'City Hospital',
             'residential_address': '123 Elm St, Town',
@@ -150,7 +154,6 @@ def add_example_data(**kwargs):
             'first_name': 'Charlotte',
             'second_name': 'Emma',
             'surname': 'Jones',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*9),
             'birthplace': 'Town Clinic',
             'residential_address': '789 Pine St, City',
@@ -164,7 +167,6 @@ def add_example_data(**kwargs):
             'first_name': 'Liam',
             'second_name': 'Mason',
             'surname': 'Brown',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*8),
             'birthplace': 'City Hospital',
             'residential_address': '456 Oak St, Town',
@@ -178,7 +180,6 @@ def add_example_data(**kwargs):
             'first_name': 'Ava',
             'second_name': 'Isabella',
             'surname': 'Taylor',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*7),
             'birthplace': 'Town Clinic',
             'residential_address': '123 Elm St, City',
@@ -192,7 +193,6 @@ def add_example_data(**kwargs):
             'first_name': 'Noah',
             'second_name': 'Ethan',
             'surname': 'Martinez',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*6),
             'birthplace': 'City Hospital',
             'residential_address': '789 Pine St, Town',
@@ -206,7 +206,6 @@ def add_example_data(**kwargs):
             'first_name': 'Sophia',
             'second_name': 'Mia',
             'surname': 'Garcia',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*5),
             'birthplace': 'Town Clinic',
             'residential_address': '456 Oak St, City',
@@ -220,7 +219,6 @@ def add_example_data(**kwargs):
             'first_name': 'Alice',
             'second_name': 'Jane',
             'surname': 'Doe',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*13),
             'birthplace': 'City Hospital',
             'residential_address': '456 Elm St, Town',
@@ -233,7 +231,6 @@ def add_example_data(**kwargs):
             'first_name': 'Emily',
             'second_name': 'Grace',
             'surname': 'Brown',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*14),
             'birthplace': 'Town Clinic',
             'residential_address': '123 Oak St, City',
@@ -246,7 +243,6 @@ def add_example_data(**kwargs):
             'first_name': 'Michael',
             'second_name': 'John',
             'surname': 'Smith',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*12),
             'birthplace': 'City Hospital',
             'residential_address': '789 Pine St, Town',
@@ -259,7 +255,6 @@ def add_example_data(**kwargs):
             'first_name': 'Olivia',
             'second_name': 'Sophia',
             'surname': 'Johnson',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*11),
             'birthplace': 'Town Clinic',
             'residential_address': '456 Oak St, City',
@@ -272,7 +267,6 @@ def add_example_data(**kwargs):
             'first_name': 'James',
             'second_name': '',
             'surname': 'Williams',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*10),
             'birthplace': 'City Hospital',
             'residential_address': '123 Elm St, Town',
@@ -285,7 +279,6 @@ def add_example_data(**kwargs):
             'first_name': 'Charlotte',
             'second_name': 'Emma',
             'surname': 'Jones',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*9),
             'birthplace': 'Town Clinic',
             'residential_address': '789 Pine St, City',
@@ -298,7 +291,6 @@ def add_example_data(**kwargs):
             'first_name': 'Liam',
             'second_name': 'Mason',
             'surname': 'Brown',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*8),
             'birthplace': 'City Hospital',
             'residential_address': '456 Oak St, Town',
@@ -311,7 +303,6 @@ def add_example_data(**kwargs):
             'first_name': 'Ava',
             'second_name': 'Isabella',
             'surname': 'Taylor',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*7),
             'birthplace': 'Town Clinic',
             'residential_address': '123 Elm St, City',
@@ -324,7 +315,6 @@ def add_example_data(**kwargs):
             'first_name': 'Noah',
             'second_name': '',
             'surname': 'Martinez',
-            'gender': 'Male',
             'birth_date': timezone.now().date() - timedelta(days=365*6),
             'birthplace': 'City Hospital',
             'residential_address': '789 Pine St, Town',
@@ -337,7 +327,6 @@ def add_example_data(**kwargs):
             'first_name': 'Sophia',
             'second_name': 'Mia',
             'surname': 'Garcia',
-            'gender': 'Female',
             'birth_date': timezone.now().date() - timedelta(days=365*5),
             'birthplace': 'Town Clinic',
             'residential_address': '456 Oak St, City',
@@ -418,24 +407,139 @@ def add_example_data(**kwargs):
     Notes.objects.bulk_create(Notes(**data) for data in notes_data)
     User.objects.bulk_create(User(**data) for data in users_data)
 
-    children[0].relatives.add(relatives[0])
-    children[1].relatives.add(relatives[1], relatives[2])
-    children[2].relatives.add(relatives[3])
-    children[3].relatives.add(relatives[4], relatives[5])
-    children[4].relatives.add(relatives[6])
-    children[5].relatives.add(relatives[7])
-    children[6].relatives.add(relatives[0])
-    children[7].relatives.add(relatives[1])
-    children[8].relatives.add(relatives[2])
-    children[9].relatives.add(relatives[3])
-    children[10].relatives.add(relatives[4])
-    children[11].relatives.add(relatives[5])
-    children[12].relatives.add(relatives[6])
-    children[13].relatives.add(relatives[7])
-    children[14].relatives.add(relatives[0])
-    children[15].relatives.add(relatives[1])
-    children[16].relatives.add(relatives[2])
-    children[17].relatives.add(relatives[3])
-    children[18].relatives.add(relatives[4])
-    children[19].relatives.add(relatives[5])
+    for child in children:
+        mother = choice(relatives)
+        father = choice(relatives)
+        while mother == father: 
+            father = choice(relatives)
 
+        FamilyRelationship.objects.create(child=child, relative=mother, relation="Matka")
+        FamilyRelationship.objects.create(child=child, relative=father, relation="Ojciec")
+
+    schools_data = [
+        {
+            'name': 'School A',
+            'address': '123 Oak St, City',
+            'phone_number': '123456789',
+            'e_mail': 'john.doe@example.com',
+        },
+        {
+            'name': 'School B',
+            'address': '456 Elm St, Town',
+            'phone_number': '123456789',
+            'e_mail': 'john.doe@example.com',
+        },
+        {
+            'name': 'School C',
+            'address': '789 Pine St, Village',
+            'phone_number': '123456789',
+            'e_mail': 'john.doe@example.com',
+        }
+    ]
+
+    schools = Schools.objects.bulk_create(Schools(**data) for data in schools_data)
+
+    enrollment_data = [
+        {
+            'child': children[0],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[1],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[2],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[3],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[4],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[5],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[6],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[7],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[8],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[9],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[10],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[11],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[12],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[13],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[14],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[15],
+            'school': schools[1],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[16],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[17],
+            'school': schools[2],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[18],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+        {
+            'child': children[19],
+            'school': schools[0],
+            'start_date': timezone.now().date() - timedelta(days=365*2)
+        },
+    ]
+
+    Enrollment.objects.bulk_create(Enrollment(**data) for data in enrollment_data)

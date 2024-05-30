@@ -1,9 +1,7 @@
 import {SubmitHandler, useForm} from "react-hook-form";
 import WidthWrapper from "../wrappers/WidthWrapper.tsx";
-import InputWrapper from "./InputWrapper.tsx";
 import FormInput from "../common/FormInput.tsx";
 import {useEffect, useState} from "react";
-import {GenderEnum} from "../../models/GenderEnum.tsx";
 import {ChildModelMaximized} from "../../models/ChildModelMaximized.tsx";
 import {BASE_API_URL} from "../../api/contst.ts";
 import {useNavigate} from "react-router-dom";
@@ -12,7 +10,6 @@ import fetchImage from "../../api/fetchImage.ts";
 
 interface FormData extends ChildModelMaximized {
     image: File
-    gender: GenderEnum;
 }
 
 interface ChildCreationFormProps {
@@ -37,8 +34,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                     // @ts-expect-error
                     setValue(key, jsonData[key]);
                 });
-                console.log(jsonData.gender);
-                setValue('gender', jsonData.gender === 'female' ? GenderEnum.female : GenderEnum.male)
                 const url = await fetchImage(`${BASE_API_URL}/children/${parseInt(props.childId)}/photo`);
                 setPreview(url);
             } catch (error) {
@@ -100,10 +95,6 @@ function ChildCreationForm(props: ChildCreationFormProps) {
             setLoading(false);
         }
     };
-    const validateGender = (value: GenderEnum) => {
-        return value === GenderEnum.notDefined ? 'Pole wymagane' : true;
-    };
-
 
     const handleUploadedFile = (event) => {
         const file = event.target.files[0];
@@ -148,27 +139,27 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                                                rules={{}} error={errors.second_name}/>
                                     <FormInput name={"surname"} type={"text"} label={"Nazwisko"} register={register}
                                                rules={{required: 'Pole wymagane'}} error={errors.surname}/>
-                                    <InputWrapper labelFor="gender" labelNote="Płeć" error={errors.gender}>
-                                        <select
-                                            className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
-                                            id="gender" {...register('gender', {
-                                            required: true,
-                                            validate: validateGender
-                                        })}
-                                            defaultValue={GenderEnum.notDefined}>
-                                            <option disabled hidden value={GenderEnum.notDefined}>Płeć</option>
-                                            <option value={GenderEnum.male}>Mężczyzna</option>
-                                            <option value={GenderEnum.female}>Kobieta</option>
-                                        </select>
-                                        <div
-                                            className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">
-                                            <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"
-                                                 viewBox="0 0 20 20">
-                                                <path
-                                                    d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>
-                                            </svg>
-                                        </div>
-                                    </InputWrapper>
+                                    {/*<InputWrapper labelFor="gender" labelNote="Płeć" error={errors.gender}>*/}
+                                    {/*    <select*/}
+                                    {/*        className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"*/}
+                                    {/*        id="gender" {...register('gender', {*/}
+                                    {/*        required: true,*/}
+                                    {/*        validate: validateGender*/}
+                                    {/*    })}*/}
+                                    {/*        defaultValue={GenderEnum.notDefined}>*/}
+                                    {/*        <option disabled hidden value={GenderEnum.notDefined}>Płeć</option>*/}
+                                    {/*        <option value={GenderEnum.male}>Mężczyzna</option>*/}
+                                    {/*        <option value={GenderEnum.female}>Kobieta</option>*/}
+                                    {/*    </select>*/}
+                                    {/*    <div*/}
+                                    {/*        className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-gray-700">*/}
+                                    {/*        <svg className="fill-current h-4 w-4" xmlns="http://www.w3.org/2000/svg"*/}
+                                    {/*             viewBox="0 0 20 20">*/}
+                                    {/*            <path*/}
+                                    {/*                d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z"/>*/}
+                                    {/*        </svg>*/}
+                                    {/*    </div>*/}
+                                    {/*</InputWrapper>*/}
                                 </div>
                                 <div className='flex flex-col sm:grid sm:grid-cols-2 xl:flex xl:flex-row'>
                                     <FormInput name={"birth_date"} type={"date"} label={"Data urodzenia"}
@@ -198,7 +189,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                                 </div>
                             </div>
                         </div>
-                        <div>
+                        <div className="flex flex-col gap-2 sm:flex-row sm:gap-4">
                             {error && <div className='flex justify-center'>
                                 <span className='text-sm text-red-800'>Coś poszło nie tak.<br/>Sprobuj ponownie</span>
                             </div>}
@@ -208,6 +199,13 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                                 disabled={loading}>
                                 {props.editMode ? 'Zapisz zmiany' : 'Dodaj dziecko'}
                             </button>
+                            {props.editMode && <button
+                                onClick={() => navigate(`/children/${props.childId}`)}
+                                className='mt-3 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 border border-red-700 rounded disabled:opacity-30'
+                                type="button"
+                                disabled={loading}>
+                                Odrzuć zmiany
+                            </button>}
                         </div>
                     </div>
 

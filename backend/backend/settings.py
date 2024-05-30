@@ -18,6 +18,8 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 MEDIA_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/media/')
 
+GOOGLE_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/views_collection/')
+
 DOCUMENTS_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/documents/')
 
 # Quick-start development settings - unsuitable for production
@@ -37,8 +39,7 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
-## custom user model
-AUTH_USER_MODEL = 'fundacjaROZ.User'
+
 
 # Application definition
 
@@ -60,9 +61,9 @@ ROOT_URLCONF = 'backend.urls'
 REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',
-    ],
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'fundacjaROZ.authentication.JWTAuthentication',
     ]
@@ -125,6 +126,8 @@ DATABASES = {
     }
 }
 
+## custom user model
+AUTH_USER_MODEL = 'fundacjaROZ.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -166,3 +169,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+

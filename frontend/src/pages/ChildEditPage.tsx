@@ -14,7 +14,7 @@ function ChildEditPage() {
     }, []);
     return (
         <HeightWrapper>
-            <Top headerHeight={350}>
+            <Top headerHeight={100}>
                 <Header/>
             </Top>
             <ChildCreationForm editMode={true} childId={id}/>
