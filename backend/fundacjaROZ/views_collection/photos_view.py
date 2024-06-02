@@ -1,21 +1,12 @@
-import tempfile
 import time
 from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from ..models import Children
-from django.conf import settings
-
-from googleapiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
 import os
-
-from django.http import HttpResponse
+from django.http import FileResponse
+from ..models import Children
 from rest_framework import status
-from googleapiclient.errors import HttpError
-from googleapiclient.http import MediaFileUpload
-from .google_connection import google_connect
+from django.conf import settings
 
 class ChildrenPhotoAPIView(APIView):
 
@@ -39,8 +30,7 @@ class ChildrenPhotoAPIView(APIView):
 
         child = get_object_or_404(Children, pk=pk)
         photo = child.photo_path
-
-        if not photo:
+        if photo == "":
             photo = 'default.png'
 
         query = f"name='{photo}'"
@@ -94,6 +84,11 @@ class ChildrenPhotoAPIView(APIView):
     def put(self, request, pk):
 
         child = get_object_or_404(Children, pk=pk)
+        if child.photo_path:
+            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
+            if os.path.exists(file_path):
+                os.remove(file_path)
+
         if 'photo' in request.FILES:
             google_connection = google_connect()
             DRIVE = google_connection.get_drive()
@@ -142,8 +137,8 @@ class ChildrenPhotoAPIView(APIView):
                 DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                 child.photo_path = filename
                 child.save()
-            except:
-                return Response({'error': 'Wystąpił błąd podczas zapisywania pliku na dysku Google'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
-            return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
+                return Response({'message': 'Zdjęcie zostało zaktualizowane'}, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Nieobsługiwany typ pliku'}, status=status.HTTP_415_UNSUPPORTED_MEDIA_TYPE)
         else:
             return Response({'error': 'Nie przesłano zdjęcia'}, status=status.HTTP_400_BAD_REQUEST)

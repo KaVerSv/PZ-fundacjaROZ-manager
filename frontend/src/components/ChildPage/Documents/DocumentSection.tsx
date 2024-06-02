@@ -1,23 +1,23 @@
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faUserPlus} from "@fortawesome/free-solid-svg-icons";
+import {faFolderPlus} from "@fortawesome/free-solid-svg-icons";
 import useSWR from "swr";
 import {BASE_API_URL} from "../../../api/contst.ts";
 import {useState} from "react";
-import RelativeForm from "./RelativeForm.tsx";
-import Relative from "./Relative.tsx";
+import DocumentForm from "./DocumentForm.tsx";
+import Document from "./Document.tsx";
 import {Mode} from "../Mode.ts";
-import {RelativeModel} from "../../../models/RelativeModel.ts";
+import {DocumentModel} from "../../../models/DocumentModel.ts";
 
 interface NotesBlockProps {
     childId: string
 }
 
 
-function RelativesSection(props: NotesBlockProps) {
+function DocumentSection(props: NotesBlockProps) {
 
-    const [showRelativesFrom, setShowRelativesFrom] = useState(false);
+    const [showDocumentFrom, setShowDocumentFrom] = useState(false);
     const [isWrapped, setIsWrapped] = useState(true);
-    const fetcher: (url: string) => Promise<RelativeModel[]> = async (url) => {
+    const fetcher: (url: string) => Promise<DocumentModel[]> = async (url) => {
 
         const response = await fetch(url, {
             method: 'GET',
@@ -37,31 +37,31 @@ function RelativesSection(props: NotesBlockProps) {
         error,
         isLoading,
         mutate
-    } = useSWR<RelativeModel[]>(`${BASE_API_URL}children/${props.childId}/relatives/`, fetcher, {refreshInterval: 0});
+    } = useSWR<DocumentModel[]>(`${BASE_API_URL}children/${props.childId}/documents/`, fetcher, {refreshInterval: 0});
 
     if (error) return <div>failed to load</div>
     if (isLoading) return <div>loading...</div>
 
     return (
         <div
-            className='flex flex-col gap-1.5 w-[90%] sm:w-96 border-main_red border-4 rounded-2xl m-2 p-3 sm:mb-auto'>
+            className='flex flex-col gap-1.5 border-main_red border-4 rounded-2xl m-2 p-3 sm:mb-auto'>
             <div className='flex flex-row justify-between'>
-                <span className='font-bold text-lg'>Rodzice</span>
+                <span className='font-bold text-lg'>Dokumenty</span>
                 <div className='text-main_red hover:text-red-600 cursor-pointer' onClick={() => {
-                    setShowRelativesFrom(!showRelativesFrom)
+                    setShowDocumentFrom(!showDocumentFrom)
                 }}>
-                    <FontAwesomeIcon icon={faUserPlus}/>
+                    <FontAwesomeIcon icon={faFolderPlus}/>
                 </div>
             </div>
             <div className='w-full flex justify-center'>
                 <div className='w-[80%] border-[1px] border-red-700 rounded-[100%]'></div>
             </div>
-            {showRelativesFrom && <div>
-                <RelativeForm toggleReload={() => {
+            {showDocumentFrom && <div>
+                <DocumentForm toggleReload={() => {
                     mutate()
                 }}
                               toggleShowForm={() => {
-                                  setShowRelativesFrom(false);
+                                  setShowDocumentFrom(false);
                               }} mode={Mode.create} childId={props.childId}/>
             </div>}
 
@@ -70,24 +70,20 @@ function RelativesSection(props: NotesBlockProps) {
                     <button
                         className="bg-blue-500 text-white font-semibold py-2 px-4 rounded"
                         onClick={() => setIsWrapped(!isWrapped)}
-                    > {isWrapped ? 'Rozwiń rodziców' : 'Zwiń rodziców'}
+                    > {isWrapped ? 'Rozwiń dokumenty' : 'Zwiń dokumenty'}
                     </button>
                     <div className={`flex flex-col gap-5 overflow-hidden ${
                         isWrapped ? 'max-h-0 absolute' : 'max-h-full'
                     }`}>
                         {data
-                            .sort((a, b) => {
-                                if(a.alive === false) return 1;
-                                else return a.first_name.localeCompare(b.first_name)
-                            })
-                            .map((relative) => <Relative toggleReload={mutate} child_id={props.childId}
-                                                         key={relative.id} relative={relative}/>)}
+                            .map((document) => <Document toggleReload={mutate} child_id={props.childId}
+                                                         key={document.id} document={document}/>)}
                     </div>
                 </div>
                 :
-                <span className='mx-auto'>Póki co nie ma rodziców</span>}
+                <span className='mx-auto'>Póki co nie ma dokumentów</span>}
         </div>
     );
 }
 
-export default RelativesSection;
+export default DocumentSection;

@@ -1,5 +1,3 @@
-import {GenderEnum} from "./GenderEnum.tsx";
-
 export interface ChildModelMaximized {
     id: string
     pesel: string,
@@ -14,7 +12,6 @@ export interface ChildModelMaximized {
     leaving_date: string,
     photo_path: string,
     relatives: number[]
-    gender: GenderEnum | string;
 }
 //
 // export var currentChildrenFull: ChildModelMaximized[] = [
