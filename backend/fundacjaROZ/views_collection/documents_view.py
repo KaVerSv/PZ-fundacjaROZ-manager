@@ -20,8 +20,7 @@ import tempfile
 from .google_connection import google_connect
 
 class DocumentsAPIView(APIView):
-    google_connection = google_connect()
-    DRIVE = google_connection.get_drive()
+
     
     def get(self, request):
         documents = Documents.objects.all()
@@ -32,7 +31,8 @@ class DocumentsAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request):
-
+        google_connection = google_connect()
+        DRIVE = google_connection.get_drive()
         
         serializer = DocumentsSerializer(data=request.data)
         if serializer.is_valid():
@@ -40,7 +40,7 @@ class DocumentsAPIView(APIView):
             if file_:
                 filename = file_.name
                 query = f"name='{filename}'"
-                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     base_name, extension = os.path.splitext(filename)
@@ -55,7 +55,7 @@ class DocumentsAPIView(APIView):
                     temp_file.write(file_.read())
                     media = MediaFileUpload(temp_file.name, mimetype='application/octet-stream', resumable=True)
                 try:
-                    response = self.DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    response = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                     serializer.save(file_name=filename)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 except HttpError as e:
@@ -65,8 +65,7 @@ class DocumentsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class ChildrenDetailsDocumentsAPIView(APIView): 
-    google_connection = google_connect()
-    DRIVE = google_connection.get_drive()
+
      
     def get(self, request, pk):
         child = get_object_or_404(Children, pk=pk)
@@ -79,7 +78,8 @@ class ChildrenDetailsDocumentsAPIView(APIView):
     
     def post(self, request, pk):
 
-        
+        google_connection = google_connect()
+        DRIVE = google_connection.get_drive()
         child = get_object_or_404(Children, pk=pk)
         serializer = DocumentsSerializer(data=request.data)
         if serializer.is_valid():
@@ -87,7 +87,7 @@ class ChildrenDetailsDocumentsAPIView(APIView):
             if file_:
                 filename = file_.name
                 query = f"name='{filename}'"
-                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     base_name, extension = os.path.splitext(filename)
@@ -102,7 +102,7 @@ class ChildrenDetailsDocumentsAPIView(APIView):
                     temp_file.write(file_.read())
                     media = MediaFileUpload(temp_file.name, mimetype='application/octet-stream', resumable=True)
                 try:
-                    response = self.DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    response = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                     serializer.save(file_name=filename, child_id = child)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 except HttpError as e:
@@ -112,8 +112,8 @@ class ChildrenDetailsDocumentsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
     
 class RelativesDetailsDocumentsAPIView(APIView):  
-    google_connection = google_connect()
-    DRIVE = google_connection.get_drive()
+
+
     def get(self, request, pk):
         relative = get_object_or_404(Relatives, pk=pk)
         documents = Documents.objects.filter(relative_id = relative)
@@ -124,7 +124,8 @@ class RelativesDetailsDocumentsAPIView(APIView):
         return Response(serializer.data, status=status.HTTP_200_OK)
 
     def post(self, request, pk):
-       
+        google_connection = google_connect()
+        DRIVE = google_connection.get_drive()
         
         relative = get_object_or_404(Relatives, pk=pk)
         serializer = DocumentsSerializer(data=request.data)
@@ -133,7 +134,7 @@ class RelativesDetailsDocumentsAPIView(APIView):
             if file_:
                 filename = file_.name
                 query = f"name='{filename}'"
-                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     base_name, extension = os.path.splitext(filename)
@@ -148,7 +149,7 @@ class RelativesDetailsDocumentsAPIView(APIView):
                     temp_file.write(file_.read())
                     media = MediaFileUpload(temp_file.name, mimetype='application/octet-stream', resumable=True)
                 try:
-                    response = self.DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
+                    response = DRIVE.files().create(body=file_metadata, media_body=media, fields='id').execute()
                     serializer.save(file_name=filename, relative_id = relative)
                     return Response(serializer.data, status=status.HTTP_201_CREATED)
                 except HttpError as e:
@@ -158,8 +159,7 @@ class RelativesDetailsDocumentsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DocumentsDetailsAPIView(APIView):
-    google_connection = google_connect()
-    DRIVE = google_connection.get_drive()
+
     
     def get(self, request, pk):
         document = get_object_or_404(Documents, pk=pk)
@@ -169,17 +169,18 @@ class DocumentsDetailsAPIView(APIView):
         return Response(data, status=status.HTTP_200_OK)
     
     def delete(self, request, pk):
-       
+        google_connection = google_connect()
+        DRIVE = google_connection.get_drive()
 
         document = get_object_or_404(Documents, pk=pk)
         if document and document.file_name:
             query = f"name='{document.file_name}'"
             try:
-                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if files:
                     file_id = files[0]['id']
-                    self.DRIVE.files().delete(fileId=file_id).execute()
+                    DRIVE.files().delete(fileId=file_id).execute()
                     document.delete()
                     return Response({'message': 'Dokument usunięty'}, status=status.HTTP_200_OK)
                 else:
@@ -240,23 +241,23 @@ class DocumentsDetailsAPIView(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class DocumentsDetailsFileAPIView(APIView):
-    google_connection = google_connect()
-    DRIVE = google_connection.get_drive()
+
              
     def get(self, request, pk=None):
-       
+        google_connection = google_connect()
+        DRIVE = google_connection.get_drive()
 
         document = get_object_or_404(Documents, pk=pk)
         if document:
             query = f"name='{document.file_name}'"
             try:
-                response = self.DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = DRIVE.files().list(q=query, fields='files(id)').execute()
                 files = response.get('files', [])
                 if not files:
                     return HttpResponse("Plik nie został znaleziony.")
                 
                 file_id = files[0]['id']
-                request = self.DRIVE.files().get_media(fileId=file_id)
+                request = DRIVE.files().get_media(fileId=file_id)
                 file_content = request.execute()
 
                 file_extension = document.file_name.split('.')[-1].lower()
