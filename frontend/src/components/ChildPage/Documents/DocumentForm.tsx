@@ -25,6 +25,9 @@ function DocumentForm(props: Props) {
     const handleChange = () => {
         setIsChecked(!isChecked);
         setValue('relative_id', -1);
+        // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+        // @ts-expect-error
+        trigger('');
     };
     const fetcher: (url: string) => Promise<RelativeModel[]> = async (url) => {
 
@@ -50,7 +53,8 @@ function DocumentForm(props: Props) {
         handleSubmit,
         formState: {errors, isValid},
         setFocus,
-        setValue
+        setValue,
+        trigger
     } = useForm<DocumentModel>({
         mode: "onChange",
         defaultValues: {
@@ -76,7 +80,7 @@ function DocumentForm(props: Props) {
             formData.append('signature', documentFormData.signature);
             formData.append('specification', documentFormData.specification);
             formData.append('child_id', documentFormData.child_id.toString());
-            if (documentFormData.relative_id != -1) formData.append('relative_id', documentFormData.relative_id.toString());
+            if (documentFormData.relative_id != -1 && documentFormData.relative_id != undefined) formData.append('relative_id', documentFormData.relative_id.toString());
 
             console.log(formData)
             const response = await fetch(`${BASE_API_URL}${props.mode === Mode.edit ? `documents/${props.document.id}/` : `documents/`}`, {
@@ -145,7 +149,8 @@ function DocumentForm(props: Props) {
                         {...register('relative_id', {
                                 required: isChecked,
                                 validate: (value) => {
-                                    if (value === -1) return "incorrect value";
+                                    console.log("validation")
+                                    if (isChecked && value === -1) return "Wybierz rodzica";
                                     return true;
                                 }
                             }
