@@ -6,7 +6,7 @@ import SchoolForm from "./SchoolForm.tsx";
 import School from "./School.tsx";
 import {Mode} from "../Mode.ts";
 import {SchoolModel} from "../../../models/ShoolModel.ts";
-import {faCirclePlus, faSchool} from "@fortawesome/free-solid-svg-icons";
+import {faSchool} from "@fortawesome/free-solid-svg-icons";
 
 interface NotesBlockProps {
     childId: string
