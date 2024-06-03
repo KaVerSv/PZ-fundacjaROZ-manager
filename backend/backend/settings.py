@@ -12,6 +12,23 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 
 from pathlib import Path
 import os
+from oauth2client import file, client, tools
+from googleapiclient import discovery
+from httplib2 import Http
+
+# def init_google_drive():
+#     SCOPES = 'https://www.googleapis.com/auth/drive'
+#     file_path_store = os.path.join("backend/", 'storage.json')
+#     store = file.Storage(file_path_store)
+#     creds = store.get()
+#     if not creds or creds.invalid:
+#         file_path = os.path.join("backend/", 'credentials.json')
+#         flow = client.flow_from_clientsecrets(file_path, SCOPES)
+#         creds = tools.run_flow(flow, store)
+#     drive_service = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+#     return drive_service
+
+# GOOGLE_DRIVE_SERVICE = init_google_drive()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -54,6 +71,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'fundacjaROZ',
     'drf_spectacular',
+    # 'fundacjaROZ.apps.FundacjarozConfig',
 ]
 
 ROOT_URLCONF = 'backend.urls'
@@ -83,6 +101,7 @@ CORS_ALLOW_HEADERS = (
 )
 
 MIDDLEWARE = [
+    # 'backend.google_middleware.GoogleDriveMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',

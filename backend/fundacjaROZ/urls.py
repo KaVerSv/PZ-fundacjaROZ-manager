@@ -6,7 +6,7 @@ from .views_collection.photos_view import ChildrenPhotoAPIView
 from .views_collection.relatives_view import RelativeChildrensAPIView,RelativeChildrensDetailsAPIView,ChildrenRelativesAPIView,ChildrenRelativesDetailsAPIView
 from .views_collection.documents_view import ChildrenDetailsDocumentsAPIView,DocumentsAPIView,DocumentsDetailsAPIView, DocumentsDetailsFileAPIView, RelativesDetailsDocumentsAPIView
 from .views_collection.schools_view import ChildrenSchoolsAPIView,ChildrenSchoolsDetailsAPIView
-from .views import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI
+from .views import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI, authenticate_google, auth_callback
 
 
 urlpatterns = [
@@ -40,4 +40,7 @@ urlpatterns = [
     path('documents/',  DocumentsAPIView.as_view()),
     path('documents/<int:pk>/',  DocumentsDetailsAPIView.as_view()),
     path('documents/<int:pk>/file/',  DocumentsDetailsFileAPIView().as_view()),
+    
+    path('auth/google/', authenticate_google, name='authenticate_google'),
+    path('auth/google/callback/', auth_callback, name='auth_callback'),
 ]
