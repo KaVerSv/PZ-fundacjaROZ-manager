@@ -26,6 +26,7 @@ class DocumentsAPIView(APIView):
         documents = Documents.objects.all()
         serializer = DocumentsSerializer(documents, many=True)
         data = serializer.data
+        print("a chuj")
         for document_data in data:
             document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -71,6 +72,7 @@ class ChildrenDetailsDocumentsAPIView(APIView):
         child = get_object_or_404(Children, pk=pk)
         documents = Documents.objects.filter(child_id=child)
         serializer = DocumentsSerializer(documents, many=True)
+        print("tak tytaj")
         data = serializer.data
         for document_data in data:
             document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
@@ -165,6 +167,7 @@ class DocumentsDetailsAPIView(APIView):
         document = get_object_or_404(Documents, pk=pk)
         serializer = DocumentsSerializer(document)
         data = serializer.data
+        print('alleluja')
         data['file_name'] = f"http://localhost:8000/documents/{pk}/file/"
         return Response(data, status=status.HTTP_200_OK)
     
@@ -242,7 +245,7 @@ class DocumentsDetailsAPIView(APIView):
 
 class DocumentsDetailsFileAPIView(APIView):
 
-             
+                
     def get(self, request, pk=None):
         google_connection = google_connect()
         DRIVE = google_connection.get_drive()
@@ -251,18 +254,19 @@ class DocumentsDetailsFileAPIView(APIView):
         if document:
             query = f"name='{document.file_name}'"
             try:
-                response = DRIVE.files().list(q=query, fields='files(id)').execute()
+                response = DRIVE.files().list(q=query, fields='files(id, name)').execute()
                 files = response.get('files', [])
                 if not files:
                     return HttpResponse("Plik nie został znaleziony.")
                 
                 file_id = files[0]['id']
-                request = DRIVE.files().get_media(fileId=file_id)
-                file_content = request.execute()
+                file_name = files[0]['name']
+                file_request = DRIVE.files().get_media(fileId=file_id)
+                file_content = file_request.execute()
 
                 file_extension = document.file_name.split('.')[-1].lower()
                 
-                content_type = 'image/png'
+                content_type = 'application/octet-stream'  # Domyślny typ zawartości
 
                 if file_extension == 'pdf':
                     content_type = 'application/pdf'
@@ -276,11 +280,14 @@ class DocumentsDetailsFileAPIView(APIView):
                     content_type = 'application/msword'
                 elif file_extension == 'docx':
                     content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-                
-                
-                return HttpResponse(file_content, content_type=content_type)
+
+                print("Content-Type:", content_type)
+
+                response = HttpResponse(file_content, content_type=content_type)
+                response['Content-Disposition'] = f'attachment; filename="{file_name}"'
+                return response
             
             except HttpError as e:
-                return HttpResponse(f"Wystąpił błąd podczas pobierania pliku {e}")
+                return HttpResponse(f"Wystąpił błąd podczas pobierania pliku: {e}")
         else:
             return Response({'error': 'Document nie istnieje'}, status=status.HTTP_404_NOT_FOUND)
