@@ -37,7 +37,8 @@ function RelativeForm(props: Props) {
             residential_address: props.relative?.residential_address,
             e_mail: props.relative?.e_mail,
             legal_status: props.relative?.legal_status,
-            alive: props.relative?.alive
+            alive: props.relative?.alive,
+            relation: props.relative?.relation
         }
     },);
 
@@ -114,12 +115,19 @@ function RelativeForm(props: Props) {
                        rules={{
                            required: 'Pole wymagane'
                        }}/>
+            <FormInput name={"relation"} type={"text"} label={"Typ powiązania"}
+                       register={register}
+                       error={errors.relation}
+                       rules={{
+                           required: 'Pole wymagane'
+                       }}/>
             <InputWrapper labelFor="alive" labelNote="Żyje" alwaysShowLabel={true} error={errors.alive}>
                 <select
                     className="appearance-none block min-w-40 w-full bg-gray-200 text-gray-700 border border-gray-200 rounded py-3 px-4 leading-tight focus:outline-none focus:bg-white focus:border-gray-500"
+                    defaultValue={'true'}
                     id="alive" {...register('alive', {
                 })}>
-                    <option selected={true} value={'true'}>Tak</option>
+                    <option  value={'true'}>Tak</option>
                     <option value={'false'}>Nie</option>
                 </select>
                 <div

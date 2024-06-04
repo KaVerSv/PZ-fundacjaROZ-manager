@@ -73,6 +73,7 @@ function Relative(props: NoteProps) {
                 <InfoContainer note={'Adres zamieszkania'} text={props.relative.residential_address}/>
                 <InfoContainer note={'Telefon'} text={props.relative.phone_number}/>
                 <InfoContainer note={'Status prawny'} text={props.relative.legal_status}/>
+                <InfoContainer note={'Typ powiązania'} text={props.relative.relation}/>
                 <InfoContainer note={'Żyje'} text={props.relative.alive? 'Tak' : 'Nie'}/>
             </div>}
         </div>

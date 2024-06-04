@@ -8,4 +8,5 @@ export interface RelativeModel {
     e_mail: string;
     legal_status: string,
     alive: boolean | string;
+    relation: string;
 }
