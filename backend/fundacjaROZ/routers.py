@@ -4,7 +4,7 @@ from .views_collection.children_view import ChildrenAPIView
 from .views_collection.relatives_view import RelativesAPIView
 from .views_collection.schools_view import SchoolsAPIView
 
-from .views import UsersViewAPI
+from .views_collection.user_view import UsersViewAPI
 
 router = DefaultRouter()
 
