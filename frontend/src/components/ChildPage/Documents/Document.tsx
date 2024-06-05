@@ -33,21 +33,21 @@ function Document(props: DocumentProps) {
             console.error('Error deleting:', error);
         }
     }
-
     const fetcher: (url: string) => Promise<RelativeModel> = async (url) => {
+        if (props.document.relative_id) {
+            const response = await fetch(url, {
+                method: 'GET',
+                headers: {
+                    'Authorization': `Bearer ${localStorage.getItem("token")}`,
+                    'Content-Type': 'application/json',
+                },
+            });
 
-        const response = await fetch(url, {
-            method: 'GET',
-            headers: {
-                'Authorization': `Bearer ${localStorage.getItem("token")}`,
-                'Content-Type': 'application/json',
-            },
-        });
-
-        if (!response.ok) {
-            throw new Error(`API request failed with status ${response.status}`);
-        }
-        return response.json();
+            if (!response.ok) {
+                throw new Error(`API request failed with status ${response.status}`);
+            }
+            return response.json();
+        } else return null;
     };
     const {
         data
@@ -55,8 +55,9 @@ function Document(props: DocumentProps) {
 
 
     return (
-        <div className={`bg-orange-500 bg-opacity-60 ${!editMode?'p-3': 'pt-8' } rounded-xl`}>
-            <div className='flex justify-end relative' style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
+        <div className={`bg-orange-500 bg-opacity-60 ${!editMode ? 'p-3' : 'pt-8'} rounded-xl`}>
+            <div className='flex justify-end relative'
+                 style={editMode ? {flexDirection: "column"} : {flexDirection: "row"}}>
                 {!editMode ?
                     <div className='flex gap-2 justify-end'>
                         <div className='text-main_red hover:text-red-500 cursor-pointer'
@@ -78,13 +79,13 @@ function Document(props: DocumentProps) {
                     </div>
                 }
                 {editMode && <>
-                <DocumentForm toggleReload={props.toggleReload}
-                              toggleShowForm={() => {
-                                  setEditMode(false)
-                              }}
-                              mode={Mode.edit}
-                              childId={props.child_id}
-                              document={props.document}
+                    <DocumentForm toggleReload={props.toggleReload}
+                                  toggleShowForm={() => {
+                                      setEditMode(false)
+                                  }}
+                                  mode={Mode.edit}
+                                  childId={props.child_id}
+                                  document={props.document}
                     />
                 </>
 
@@ -97,12 +98,13 @@ function Document(props: DocumentProps) {
                     <InfoContainer note={'Data'} text={props.document.date}/>
                 </div>
                 {data &&
-                <div className='w-full mt-4'>
-                    <InfoContainer note={'Rodzic powiązany'} text={`${data.first_name}${data.second_name ? ' ' + data.second_name + ' ' : ' '}${data.surname}`}/>
-                </div>}
+                    <div className='w-full mt-4'>
+                        <InfoContainer note={'Rodzic powiązany'}
+                                       text={`${data.first_name}${data.second_name ? ' ' + data.second_name + ' ' : ' '}${data.surname}`}/>
+                    </div>}
                 <button
                     className="bg-blue-500 text-white font-semibold py-2 px-4 rounded"
-                    onClick={()=>{
+                    onClick={() => {
                         const fileUrl = props.document.file_name; // Replace this with your file URL
                         const headers = {
                             'Authorization': `Bearer ${localStorage.getItem("token")}`
