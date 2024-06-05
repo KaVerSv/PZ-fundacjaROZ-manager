@@ -1,13 +1,10 @@
 from rest_framework.response import Response
 from rest_framework.generics import ListAPIView
-import os
 from ..models import Children, FamilyRelationship
 from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
-from django.conf import settings
 from ..serializers import ChildrenSerializer, ShortChildrenSerializer
 from .google_connection import google_connect
-from googleapiclient.errors import HttpError
 
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
