@@ -100,49 +100,69 @@ class Documents(models.Model):
     child_id = models.ForeignKey(Children, on_delete=models.SET_NULL, null=True)
     relative_id = models.ForeignKey(Relatives, on_delete=models.SET_NULL, null=True)
 
-class CustomUserManager(BaseUserManager):
-	def create_user(self, email, password=None):
-		if not email:
-			raise ValueError('A user email is needed.')
+# class CustomUserManager(BaseUserManager):
+# 	def create_user(self, email, password=None):
+# 		if not email:
+# 			raise ValueError('A user email is needed.')
 
-		if not password:
-			raise ValueError('A user password is needed.')
+# 		if not password:
+# 			raise ValueError('A user password is needed.')
 
-		email = self.normalize_email(email)
-		user = self.model(email=email)
-		user.set_password(password)
-		user.save()
-		return user
+# 		email = self.normalize_email(email)
+# 		user = self.model(email=email)
+# 		user.set_password(password)
+# 		user.save()
+# 		return user
 
-	def create_superuser(self, email, password=None):
-		if not email:
-			raise ValueError('A user email is needed.')
+# 	def create_superuser(self, email, password=None):
+# 		if not email:
+# 			raise ValueError('A user email is needed.')
 
-		if not password:
-			raise ValueError('A user password is needed.')
+# 		if not password:
+# 			raise ValueError('A user password is needed.')
 
-		user = self.create_user(email, password)
-		user.is_superuser = True
-		user.is_staff = True
-		user.save()
-		return user
+# 		user = self.create_user(email, password)
+# 		user.is_superuser = True
+# 		user.is_staff = True
+# 		user.save()
+# 		return user
      
-#classy z polami sie powtarzajacymi
-class User(AbstractBaseUser, PermissionsMixin):
-    user_id = models.AutoField(primary_key=True)
-    first_name = models.CharField(max_length=50)
-    surname = models.CharField(max_length=100)
-    email = models.EmailField(max_length=100, unique=True)
-    # is_staff = models.BooleanField(default=False)
-    USERNAME_FIELD = 'email'
-    REQUIRED_FIELDS = ['first_name', 'surname']
-    objects = CustomUserManager()
+# #classy z polami sie powtarzajacymi
+# class User(AbstractBaseUser, PermissionsMixin):
+#     user_id = models.AutoField(primary_key=True)
+#     first_name = models.CharField(max_length=50)
+#     surname = models.CharField(max_length=100)
+#     email = models.EmailField(max_length=100, unique=True)
+#     # is_staff = models.BooleanField(default=False)
+#     USERNAME_FIELD = 'email'
+#     REQUIRED_FIELDS = ['first_name', 'surname']
+#     objects = CustomUserManager()
 
-    # Use django.contrib.auth.models.Group
-    groups = models.ManyToManyField(Group, related_name='custom_user_set')
+#     # Use django.contrib.auth.models.Group
+#     groups = models.ManyToManyField(Group, related_name='custom_user_set')
 
-    # Add related_name arguments to resolve clashes
-    user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')
+#     # Add related_name arguments to resolve clashes
+#     user_permissions = models.ManyToManyField(Permission, related_name='custom_user_set')
+
+#     def __str__(self):
+#         return self.email
+
+
+from django.contrib.auth.models import AbstractUser
+
+class User(AbstractUser):
+    # Add any additional fields you want in your custom user model
+    # For example:
+    email = models.CharField(max_length=250, unique=True, null=False, blank=False)
+    REGISTRATION_CHOICES = [
+        ('email', 'Email'),
+        ('google', 'Google'),
+    ]
+    registration_method = models.CharField(
+        max_length=10,
+        choices=REGISTRATION_CHOICES,
+        default='email'
+    )
 
     def __str__(self):
-        return self.email
+       return self.username

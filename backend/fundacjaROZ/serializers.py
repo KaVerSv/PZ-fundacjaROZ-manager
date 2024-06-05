@@ -96,10 +96,10 @@ class NotesSerializer(ModelSerializer):
         model = Notes
         fields = ('id','child_id', 'title', 'contents')
 
-class UsersSerializer(ModelSerializer):
-    class Meta:
-        model = User
-        fields = ('user_id','first_name','surname','email')
+# class UsersSerializer(ModelSerializer):
+#     class Meta:
+#         model = User
+#         fields = ('user_id','first_name','surname','email')
 
 class DocumentsSerializer(ModelSerializer):
     class Meta:
@@ -111,29 +111,35 @@ class SchoolsSerializer(ModelSerializer):
         model = Schools
         fields = ('id', 'name', 'address','phone_number','e_mail')
 
-class UserRegistrationSerializer(serializers.ModelSerializer):
-    password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
+# class UserRegistrationSerializer(serializers.ModelSerializer):
+#     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
 
+#     class Meta:
+#         model = get_user_model()
+#         fields = ['email', 'first_name', 'surname', 'password']
+
+#     def create(self, validated_data):
+#         user_password = validated_data.get('password', None)
+#         email = validated_data.get('email')
+#         first_name = validated_data.get('first_name')
+#         surname = validated_data.get('surname')
+
+#         db_instance = self.Meta.model(
+#             email=email,
+#             first_name=first_name,
+#             surname=surname
+#         )
+#         db_instance.set_password(user_password)
+#         db_instance.save()
+#         return db_instance
+
+# class UserLoginSerializer(serializers.Serializer):
+#     email = serializers.CharField(max_length=100)
+#     password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
+#     token = serializers.CharField(max_length=255, read_only=True)
+
+class UserSerializer(serializers.ModelSerializer):
+    
     class Meta:
-        model = get_user_model()
-        fields = ['email', 'first_name', 'surname', 'password']
-
-    def create(self, validated_data):
-        user_password = validated_data.get('password', None)
-        email = validated_data.get('email')
-        first_name = validated_data.get('first_name')
-        surname = validated_data.get('surname')
-
-        db_instance = self.Meta.model(
-            email=email,
-            first_name=first_name,
-            surname=surname
-        )
-        db_instance.set_password(user_password)
-        db_instance.save()
-        return db_instance
-
-class UserLoginSerializer(serializers.Serializer):
-    email = serializers.CharField(max_length=100)
-    password = serializers.CharField(max_length=100, min_length=8, style={'input_type': 'password'})
-    token = serializers.CharField(max_length=255, read_only=True)
+        model = User
+        fields = ['first_name', 'last_name', 'email']

@@ -6,14 +6,14 @@ from .views_collection.photos_view import ChildrenPhotoAPIView
 from .views_collection.relatives_view import RelativeChildrensAPIView,RelativeChildrensDetailsAPIView,ChildrenRelativesAPIView,ChildrenRelativesDetailsAPIView
 from .views_collection.documents_view import ChildrenDetailsDocumentsAPIView,DocumentsAPIView,DocumentsDetailsAPIView, DocumentsDetailsFileAPIView, RelativesDetailsDocumentsAPIView
 from .views_collection.schools_view import ChildrenSchoolsAPIView,ChildrenSchoolsDetailsAPIView
-from .views_collection.user_view import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI
-from .views import authenticate_google, auth_callback
+# from .views_collection.user_view import UserRegistrationAPIView,UserLoginAPIView, UserViewAPI
+from .views import GoogleLoginApi#,authenticate_google, auth_callback
 
 
 urlpatterns = [
-	path('register/', UserRegistrationAPIView.as_view()),
-	path('login/', UserLoginAPIView.as_view()),
-	path('user/', UserViewAPI.as_view()),
+	# path('register/', UserRegistrationAPIView.as_view()),
+	# path('login/', UserLoginAPIView.as_view()),
+	# path('user/', UserViewAPI.as_view()),
     
 	path('children/current/', CurrentChildrenAPIView.as_view()),
     path('children/archival/', ArchivalChildrenAPIView.as_view()),
@@ -42,6 +42,9 @@ urlpatterns = [
     path('documents/<int:pk>/',  DocumentsDetailsAPIView.as_view()),
     path('documents/<int:pk>/file/',  DocumentsDetailsFileAPIView().as_view()),
     
-    path('auth/google/', authenticate_google, name='authenticate_google'),
-    path('auth/google/callback/', auth_callback, name='auth_callback'),
+    # path('auth/google/', authenticate_google, name='authenticate_google'),
+    # path('auth/google/callback/', auth_callback, name='auth_callback'),
+
+    path("api/auth/google/", GoogleLoginApi.as_view(), name="login-with-google"),
+
 ]

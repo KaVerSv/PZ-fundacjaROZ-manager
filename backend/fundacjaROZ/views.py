@@ -1,60 +1,144 @@
-import os
-import json
-from django.shortcuts import redirect
-from django.http import HttpResponse
+# import os
+# import json
+# from django.shortcuts import redirect
+# from django.http import HttpResponse
+# from django.conf import settings
+# from google_auth_oauthlib.flow import Flow
+
+# # Dodaj ten wiersz, aby zezwolić na niebezpieczne połączenia HTTP
+# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
+
+# def authenticate_google(request):
+#     SCOPES = ['https://www.googleapis.com/auth/drive']
+#     GOOGLE_ROOT = settings.GOOGLE_ROOT
+#     file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
+
+#     flow = Flow.from_client_secrets_file(
+#         file_path,
+#         scopes=SCOPES,
+#         redirect_uri='http://localhost:8000/auth/google/callback'
+#     )
+    
+#     authorization_url, state = flow.authorization_url(
+#         access_type='offline',
+#         include_granted_scopes='true'
+#     )
+    
+#     request.session['state'] = state
+#     return redirect(authorization_url)
+
+# def auth_callback(request):
+#     SCOPES = ['https://www.googleapis.com/auth/drive']
+#     GOOGLE_ROOT = settings.GOOGLE_ROOT
+#     file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
+
+#     state = request.session['state']
+
+#     flow = Flow.from_client_secrets_file(
+#         file_path,
+#         scopes=SCOPES,
+#         state=state,
+#         redirect_uri='http://localhost:8000/auth/google/callback'
+#     )
+    
+#     flow.fetch_token(authorization_response=request.build_absolute_uri())
+
+#     credentials = flow.credentials
+#     creds_data = {
+#         'token': credentials.token,
+#         'refresh_token': credentials.refresh_token,
+#         'token_uri': credentials.token_uri,
+#         'client_id': credentials.client_id,
+#         'client_secret': credentials.client_secret,
+#         'scopes': credentials.scopes
+#     }
+    
+#     file_path_store = os.path.join(GOOGLE_ROOT, 'storage.json')
+#     with open(file_path_store, 'w') as token_file:
+#         json.dump(creds_data, token_file)
+
+#     return HttpResponse("Autoryzacja zakończona pomyślnie.")
+
+
+
+from urllib.parse import urlencode
+from rest_framework import serializers
+from rest_framework.views import APIView
 from django.conf import settings
-from google_auth_oauthlib.flow import Flow
+from django.shortcuts import redirect
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
+from rest_framework.response import Response
+from .mixins import PublicApiMixin, ApiErrorsMixin
+from .utils import google_get_access_token, google_get_user_info
+from .models import User
+from .serializers import UserSerializer
 
-# Dodaj ten wiersz, aby zezwolić na niebezpieczne połączenia HTTP
-os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
-def authenticate_google(request):
-    SCOPES = ['https://www.googleapis.com/auth/drive']
-    GOOGLE_ROOT = settings.GOOGLE_ROOT
-    file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
+def generate_tokens_for_user(user):
+    """
+    Generate access and refresh tokens for the given user
+    """
+    serializer = TokenObtainPairSerializer()
+    token_data = serializer.get_token(user)
+    access_token = token_data.access_token
+    refresh_token = token_data
+    return access_token, refresh_token
 
-    flow = Flow.from_client_secrets_file(
-        file_path,
-        scopes=SCOPES,
-        redirect_uri='http://localhost:8000/auth/google/callback'
-    )
+
+class GoogleLoginApi(PublicApiMixin, ApiErrorsMixin, APIView):
+    class InputSerializer(serializers.Serializer):
+        code = serializers.CharField(required=False)
+        error = serializers.CharField(required=False)
+
+    def get(self, request, *args, **kwargs):
+        input_serializer = self.InputSerializer(data=request.GET)
+        input_serializer.is_valid(raise_exception=True)
+
+        validated_data = input_serializer.validated_data
+
+        code = validated_data.get('code')
+        error = validated_data.get('error')
+
+        login_url = f'{settings.BASE_FRONTEND_URL}/login'
     
-    authorization_url, state = flow.authorization_url(
-        access_type='offline',
-        include_granted_scopes='true'
-    )
-    
-    request.session['state'] = state
-    return redirect(authorization_url)
+        if error or not code:
+            params = urlencode({'error': error})
+            return redirect(f'{login_url}?{params}')
 
-def auth_callback(request):
-    SCOPES = ['https://www.googleapis.com/auth/drive']
-    GOOGLE_ROOT = settings.GOOGLE_ROOT
-    file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
+        redirect_uri = f'{settings.BASE_FRONTEND_URL}/google/'
+        access_token = google_get_access_token(code=code, 
+                                               redirect_uri=redirect_uri)
 
-    state = request.session['state']
+        user_data = google_get_user_info(access_token=access_token)
 
-    flow = Flow.from_client_secrets_file(
-        file_path,
-        scopes=SCOPES,
-        state=state,
-        redirect_uri='http://localhost:8000/auth/google/callback'
-    )
-    
-    flow.fetch_token(authorization_response=request.build_absolute_uri())
+        try:
+            user = User.objects.get(email=user_data['email'])
+            access_token, refresh_token = generate_tokens_for_user(user)
+            response_data = {
+                'user': UserSerializer(user).data,
+                'access_token': str(access_token),
+                'refresh_token': str(refresh_token)
+            }
+            return Response(response_data)
+        except User.DoesNotExist:
+            username = user_data['email'].split('@')[0]
+            first_name = user_data.get('given_name', '')
+            last_name = user_data.get('family_name', '')
 
-    credentials = flow.credentials
-    creds_data = {
-        'token': credentials.token,
-        'refresh_token': credentials.refresh_token,
-        'token_uri': credentials.token_uri,
-        'client_id': credentials.client_id,
-        'client_secret': credentials.client_secret,
-        'scopes': credentials.scopes
-    }
-    
-    file_path_store = os.path.join(GOOGLE_ROOT, 'storage.json')
-    with open(file_path_store, 'w') as token_file:
-        json.dump(creds_data, token_file)
-
-    return HttpResponse("Autoryzacja zakończona pomyślnie.")
+            user = User.objects.create(
+                username=username,
+                email=user_data['email'],
+                first_name=first_name,
+                last_name=last_name,
+                registration_method='google',
+                phone_no=None,
+                referral=None
+            )
+         
+            access_token, refresh_token = generate_tokens_for_user(user)
+            response_data = {
+                'user': UserSerializer(user).data,
+                'access_token': str(access_token),
+                'refresh_token': str(refresh_token)
+            }
+            return Response(response_data)
