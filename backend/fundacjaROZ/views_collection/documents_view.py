@@ -26,7 +26,6 @@ class DocumentsAPIView(APIView):
         documents = Documents.objects.all()
         serializer = DocumentsSerializer(documents, many=True)
         data = serializer.data
-        print("a chuj")
         for document_data in data:
             document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -72,7 +71,6 @@ class ChildrenDetailsDocumentsAPIView(APIView):
         child = get_object_or_404(Children, pk=pk)
         documents = Documents.objects.filter(child_id=child)
         serializer = DocumentsSerializer(documents, many=True)
-        print("tak tytaj")
         data = serializer.data
         for document_data in data:
             document_data['file_name'] = f"http://localhost:8000/documents/{document_data['id']}/file/"
@@ -167,7 +165,6 @@ class DocumentsDetailsAPIView(APIView):
         document = get_object_or_404(Documents, pk=pk)
         serializer = DocumentsSerializer(document)
         data = serializer.data
-        print('alleluja')
         data['file_name'] = f"http://localhost:8000/documents/{pk}/file/"
         return Response(data, status=status.HTTP_200_OK)
     
@@ -280,8 +277,6 @@ class DocumentsDetailsFileAPIView(APIView):
                     content_type = 'application/msword'
                 elif file_extension == 'docx':
                     content_type = 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
-
-                print("Content-Type:", content_type)
 
                 response = HttpResponse(file_content, content_type=content_type)
                 response['Content-Disposition'] = f'attachment; filename="{file_name}"'
