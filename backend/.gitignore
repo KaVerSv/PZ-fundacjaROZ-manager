@@ -3,4 +3,3 @@
 /fundacjaROZ/views_collection/credentials.json
 *.pyc
 .env
-/backend/.env

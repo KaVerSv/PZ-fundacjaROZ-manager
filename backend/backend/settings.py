@@ -16,12 +16,16 @@ from oauth2client import file, client, tools
 from googleapiclient import discovery
 from httplib2 import Http
 
-import os
+from pathlib import Path
 import environ
 
-# Inicjalizacja django-environ
+BASE_DIR = Path(__file__).resolve().parent.parent
+
 env = environ.Env()
-environ.Env.read_env()
+env_file = BASE_DIR / '.env'
+
+if env_file.exists():
+    environ.Env.read_env(str(env_file))
 
 GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
 GOOGLE_PROJECT_ID = env('GOOGLE_PROJECT_ID')
