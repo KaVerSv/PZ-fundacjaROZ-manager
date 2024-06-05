@@ -22,6 +22,7 @@ function ChildCreationForm(props: ChildCreationFormProps) {
     const navigate = useNavigate();
     useEffect(() => {
         const fetchData = async () => {
+            console.log(localStorage.getItem("token"));
             try {
                 const response = await fetch(`${BASE_API_URL}/children/${parseInt(props.childId)}`, {
                     headers: {
@@ -34,7 +35,9 @@ function ChildCreationForm(props: ChildCreationFormProps) {
                     // @ts-expect-error
                     setValue(key, jsonData[key]);
                 });
+                console.log("kurwa");
                 const url = await fetchImage(`${BASE_API_URL}/children/${parseInt(props.childId)}/photo`);
+                console.log("cipa");
                 setPreview(url);
             } catch (error) {
                 console.error('Error fetching data:', error);

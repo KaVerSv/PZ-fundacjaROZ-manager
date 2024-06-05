@@ -4,11 +4,6 @@ from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from ..models import Children
-from django.conf import settings
-
-from googleapiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
 import os
 
 from django.http import HttpResponse
@@ -19,23 +14,9 @@ from .google_connection import google_connect
 
 class ChildrenPhotoAPIView(APIView):
 
-        
-
-
-
-
     def get(self, request, pk):
         google_connection = google_connect()
         DRIVE = google_connection.get_drive()
-        # SCOPES = 'https://www.googleapis.com/auth/drive'
-        # file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-        # store = file.Storage(file_path_store)
-        # creds = store.get()
-        # if not creds or creds.invalid:
-        #     file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-        #     flow = client.flow_from_clientsecrets(file_path, SCOPES)
-        #     creds = tools.run_flow(flow, store)
-        # DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
 
         child = get_object_or_404(Children, pk=pk)
         photo = child.photo_path
@@ -64,15 +45,6 @@ class ChildrenPhotoAPIView(APIView):
         if child.photo_path:
             google_connection = google_connect()
             DRIVE = google_connection.get_drive()
-            # SCOPES = 'https://www.googleapis.com/auth/drive'
-            # file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-            # store = file.Storage(file_path_store)
-            # creds = store.get()
-            # if not creds or creds.invalid:
-            #     file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            #     flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            #     creds = tools.run_flow(flow, store)
-            # DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
 
             query = f"name='{child.photo_path}'"
             try:
@@ -97,15 +69,6 @@ class ChildrenPhotoAPIView(APIView):
         if 'photo' in request.FILES:
             google_connection = google_connect()
             DRIVE = google_connection.get_drive()
-            # SCOPES = 'https://www.googleapis.com/auth/drive'
-            # file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
-            # store = file.Storage(file_path_store)
-            # creds = store.get()
-            # if not creds or creds.invalid:
-            #     file_path = os.path.join(settings.GOOGLE_ROOT, 'credentials.json')
-            #     flow = client.flow_from_clientsecrets(file_path, SCOPES)
-            #     creds = tools.run_flow(flow, store)
-            # DRIVE = discovery.build('drive', 'v3', http=creds.authorize(Http()))
 
             if child.photo_path:
                 query = f"name='{child.photo_path}'"

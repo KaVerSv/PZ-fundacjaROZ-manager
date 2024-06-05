@@ -127,8 +127,6 @@ class CustomUserManager(BaseUserManager):
 		user.save()
 		return user
      
-
-#
 #classy z polami sie powtarzajacymi
 class User(AbstractBaseUser, PermissionsMixin):
     user_id = models.AutoField(primary_key=True)

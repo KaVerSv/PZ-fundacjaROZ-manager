@@ -1,18 +1,6 @@
-from django.apps import AppConfig
-from django.db.models.signals import post_migrate
-from .fixtures import add_example_data
-from django.apps import AppConfig
-from django.conf import settings
-from googleapiclient import discovery
-from httplib2 import Http
-from oauth2client import file, client, tools
 import os
-import subprocess
 from django.apps import AppConfig
 from django.conf import settings
-from googleapiclient import discovery
-from httplib2 import Http
-from oauth2client import file
 
 
 
@@ -28,7 +16,6 @@ class FundacjarozConfig(AppConfig):
 
     # def ready(self):
     #     post_migrate.connect(add_example_data, sender=self)
-    # your_app/apps.py
 
     def ready(self):
         self.init_google_drive()
@@ -39,12 +26,10 @@ class FundacjarozConfig(AppConfig):
         GOOGLE_ROOT = settings.GOOGLE_ROOT
         file_path_store = os.path.join(GOOGLE_ROOT, 'storage.json')
 
-        # Sprawdzenie czy plik z danymi uwierzytelniającymi istnieje
         if os.path.exists(file_path_store):
             with open(file_path_store, 'r') as token_file:
                 creds_data = json.load(token_file)
 
-            # Utworzenie obiektu Credentials
             creds = Credentials(
                 token=creds_data['token'],
                 refresh_token=creds_data.get('refresh_token'),

@@ -1,9 +1,3 @@
-# from django.conf import settings
-# from googleapiclient import discovery
-# from httplib2 import Http
-# from oauth2client import file, client, tools
-# import os
-
 import os
 import json
 from django.conf import settings

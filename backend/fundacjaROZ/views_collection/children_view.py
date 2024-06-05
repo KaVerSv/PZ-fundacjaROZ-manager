@@ -6,6 +6,8 @@ from rest_framework.viewsets import ModelViewSet
 from rest_framework import status
 from django.conf import settings
 from ..serializers import ChildrenSerializer, ShortChildrenSerializer
+from .google_connection import google_connect
+from googleapiclient.errors import HttpError
 
 class ChildrenAPIView(ModelViewSet):
     queryset = Children.objects.all()
@@ -17,9 +19,15 @@ class ChildrenAPIView(ModelViewSet):
         child = self.get_object()
 
         if child.photo_path:
-            file_path = os.path.join(settings.MEDIA_ROOT, child.photo_path)
-            if os.path.exists(file_path):
-                os.remove(file_path)
+            google_connection = google_connect()
+            DRIVE = google_connection.get_drive()
+
+            query = f"name='{child.photo_path}'"
+            response = DRIVE.files().list(q=query, fields='files(id)').execute()
+            files = response.get('files', [])
+            if files:
+                file_id = files[0]['id']
+                DRIVE.files().delete(fileId=file_id).execute()
 
         child.delete()
         return Response({'message': 'Child and associated photo deleted successfully.'}, status=status.HTTP_204_NO_CONTENT)
