@@ -16,6 +16,7 @@ RUN apk add --virtual .build-deps --no-cache postgresql-dev gcc python3-dev musl
         pip install django-allauth && \
         pip install django-sslserver && \
         pip install -U pip google-api-python-client oauth2client && \
+        pip install django-environ \
         pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib
 
 COPY . /app/backend/

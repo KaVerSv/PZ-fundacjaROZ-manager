@@ -16,19 +16,23 @@ from oauth2client import file, client, tools
 from googleapiclient import discovery
 from httplib2 import Http
 
-# def init_google_drive():
-#     SCOPES = 'https://www.googleapis.com/auth/drive'
-#     file_path_store = os.path.join("backend/", 'storage.json')
-#     store = file.Storage(file_path_store)
-#     creds = store.get()
-#     if not creds or creds.invalid:
-#         file_path = os.path.join("backend/", 'credentials.json')
-#         flow = client.flow_from_clientsecrets(file_path, SCOPES)
-#         creds = tools.run_flow(flow, store)
-#     drive_service = discovery.build('drive', 'v3', http=creds.authorize(Http()))
-#     return drive_service
+import os
+import environ
 
-# GOOGLE_DRIVE_SERVICE = init_google_drive()
+# Inicjalizacja django-environ
+env = environ.Env()
+environ.Env.read_env()
+
+GOOGLE_CLIENT_ID = env('GOOGLE_CLIENT_ID')
+GOOGLE_PROJECT_ID = env('GOOGLE_PROJECT_ID')
+GOOGLE_AUTH_URI = env('GOOGLE_AUTH_URI')
+GOOGLE_TOKEN_URI = env('GOOGLE_TOKEN_URI')
+GOOGLE_AUTH_PROVIDER_X509_CERT_URL = env('GOOGLE_AUTH_PROVIDER_X509_CERT_URL')
+GOOGLE_CLIENT_SECRET = env('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = env('GOOGLE_REDIRECT_URI')
+
+
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent

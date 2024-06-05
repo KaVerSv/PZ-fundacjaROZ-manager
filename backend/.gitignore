@@ -2,3 +2,5 @@
 /fundacjaROZ/views_collection/storage.json
 /fundacjaROZ/views_collection/credentials.json
 *.pyc
+.env
+/backend/.env

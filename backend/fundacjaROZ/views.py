@@ -20,51 +20,6 @@ from oauth2client.file import Storage
 from oauth2client.client import flow_from_clientsecrets
 from oauth2client.tools import run_flow
 import os
-
-# import os
-# from google_auth_oauthlib.flow import Flow
-# from googleapiclient.discovery import build
-# from django.shortcuts import redirect
-# from django.conf import settings
-# from django.http import HttpResponse
-# import json
-
-# os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'  # Dodaj ten wiersz
-
-# def authenticate_google(request):
-#     GOOGLE_ROOT = settings.GOOGLE_ROOT
-#     file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
-#     flow = Flow.from_client_secrets_file(
-#         file_path,
-#         scopes=['https://www.googleapis.com/auth/drive'],
-#         redirect_uri='http://localhost:8000/auth/google/callback/'
-#     )
-#     authorization_url, state = flow.authorization_url()
-#     request.session['state'] = state
-#     return redirect(authorization_url)
-
-# def auth_callback(request):
-#     state = request.session['state']
-#     GOOGLE_ROOT = settings.GOOGLE_ROOT
-#     file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
-#     flow = Flow.from_client_secrets_file(
-#         file_path,
-#         scopes=['https://www.googleapis.com/auth/drive'],
-#         state=state,
-#         redirect_uri='http://localhost:8000/auth/google/callback/'
-#     )
-#     flow.fetch_token(authorization_response=request.build_absolute_uri())
-#     credentials = flow.credentials
-#     service = build('drive', 'v3', credentials=credentials)
-#     files = service.files().list().execute().get('files', [])
-#     response = HttpResponse(json.dumps(files), content_type="application/json")
-#     return response
-
-
-
-
-
-import os
 import json
 from django.shortcuts import redirect
 from django.http import HttpResponse
@@ -73,16 +28,25 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import Flow
 from googleapiclient.discovery import build
 
-# Dodaj ten wiersz, aby zezwolić na niebezpieczne połączenia HTTP
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
 def authenticate_google(request):
     SCOPES = ['https://www.googleapis.com/auth/drive']
-    GOOGLE_ROOT = settings.GOOGLE_ROOT
-    file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
+    print(settings.GOOGLE_CLIENT_SECRET)
+    CLIENT_CONFIG = {
+        "installed": {
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "project_id": settings.GOOGLE_PROJECT_ID,
+            "auth_uri": settings.GOOGLE_AUTH_URI,
+            "token_uri": settings.GOOGLE_TOKEN_URI,
+            "auth_provider_x509_cert_url": settings.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uris": [settings.GOOGLE_REDIRECT_URI]
+        }
+    }
 
-    flow = Flow.from_client_secrets_file(
-        file_path,
+    flow = Flow.from_client_config(
+        CLIENT_CONFIG,
         scopes=SCOPES,
         redirect_uri='http://localhost:8000/auth/google/callback'
     )
@@ -97,13 +61,22 @@ def authenticate_google(request):
 
 def auth_callback(request):
     SCOPES = ['https://www.googleapis.com/auth/drive']
-    GOOGLE_ROOT = settings.GOOGLE_ROOT
-    file_path = os.path.join(GOOGLE_ROOT, 'credentials.json')
+    CLIENT_CONFIG = {
+        "installed": {
+            "client_id": settings.GOOGLE_CLIENT_ID,
+            "project_id": settings.GOOGLE_PROJECT_ID,
+            "auth_uri": settings.GOOGLE_AUTH_URI,
+            "token_uri": settings.GOOGLE_TOKEN_URI,
+            "auth_provider_x509_cert_url": settings.GOOGLE_AUTH_PROVIDER_X509_CERT_URL,
+            "client_secret": settings.GOOGLE_CLIENT_SECRET,
+            "redirect_uris": [settings.GOOGLE_REDIRECT_URI]
+        }
+    }
 
     state = request.session['state']
 
-    flow = Flow.from_client_secrets_file(
-        file_path,
+    flow = Flow.from_client_config(
+        CLIENT_CONFIG,
         scopes=SCOPES,
         state=state,
         redirect_uri='http://localhost:8000/auth/google/callback'
@@ -121,17 +94,11 @@ def auth_callback(request):
         'scopes': credentials.scopes
     }
     
-    file_path_store = os.path.join(GOOGLE_ROOT, 'storage.json')
+    file_path_store = os.path.join(settings.GOOGLE_ROOT, 'storage.json')
     with open(file_path_store, 'w') as token_file:
         json.dump(creds_data, token_file)
 
     return HttpResponse("Autoryzacja zakończona pomyślnie.")
-
-
-
-
-
-
 
 
 
