@@ -1,0 +1,4 @@
+/fundacjaROZ/migrations/
+/fundacjaROZ/views_collection/storage.json
+/fundacjaROZ/views_collection/credentials.json
+*.pyc

@@ -11,16 +11,45 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 from pathlib import Path
+import os
+from oauth2client import file, client, tools
+from googleapiclient import discovery
+from httplib2 import Http
+
+# def init_google_drive():
+#     SCOPES = 'https://www.googleapis.com/auth/drive'
+#     file_path_store = os.path.join("backend/", 'storage.json')
+#     store = file.Storage(file_path_store)
+#     creds = store.get()
+#     if not creds or creds.invalid:
+#         file_path = os.path.join("backend/", 'credentials.json')
+#         flow = client.flow_from_clientsecrets(file_path, SCOPES)
+#         creds = tools.run_flow(flow, store)
+#     drive_service = discovery.build('drive', 'v3', http=creds.authorize(Http()))
+#     return drive_service
+
+# GOOGLE_DRIVE_SERVICE = init_google_drive()
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+MEDIA_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/media/')
+
+GOOGLE_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/views_collection/')
+
+DOCUMENTS_ROOT = os.path.join(BASE_DIR, 'fundacjaROZ/documents/')
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-&ayp0mt^*z#px54zefnj#5+s_s7e4_7%!@@=m(kz$=^5c91kp!'
+SECRET_KEY = 'django-insecure-&o*y(slzh!mvh*%+z1dl3jvtdx+*xigc^lo9fsjox16ex7jo5w'
+
+
+JWT_CONFIG = {
+    'TOKEN_LIFETIME_HOURS': 24,  # Ustaw tutaj odpowiedni czas życia tokena w godzinach
+    # Inne ustawienia JWT, jeśli potrzebne
+}
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -28,10 +57,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 
+
 # Application definition
 
 INSTALLED_APPS = [
-    'fundacjaROZ.apps.FundacjarozConfig',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -40,9 +69,39 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'corsheaders',
     'rest_framework',
+    'fundacjaROZ',
+    'drf_spectacular',
+    # 'fundacjaROZ.apps.FundacjarozConfig',
 ]
 
+ROOT_URLCONF = 'backend.urls'
+
+REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
+    
+    # 'DEFAULT_PERMISSION_CLASSES': [
+    #     'rest_framework.permissions.IsAuthenticated',
+    # ],
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'fundacjaROZ.authentication.JWTAuthentication',
+    ]
+}
+
+CORS_ALLOWED_ORIGINS=['http://localhost:8080']
+
+CORS_ALLOW_CREDENTIALS: True
+
+CORS_ALLOW_HEADERS = (
+    "accept",
+    "authorization",
+    "content-type",
+    "user-agent",
+    "x-csrftoken",
+    "x-requested-with",
+)
+
 MIDDLEWARE = [
+    # 'backend.google_middleware.GoogleDriveMiddleware',
     'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
@@ -52,10 +111,6 @@ MIDDLEWARE = [
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
-
-CORS_ALLOW_ALL_ORIGINS=True
-
-ROOT_URLCONF = 'backend.urls'
 
 TEMPLATES = [
     {
@@ -90,6 +145,8 @@ DATABASES = {
     }
 }
 
+## custom user model
+AUTH_USER_MODEL = 'fundacjaROZ.User'
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
@@ -131,3 +188,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
