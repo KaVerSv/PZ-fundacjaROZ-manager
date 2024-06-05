@@ -7,9 +7,9 @@ FundacjaROZ Manager jest to aplikacja do zarządzania placówką opiekuńczo-wyc
 ## Instalacja
 
 Aby zainstalować aplikacje należy wykonać następujące kroki:
-
-git clone [<_LINK>](https://github.com/KaVerSv/PZ-fundacjaROZ-manager)
-
+```sh
+git clone https://github.com/KaVerSv/PZ-fundacjaROZ-manager.git
+ ```
 ## Uruchomienie
 
 Aby uruchomić aplikacje należy wykonać następujące kroki:
