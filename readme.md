@@ -28,6 +28,15 @@ PZ-fundacjaROZ-manager\backend\fundacjaROZ\views_collection
 ```
 a następnie po zalogowaniu w nowej zakładce przejść przez strone autoryzacji do dysku googla i po sukcesie wyłączyć zakładke i odświeżyć stronę główną
 
+## Etapy tworzenia pliku credentials
+
+Po wejściu w ten link: https://console.cloud.google.com/apis/credentials
+
+![SS8](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot8.png)
+![SS9](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot9.png)
+![SS10](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot10.png)
+![SS11](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot11.png)
+
 ## Użytkowanie
 
 Aby korzystać z aplikacji należy wejść na stronę:
