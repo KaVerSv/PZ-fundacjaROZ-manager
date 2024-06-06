@@ -31,7 +31,8 @@ a następnie po zalogowaniu w nowej zakładce przejść przez strone autoryzacji
 ## Etapy tworzenia pliku credentials
 
 Po wejściu w ten link: https://console.cloud.google.com/apis/credentials
-
+- 1.Dodanie projektu miejsce oznaczone numerem 1
+- 2.A nastepnie po kliknięciu w element oznaczony 2 zgodnie zkolejnymi zrzutami
 ![SS8](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot8.png)
 ![SS9](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot9.png)
 ![SS10](https://github.com/KaVerSv/PZ-fundacjaROZ-manager/blob/main/screenshot10.png)
